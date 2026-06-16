@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { admin } from "better-auth/plugins/admin";
 import { db } from "./db";
 import * as schema from "./auth-schema";
 
@@ -20,4 +21,10 @@ export const auth = betterAuth({
     },
   },
   trustedOrigins: [authUrl.origin, `${authUrl.protocol}//www.${authUrl.host}`],
+  plugins: [admin()],
 });
+
+export async function requireAdmin(request: Request): Promise<boolean> {
+  const session = await auth.api.getSession({ headers: request.headers });
+  return session?.user?.role === "admin";
+}

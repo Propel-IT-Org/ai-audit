@@ -1,10 +1,22 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "leaflet/dist/leaflet.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* aivible Japan Blue palette */
+  --color-kon: hsl(222 45% 17%);
+  --color-kon2: hsl(222 53% 29%);
+  --color-wave: hsl(217 63% 33%);
+  --color-gold-av: hsl(43 50% 57%);
+  --color-paper-av: hsl(43 56% 91%);
+  --color-aivy1: hsl(231 65% 65%);
+  --color-aivy2: hsl(231 51% 53%);
+  --color-japan-red: hsl(9 67% 51%);
+  --color-indigo-light: hsl(222 40% 95%);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -168,6 +180,77 @@
   h1, h2, h3 {
     font-family: var(--font-serif), Georgia, "Times New Roman", serif;
     letter-spacing: -0.02em;
+  }
+}
+
+/* aivible brand CSS vars for components using hsl(var(--...)) pattern */
+:root {
+  --kon: 222 45% 17%;
+  --kon-2: 222 53% 29%;
+  --wave: 217 63% 33%;
+  --gold-av: 43 50% 57%;
+  --paper-av: 43 56% 91%;
+  --aivy-1: 231 65% 65%;
+  --aivy-2: 231 51% 53%;
+  --japan-red: 9 67% 51%;
+  --indigo-light-hsl: 222 40% 95%;
+}
+
+/* aivible component classes */
+@layer components {
+  .av-eyebrow {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: hsl(var(--gold-av));
+  }
+
+  .score-ring {
+    position: relative;
+    width: 7rem;
+    height: 7rem;
+    border-radius: 9999px;
+    padding: 0.5rem;
+    background: conic-gradient(
+      hsl(var(--gold-av)) calc(var(--pct, 0) * 1%),
+      rgba(255, 255, 255, 0.14) 0
+    );
+    box-shadow: 0 10px 26px rgba(24, 36, 63, 0.35);
+  }
+
+  .score-ring__face {
+    width: 100%;
+    height: 100%;
+    border-radius: 9999px;
+    background: hsl(var(--kon));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
+
+  .score-ring__grade {
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .score-ring__num {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: hsl(var(--gold-av));
+    margin-top: 0.2rem;
+    letter-spacing: 0.06em;
+  }
+
+  .hero-map {
+    background-color: hsl(var(--kon));
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
   }
 }
 

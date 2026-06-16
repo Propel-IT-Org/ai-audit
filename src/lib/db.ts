@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import * as schema from "./auth-schema";
+import * as authSchema from "./auth-schema";
+import * as restaurantSchema from "./db/schema/restaurant";
 
 const globalForDb = globalThis as unknown as {
   conn: Pool | undefined;
@@ -26,6 +27,8 @@ const pool =
 if (process.env.NODE_ENV !== "production") {
   globalForDb.conn = pool;
 }
+
+const schema = { ...authSchema, ...restaurantSchema };
 
 export const db = drizzle(pool, { schema });
 export type DbClient = typeof db;

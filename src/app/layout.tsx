@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Inter_Tight, Fraunces } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Providers } from "./providers";
 
 const sans = Inter_Tight({
   subsets: ["latin"],
@@ -19,9 +20,9 @@ const mono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Audit — See your site through an AI's eyes",
+  title: "AIVIBLE — AI Visibility for Japan",
   description:
-    "Audit any website for AI / LLM compatibility (GEO). Per-page and site-wide reports with actionable, industry-specific fixes.",
+    "Plan a Japan trip with verified local gems, or make your business AI-visible. Audit, map, and discover Japan's best places.",
 };
 
 export default function RootLayout({
@@ -39,7 +40,9 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
