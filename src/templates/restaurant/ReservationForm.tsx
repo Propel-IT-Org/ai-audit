@@ -55,6 +55,8 @@ const defaultValues: ReservationValues = {
 
 const fieldInputClass =
   "rounded-none border-input bg-background pl-9 py-3 h-auto font-sans text-sm focus-visible:border-gold focus-visible:ring-gold/30";
+const plainInputClass =
+  "rounded-none border-input bg-background px-4 py-3 h-auto font-sans text-sm focus-visible:border-gold focus-visible:ring-gold/30";
 const fieldLabelClass = "font-sans text-xs uppercase tracking-[0.15em] text-muted-foreground";
 const triggerClass =
   "w-full rounded-none border-input bg-background pl-9 py-3 h-auto font-sans text-sm justify-between focus-visible:border-gold focus-visible:ring-gold/30";
@@ -67,13 +69,10 @@ export function ReservationForm({ externalBookingUrl }: Props) {
   "use no memo";
 
   const [submitted, setSubmitted] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    control,
-    reset,
-    formState: { errors },
-  } = useForm<ReservationValues>({ resolver: zodResolver(reservationSchema), defaultValues });
+  const { handleSubmit, control, reset } = useForm<ReservationValues>({
+    resolver: zodResolver(reservationSchema),
+    defaultValues,
+  });
 
   const onSubmit = () => {
     setSubmitted(true);
@@ -125,41 +124,48 @@ export function ReservationForm({ externalBookingUrl }: Props) {
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <Field>
-          <FieldLabel htmlFor="date" className={fieldLabelClass}>
-            Date <span className="text-gold">*</span>
-          </FieldLabel>
-          <div className="relative">
-            <Calendar
-              size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
-            />
-            <Input
-              id="date"
-              type="date"
-              min={new Date().toISOString().split("T")[0]}
-              className={fieldInputClass}
-              {...register("date")}
-            />
-          </div>
-          <FieldError errors={[errors.date]} />
-        </Field>
+        <Controller
+          name="date"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name} className={fieldLabelClass}>
+                Date <span className="text-gold">*</span>
+              </FieldLabel>
+              <div className="relative">
+                <Calendar
+                  size={15}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+                />
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="date"
+                  min={new Date().toISOString().split("T")[0]}
+                  className={fieldInputClass}
+                  aria-invalid={fieldState.invalid}
+                />
+              </div>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="time" className={fieldLabelClass}>
-            Time <span className="text-gold">*</span>
-          </FieldLabel>
-          <div className="relative">
-            <Clock
-              size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-muted-foreground pointer-events-none"
-            />
-            <Controller
-              name="time"
-              control={control}
-              render={({ field }) => (
+        <Controller
+          name="time"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name} className={fieldLabelClass}>
+                Time <span className="text-gold">*</span>
+              </FieldLabel>
+              <div className="relative">
+                <Clock
+                  size={15}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-muted-foreground pointer-events-none"
+                />
                 <Select value={field.value || undefined} onValueChange={field.onChange}>
-                  <SelectTrigger id="time" className={triggerClass}>
+                  <SelectTrigger id={field.name} className={triggerClass} aria-invalid={fieldState.invalid}>
                     <SelectValue placeholder="Select time" />
                   </SelectTrigger>
                   <SelectContent>
@@ -170,27 +176,27 @@ export function ReservationForm({ externalBookingUrl }: Props) {
                     ))}
                   </SelectContent>
                 </Select>
-              )}
-            />
-          </div>
-          <FieldError errors={[errors.time]} />
-        </Field>
+              </div>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="guests" className={fieldLabelClass}>
-            Number of Guests <span className="text-gold">*</span>
-          </FieldLabel>
-          <div className="relative">
-            <Users
-              size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-muted-foreground pointer-events-none"
-            />
-            <Controller
-              name="guests"
-              control={control}
-              render={({ field }) => (
+        <Controller
+          name="guests"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name} className={fieldLabelClass}>
+                Number of Guests <span className="text-gold">*</span>
+              </FieldLabel>
+              <div className="relative">
+                <Users
+                  size={15}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-muted-foreground pointer-events-none"
+                />
                 <Select value={field.value || undefined} onValueChange={field.onChange}>
-                  <SelectTrigger id="guests" className={triggerClass}>
+                  <SelectTrigger id={field.name} className={triggerClass} aria-invalid={fieldState.invalid}>
                     <SelectValue placeholder="Select guests" />
                   </SelectTrigger>
                   <SelectContent>
@@ -201,65 +207,82 @@ export function ReservationForm({ externalBookingUrl }: Props) {
                     ))}
                   </SelectContent>
                 </Select>
-              )}
-            />
-          </div>
-          <FieldError errors={[errors.guests]} />
-        </Field>
+              </div>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="phone" className={fieldLabelClass}>
-            Phone
-          </FieldLabel>
-          <Input
-            id="phone"
-            type="tel"
-            placeholder="+xx xxx xxx xxxx"
-            className="rounded-none border-input bg-background px-4 py-3 h-auto font-sans text-sm focus-visible:border-gold focus-visible:ring-gold/30"
-            {...register("phone")}
-          />
-        </Field>
+        <Controller
+          name="phone"
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor={field.name} className={fieldLabelClass}>
+                Phone
+              </FieldLabel>
+              <Input
+                {...field}
+                id={field.name}
+                type="tel"
+                placeholder="+xx xxx xxx xxxx"
+                className={plainInputClass}
+              />
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="fullName" className={fieldLabelClass}>
-            Full Name <span className="text-gold">*</span>
-          </FieldLabel>
-          <Input
-            id="fullName"
-            placeholder="e.g. Jane Smith"
-            className="rounded-none border-input bg-background px-4 py-3 h-auto font-sans text-sm focus-visible:border-gold focus-visible:ring-gold/30"
-            {...register("fullName")}
-          />
-          <FieldError errors={[errors.fullName]} />
-        </Field>
+        <Controller
+          name="fullName"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name} className={fieldLabelClass}>
+                Full Name <span className="text-gold">*</span>
+              </FieldLabel>
+              <Input
+                {...field}
+                id={field.name}
+                placeholder="e.g. Jane Smith"
+                className={plainInputClass}
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="email" className={fieldLabelClass}>
-            Email <span className="text-gold">*</span>
-          </FieldLabel>
-          <Input
-            id="email"
-            type="email"
-            placeholder="your@email.com"
-            className="rounded-none border-input bg-background px-4 py-3 h-auto font-sans text-sm focus-visible:border-gold focus-visible:ring-gold/30"
-            {...register("email")}
-          />
-          <FieldError errors={[errors.email]} />
-        </Field>
+        <Controller
+          name="email"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name} className={fieldLabelClass}>
+                Email <span className="text-gold">*</span>
+              </FieldLabel>
+              <Input
+                {...field}
+                id={field.name}
+                type="email"
+                placeholder="your@email.com"
+                className={plainInputClass}
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-        <Field className="sm:col-span-2">
-          <FieldLabel htmlFor="dietary" className={fieldLabelClass}>
-            Dietary Restrictions / Allergies
-          </FieldLabel>
-          <Controller
-            name="dietary"
-            control={control}
-            render={({ field }) => (
+        <Controller
+          name="dietary"
+          control={control}
+          render={({ field }) => (
+            <Field className="sm:col-span-2">
+              <FieldLabel htmlFor={field.name} className={fieldLabelClass}>
+                Dietary Restrictions / Allergies
+              </FieldLabel>
               <Select value={field.value || undefined} onValueChange={field.onChange}>
-                <SelectTrigger
-                  id="dietary"
-                  className="w-full rounded-none border-input bg-background px-4 py-3 h-auto font-sans text-sm justify-between focus-visible:border-gold focus-visible:ring-gold/30"
-                >
+                <SelectTrigger id={field.name} className="w-full rounded-none border-input bg-background px-4 py-3 h-auto font-sans text-sm justify-between focus-visible:border-gold focus-visible:ring-gold/30">
                   <SelectValue placeholder="None" />
                 </SelectTrigger>
                 <SelectContent>
@@ -270,22 +293,28 @@ export function ReservationForm({ externalBookingUrl }: Props) {
                   ))}
                 </SelectContent>
               </Select>
-            )}
-          />
-        </Field>
+            </Field>
+          )}
+        />
 
-        <Field className="sm:col-span-2">
-          <FieldLabel htmlFor="specialRequests" className={fieldLabelClass}>
-            Special Requests
-          </FieldLabel>
-          <Textarea
-            id="specialRequests"
-            rows={3}
-            placeholder="Celebrations, anniversaries, accessibility needs, high chair..."
-            className="rounded-none border-input bg-background px-4 py-3 font-sans text-sm resize-none focus-visible:border-gold focus-visible:ring-gold/30"
-            {...register("specialRequests")}
-          />
-        </Field>
+        <Controller
+          name="specialRequests"
+          control={control}
+          render={({ field }) => (
+            <Field className="sm:col-span-2">
+              <FieldLabel htmlFor={field.name} className={fieldLabelClass}>
+                Special Requests
+              </FieldLabel>
+              <Textarea
+                {...field}
+                id={field.name}
+                rows={3}
+                placeholder="Celebrations, anniversaries, accessibility needs, high chair..."
+                className="rounded-none border-input bg-background px-4 py-3 font-sans text-sm resize-none focus-visible:border-gold focus-visible:ring-gold/30"
+              />
+            </Field>
+          )}
+        />
       </div>
 
       <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">

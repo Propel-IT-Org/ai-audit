@@ -76,13 +76,12 @@ export function AdminForm() {
 
   const fileRef = useRef<HTMLInputElement>(null);
   const {
-    register,
     handleSubmit,
     control,
     setValue,
     getValues,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<FormValues>({ resolver: zodResolver(formSchema), defaultValues });
 
   const mdxBody = useWatch({ control, name: "mdxBody" });
@@ -127,63 +126,110 @@ export function AdminForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <FieldGroup>
-        <Field>
-          <FieldLabel htmlFor="nameEn">
-            Name (English) <span className="text-destructive">*</span>
-          </FieldLabel>
-          <Input id="nameEn" {...register("nameEn", { onBlur: handleNameEnBlur })} />
-          <FieldError errors={[errors.nameEn]} />
-        </Field>
+        <Controller
+          name="nameEn"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>
+                Name (English) <span className="text-destructive">*</span>
+              </FieldLabel>
+              <Input
+                {...field}
+                id={field.name}
+                aria-invalid={fieldState.invalid}
+                onBlur={() => { field.onBlur(); handleNameEnBlur(); }}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="nameJp">Name (Japanese)</FieldLabel>
-          <Input id="nameJp" {...register("nameJp")} />
-        </Field>
+        <Controller
+          name="nameJp"
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor={field.name}>Name (Japanese)</FieldLabel>
+              <Input {...field} id={field.name} />
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="slug">
-            Slug <span className="text-destructive">*</span>
-          </FieldLabel>
-          <Input id="slug" placeholder="auto-filled" {...register("slug")} />
-          <FieldError errors={[errors.slug]} />
-        </Field>
+        <Controller
+          name="slug"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>
+                Slug <span className="text-destructive">*</span>
+              </FieldLabel>
+              <Input {...field} id={field.name} placeholder="auto-filled" aria-invalid={fieldState.invalid} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="address">Address</FieldLabel>
-          <Input id="address" {...register("address")} />
-        </Field>
+        <Controller
+          name="address"
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor={field.name}>Address</FieldLabel>
+              <Input {...field} id={field.name} />
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="aiOverview">AI Overview</FieldLabel>
-          <Textarea
-            id="aiOverview"
-            rows={3}
-            placeholder="Short AI-generated overview shown on the map pin popup…"
-            {...register("aiOverview")}
+        <Controller
+          name="aiOverview"
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor={field.name}>AI Overview</FieldLabel>
+              <Textarea
+                {...field}
+                id={field.name}
+                rows={3}
+                placeholder="Short AI-generated overview shown on the map pin popup…"
+              />
+              <FieldDescription>Shown in the pin preview popup.</FieldDescription>
+            </Field>
+          )}
+        />
+
+        <Field orientation="responsive">
+          <Controller
+            name="lat"
+            control={control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel htmlFor={field.name}>Latitude</FieldLabel>
+                <Input {...field} id={field.name} type="number" step="any" placeholder="e.g. 35.6762" />
+              </Field>
+            )}
           />
-          <FieldDescription>Shown in the pin preview popup.</FieldDescription>
+          <Controller
+            name="lng"
+            control={control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel htmlFor={field.name}>Longitude</FieldLabel>
+                <Input {...field} id={field.name} type="number" step="any" placeholder="e.g. 139.6503" />
+              </Field>
+            )}
+          />
         </Field>
 
         <Field orientation="responsive">
-          <Field>
-            <FieldLabel htmlFor="lat">Latitude</FieldLabel>
-            <Input id="lat" type="number" step="any" placeholder="e.g. 35.6762" {...register("lat")} />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="lng">Longitude</FieldLabel>
-            <Input id="lng" type="number" step="any" placeholder="e.g. 139.6503" {...register("lng")} />
-          </Field>
-        </Field>
-
-        <Field orientation="responsive">
-          <Field>
-            <FieldLabel htmlFor="category">Category</FieldLabel>
-            <Controller
-              name="category"
-              control={control}
-              render={({ field }) => (
+          <Controller
+            name="category"
+            control={control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel htmlFor={field.name}>Category</FieldLabel>
                 <Select value={field.value || undefined} onValueChange={field.onChange}>
-                  <SelectTrigger id="category" className="w-full">
+                  <SelectTrigger id={field.name} className="w-full">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -194,43 +240,61 @@ export function AdminForm() {
                     ))}
                   </SelectContent>
                 </Select>
-              )}
-            />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="prefecture">Prefecture</FieldLabel>
-            <Input id="prefecture" placeholder="e.g. Tokyo" {...register("prefecture")} />
-          </Field>
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="imageUrl">Image URL</FieldLabel>
-          <Input id="imageUrl" type="url" placeholder="https://…" {...register("imageUrl")} />
-          <FieldError errors={[errors.imageUrl]} />
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="websiteUrl">Website URL</FieldLabel>
-          <Input id="websiteUrl" type="url" placeholder="https://…" {...register("websiteUrl")} />
-          <FieldError errors={[errors.websiteUrl]} />
-        </Field>
-
-        <Field orientation="horizontal">
+              </Field>
+            )}
+          />
           <Controller
-            name="hiddenGem"
+            name="prefecture"
             control={control}
             render={({ field }) => (
+              <Field>
+                <FieldLabel htmlFor={field.name}>Prefecture</FieldLabel>
+                <Input {...field} id={field.name} placeholder="e.g. Tokyo" />
+              </Field>
+            )}
+          />
+        </Field>
+
+        <Controller
+          name="imageUrl"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Image URL</FieldLabel>
+              <Input {...field} id={field.name} type="url" placeholder="https://…" aria-invalid={fieldState.invalid} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="websiteUrl"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Website URL</FieldLabel>
+              <Input {...field} id={field.name} type="url" placeholder="https://…" aria-invalid={fieldState.invalid} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="hiddenGem"
+          control={control}
+          render={({ field }) => (
+            <Field orientation="horizontal">
               <Checkbox
-                id="hiddenGem"
+                id={field.name}
                 checked={field.value}
                 onCheckedChange={(checked) => field.onChange(checked === true)}
               />
-            )}
-          />
-          <FieldLabel htmlFor="hiddenGem" className="font-normal">
-            Hidden gem (verified)
-          </FieldLabel>
-        </Field>
+              <FieldLabel htmlFor={field.name} className="font-normal">
+                Hidden gem (verified)
+              </FieldLabel>
+            </Field>
+          )}
+        />
 
         <FieldSeparator />
 
@@ -250,10 +314,16 @@ export function AdminForm() {
         </Field>
 
         {mdxBody && (
-          <Field>
-            <FieldLabel htmlFor="mdxBody">MDX Preview / Edit</FieldLabel>
-            <Textarea id="mdxBody" rows={8} className="font-mono text-xs" {...register("mdxBody")} />
-          </Field>
+          <Controller
+            name="mdxBody"
+            control={control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel htmlFor={field.name}>MDX Preview / Edit</FieldLabel>
+                <Textarea {...field} id={field.name} rows={8} className="font-mono text-xs" />
+              </Field>
+            )}
+          />
         )}
 
         <FieldContent>
