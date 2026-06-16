@@ -1,52 +1,81 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, ChevronDown, Clock, Users } from "lucide-react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Calendar, Clock, Users } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 
 const TIMES = [
-  "11:30",
-  "12:00",
-  "12:30",
-  "13:00",
-  "13:30",
-  "17:30",
-  "18:00",
-  "18:30",
-  "19:00",
-  "19:30",
-  "20:00",
-  "20:30",
-  "21:00",
+  "11:30", "12:00", "12:30", "13:00", "13:30",
+  "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00",
 ];
 
 const GUEST_COUNTS = [
-  "1 Guest",
-  "2 Guests",
-  "3 Guests",
-  "4 Guests",
-  "5 Guests",
-  "6 Guests",
-  "7+ (Group)",
+  "1 Guest", "2 Guests", "3 Guests", "4 Guests", "5 Guests", "6 Guests", "7+ (Group)",
 ];
 
 const DIETARY_OPTIONS = [
-  "Vegetarian",
-  "Vegan",
-  "Halal-friendly",
-  "Gluten-free",
-  "Shellfish allergy",
-  "Nut allergy",
+  "Vegetarian", "Vegan", "Halal-friendly", "Gluten-free", "Shellfish allergy", "Nut allergy",
 ];
+
+const reservationSchema = z.object({
+  date: z.string().min(1, "Date is required"),
+  time: z.string().min(1, "Time is required"),
+  guests: z.string().min(1, "Number of guests is required"),
+  phone: z.string().optional(),
+  fullName: z.string().min(1, "Full name is required"),
+  email: z.string().min(1, "Email is required").email("Enter a valid email"),
+  dietary: z.string().optional(),
+  specialRequests: z.string().optional(),
+});
+
+type ReservationValues = z.infer<typeof reservationSchema>;
+
+const defaultValues: ReservationValues = {
+  date: "",
+  time: "",
+  guests: "",
+  phone: "",
+  fullName: "",
+  email: "",
+  dietary: "",
+  specialRequests: "",
+};
+
+const fieldInputClass =
+  "rounded-none border-input bg-background pl-9 py-3 h-auto font-sans text-sm focus-visible:border-gold focus-visible:ring-gold/30";
+const fieldLabelClass = "font-sans text-xs uppercase tracking-[0.15em] text-muted-foreground";
+const triggerClass =
+  "w-full rounded-none border-input bg-background pl-9 py-3 h-auto font-sans text-sm justify-between focus-visible:border-gold focus-visible:ring-gold/30";
 
 interface Props {
   externalBookingUrl?: string;
 }
 
 export function ReservationForm({ externalBookingUrl }: Props) {
-  const [submitted, setSubmitted] = useState(false);
+  "use no memo";
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [submitted, setSubmitted] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<ReservationValues>({ resolver: zodResolver(reservationSchema), defaultValues });
+
+  const onSubmit = () => {
     setSubmitted(true);
   };
 
@@ -74,7 +103,7 @@ export function ReservationForm({ externalBookingUrl }: Props) {
           </a>
         )}
         <button
-          onClick={() => setSubmitted(false)}
+          onClick={() => { setSubmitted(false); reset(defaultValues); }}
           className="font-sans text-xs tracking-[0.15em] uppercase px-6 py-3 border border-border text-foreground hover:bg-secondary transition-colors"
         >
           Make Another Reservation
@@ -85,7 +114,7 @@ export function ReservationForm({ externalBookingUrl }: Props) {
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       className="bg-card border border-border p-8 md:p-10"
     >
       <p className="font-sans text-[10px] uppercase tracking-[0.3em] text-gold mb-2">
@@ -96,148 +125,167 @@ export function ReservationForm({ externalBookingUrl }: Props) {
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div className="flex flex-col gap-1.5">
-          <label className="font-sans text-xs uppercase tracking-[0.15em] text-muted-foreground">
+        <Field>
+          <FieldLabel htmlFor="date" className={fieldLabelClass}>
             Date <span className="text-gold">*</span>
-          </label>
+          </FieldLabel>
           <div className="relative">
             <Calendar
               size={15}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
             />
-            <input
+            <Input
+              id="date"
               type="date"
-              required
               min={new Date().toISOString().split("T")[0]}
-              className="w-full pl-9 pr-4 py-3 bg-background border border-input font-sans text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-gold"
+              className={fieldInputClass}
+              {...register("date")}
             />
           </div>
-        </div>
+          <FieldError errors={[errors.date]} />
+        </Field>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="font-sans text-xs uppercase tracking-[0.15em] text-muted-foreground">
+        <Field>
+          <FieldLabel htmlFor="time" className={fieldLabelClass}>
             Time <span className="text-gold">*</span>
-          </label>
+          </FieldLabel>
           <div className="relative">
             <Clock
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-muted-foreground pointer-events-none"
             />
-            <select
-              required
-              defaultValue=""
-              className="w-full pl-9 pr-8 py-3 bg-background border border-input font-sans text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-gold appearance-none cursor-pointer"
-            >
-              <option value="">Select time</option>
-              {TIMES.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              size={14}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+            <Controller
+              name="time"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value || undefined} onValueChange={field.onChange}>
+                  <SelectTrigger id="time" className={triggerClass}>
+                    <SelectValue placeholder="Select time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIMES.map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             />
           </div>
-        </div>
+          <FieldError errors={[errors.time]} />
+        </Field>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="font-sans text-xs uppercase tracking-[0.15em] text-muted-foreground">
+        <Field>
+          <FieldLabel htmlFor="guests" className={fieldLabelClass}>
             Number of Guests <span className="text-gold">*</span>
-          </label>
+          </FieldLabel>
           <div className="relative">
             <Users
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-muted-foreground pointer-events-none"
             />
-            <select
-              required
-              defaultValue=""
-              className="w-full pl-9 pr-8 py-3 bg-background border border-input font-sans text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-gold appearance-none cursor-pointer"
-            >
-              <option value="">Select guests</option>
-              {GUEST_COUNTS.map((g) => (
-                <option key={g} value={g}>
-                  {g}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              size={14}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+            <Controller
+              name="guests"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value || undefined} onValueChange={field.onChange}>
+                  <SelectTrigger id="guests" className={triggerClass}>
+                    <SelectValue placeholder="Select guests" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {GUEST_COUNTS.map((g) => (
+                      <SelectItem key={g} value={g}>
+                        {g}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             />
           </div>
-        </div>
+          <FieldError errors={[errors.guests]} />
+        </Field>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="font-sans text-xs uppercase tracking-[0.15em] text-muted-foreground">
+        <Field>
+          <FieldLabel htmlFor="phone" className={fieldLabelClass}>
             Phone
-          </label>
-          <input
+          </FieldLabel>
+          <Input
+            id="phone"
             type="tel"
             placeholder="+xx xxx xxx xxxx"
-            className="w-full px-4 py-3 bg-background border border-input font-sans text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-gold"
+            className="rounded-none border-input bg-background px-4 py-3 h-auto font-sans text-sm focus-visible:border-gold focus-visible:ring-gold/30"
+            {...register("phone")}
           />
-        </div>
+        </Field>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="font-sans text-xs uppercase tracking-[0.15em] text-muted-foreground">
+        <Field>
+          <FieldLabel htmlFor="fullName" className={fieldLabelClass}>
             Full Name <span className="text-gold">*</span>
-          </label>
-          <input
-            type="text"
-            required
+          </FieldLabel>
+          <Input
+            id="fullName"
             placeholder="e.g. Jane Smith"
-            className="w-full px-4 py-3 bg-background border border-input font-sans text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-gold"
+            className="rounded-none border-input bg-background px-4 py-3 h-auto font-sans text-sm focus-visible:border-gold focus-visible:ring-gold/30"
+            {...register("fullName")}
           />
-        </div>
+          <FieldError errors={[errors.fullName]} />
+        </Field>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="font-sans text-xs uppercase tracking-[0.15em] text-muted-foreground">
+        <Field>
+          <FieldLabel htmlFor="email" className={fieldLabelClass}>
             Email <span className="text-gold">*</span>
-          </label>
-          <input
+          </FieldLabel>
+          <Input
+            id="email"
             type="email"
-            required
             placeholder="your@email.com"
-            className="w-full px-4 py-3 bg-background border border-input font-sans text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-gold"
+            className="rounded-none border-input bg-background px-4 py-3 h-auto font-sans text-sm focus-visible:border-gold focus-visible:ring-gold/30"
+            {...register("email")}
           />
-        </div>
+          <FieldError errors={[errors.email]} />
+        </Field>
 
-        <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <label className="font-sans text-xs uppercase tracking-[0.15em] text-muted-foreground">
+        <Field className="sm:col-span-2">
+          <FieldLabel htmlFor="dietary" className={fieldLabelClass}>
             Dietary Restrictions / Allergies
-          </label>
-          <div className="relative">
-            <select
-              defaultValue=""
-              className="w-full px-4 pr-8 py-3 bg-background border border-input font-sans text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-gold appearance-none cursor-pointer"
-            >
-              <option value="">None</option>
-              {DIETARY_OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              size={14}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
-            />
-          </div>
-        </div>
+          </FieldLabel>
+          <Controller
+            name="dietary"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value || undefined} onValueChange={field.onChange}>
+                <SelectTrigger
+                  id="dietary"
+                  className="w-full rounded-none border-input bg-background px-4 py-3 h-auto font-sans text-sm justify-between focus-visible:border-gold focus-visible:ring-gold/30"
+                >
+                  <SelectValue placeholder="None" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DIETARY_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </Field>
 
-        <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <label className="font-sans text-xs uppercase tracking-[0.15em] text-muted-foreground">
+        <Field className="sm:col-span-2">
+          <FieldLabel htmlFor="specialRequests" className={fieldLabelClass}>
             Special Requests
-          </label>
-          <textarea
+          </FieldLabel>
+          <Textarea
+            id="specialRequests"
             rows={3}
             placeholder="Celebrations, anniversaries, accessibility needs, high chair..."
-            className="w-full px-4 py-3 bg-background border border-input font-sans text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-gold resize-none"
+            className="rounded-none border-input bg-background px-4 py-3 font-sans text-sm resize-none focus-visible:border-gold focus-visible:ring-gold/30"
+            {...register("specialRequests")}
           />
-        </div>
+        </Field>
       </div>
 
       <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
