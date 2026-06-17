@@ -263,7 +263,18 @@ function AuditResultsView({
             <p className="mb-6 text-muted-foreground">
               We&apos;ll create an English storefront Google, Gemini, and Perplexity can find.
             </p>
-            <Link href={`/generate?url=${encodeURIComponent(report.rootUrl)}`}>
+            <Link
+              href={`/generate?url=${encodeURIComponent(report.rootUrl)}`}
+              onClick={() => {
+                // Forward the full audit report so publish enrichment can use it.
+                try {
+                  const u = /^https?:\/\//i.test(report.rootUrl) ? report.rootUrl : `https://${report.rootUrl}`;
+                  sessionStorage.setItem(`aivible:audit:${u.replace(/\/$/, "")}`, JSON.stringify(report));
+                } catch {
+                  /* sessionStorage unavailable — enrichment falls back to no-audit */
+                }
+              }}
+            >
               <Button size="lg" className="h-12 px-8 text-base font-bold shadow-lg transition-all hover:scale-[1.02]">
                 Build storefront →
                 <ArrowRight className="ml-2 h-5 w-5" />
