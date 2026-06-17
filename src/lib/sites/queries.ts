@@ -1,5 +1,3 @@
-"use server";
-
 import { listPublishedSites, readPublishedSite } from "./storage";
 
 export interface StorefrontSummaryItem {
@@ -11,7 +9,7 @@ export interface StorefrontSummaryItem {
   uploadedAt: string;
 }
 
-export async function listStorefrontsAction(limit = 50): Promise<StorefrontSummaryItem[]> {
+export async function listStorefrontSummaries(limit = 50): Promise<StorefrontSummaryItem[]> {
   const list = await listPublishedSites();
   const items = await Promise.all(
     list.slice(0, limit).map(async ({ subdomain, uploadedAt }) => {

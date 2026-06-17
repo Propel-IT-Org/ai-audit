@@ -1,9 +1,6 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { listStorefrontsAction, type StorefrontSummaryItem } from "@/lib/sites/actions";
+import type { StorefrontSummaryItem } from "@/lib/sites/queries";
 
 function getDomain(url: string): string {
   try {
@@ -17,13 +14,7 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-export function RecentShowcase() {
-  const [storefronts, setStorefronts] = useState<StorefrontSummaryItem[]>([]);
-
-  useEffect(() => {
-    listStorefrontsAction(3).then(setStorefronts).catch(() => {});
-  }, []);
-
+export function RecentShowcase({ storefronts }: { storefronts: StorefrontSummaryItem[] }) {
   if (storefronts.length === 0) return null;
 
   return (

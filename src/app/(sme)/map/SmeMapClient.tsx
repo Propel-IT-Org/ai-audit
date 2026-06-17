@@ -1,27 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { MapPin } from "lucide-react";
-import { getRestaurantsForMapAction } from "@/lib/restaurants/actions";
 import type { Restaurant } from "@/lib/db/schema/restaurant";
 
 const MapView = dynamic(() => import("./SmeMapView"), { ssr: false });
 
-export function SmeMapClient() {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [loading, setLoading] = useState(true);
+export function SmeMapClient({ restaurants }: { restaurants: Restaurant[] }) {
   const [selectedPrefecture, setSelectedPrefecture] = useState("");
-
-  useEffect(() => {
-    getRestaurantsForMapAction()
-      .then((data) => {
-        setRestaurants(data.filter((r) => r.lat != null && r.lng != null));
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
 
   const prefectures = useMemo(() => {
     const set = new Set<string>();
@@ -42,11 +30,7 @@ export function SmeMapClient() {
           <p className="mt-2 text-muted-foreground">Explore AI-visible restaurants and businesses across Japan</p>
         </div>
 
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          </div>
-        ) : restaurants.length === 0 ? (
+        {restaurants.length === 0 ? (
           <div className="py-16 text-center">
             <MapPin className="mx-auto h-12 w-12 text-muted-foreground/50" />
             <p className="mt-4 text-muted-foreground">No businesses on the map yet.</p>

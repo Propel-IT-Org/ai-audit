@@ -1,24 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { MapPin, List as ListIcon, Map as MapIcon } from "lucide-react";
 import { CategoryIcon } from "@/components/icons";
-import { listRestaurantsAction, getRestaurantsForMapAction } from "@/lib/restaurants/actions";
 import type { Restaurant } from "@/lib/db/schema/restaurant";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
-
-const LOAD_TIMEOUT = 12000;
-
-function Spinner() {
-  return (
-    <div className="flex justify-center py-16">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-    </div>
-  );
-}
 
 function GemBadge() {
   return (
@@ -34,8 +23,13 @@ function GemBadge() {
 
 function RestaurantCard({ r }: { r: Restaurant }) {
   return (
-    <Link href={`/stop/${r.slug}`} aria-label={r.nameEn} className="block h-full">
-      <div className="flex h-full flex-col rounded-lg border border-border bg-white p-4 transition-shadow hover:shadow-md">
+    <div className="relative flex h-full flex-col rounded-lg border border-border bg-white p-4 transition-shadow hover:shadow-md">
+      <Link
+        href={`/stop/${r.slug}`}
+        aria-label={r.nameEn}
+        className="absolute inset-0 z-0 rounded-lg"
+      />
+      <div className="pointer-events-none relative z-10 flex h-full flex-col">
         <div className="mb-2 flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
             {r.imageUrl ? (
@@ -82,14 +76,13 @@ function RestaurantCard({ r }: { r: Restaurant }) {
         {r.mdxBody && (
           <Link
             href={`/restaurants/${r.slug}`}
-            className="mt-3 inline-block text-xs font-medium text-[#223A70] hover:underline"
-            onClick={(e) => e.stopPropagation()}
+            className="pointer-events-auto relative z-20 mt-3 inline-block self-start text-xs font-medium text-[#223A70] hover:underline"
           >
             View restaurant page →
           </Link>
         )}
       </div>
-    </Link>
+    </div>
   );
 }
 
@@ -145,57 +138,17 @@ function uniqueVals(items: Restaurant[], pick: (r: Restaurant) => string | null 
   return Array.from(set).sort();
 }
 
-export function ExploreClient() {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState(false);
+interface Props {
+  restaurants: Restaurant[];
+  mapRestaurants: Restaurant[];
+}
+
+export function ExploreClient({ restaurants, mapRestaurants }: Props) {
   const [category, setCategory] = useState<string | null>(null);
   const [prefecture, setPrefecture] = useState("");
   const [region, setRegion] = useState("");
   const [hiddenOnly, setHiddenOnly] = useState(false);
   const [view, setView] = useState<"list" | "map">("list");
-  const [mapRestaurants, setMapRestaurants] = useState<Restaurant[]>([]);
-  const [mapLoaded, setMapLoaded] = useState(false);
-
-  const load = useCallback(() => {
-    setLoading(true);
-    setLoadError(false);
-    let settled = false;
-    const timer = setTimeout(() => {
-      if (settled) return;
-      settled = true;
-      setLoadError(true);
-      setLoading(false);
-    }, LOAD_TIMEOUT);
-    listRestaurantsAction()
-      .then((data) => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        setRestaurants(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        setLoadError(true);
-        setLoading(false);
-      });
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
-
-  useEffect(() => {
-    if (view === "map" && !mapLoaded) {
-      getRestaurantsForMapAction()
-        .then((data) => {
-          setMapRestaurants(data.filter((r) => r.lat != null && r.lng != null));
-          setMapLoaded(true);
-        })
-        .catch(() => setMapLoaded(true));
-    }
-  }, [view, mapLoaded]);
 
   const categories = useMemo(() => uniqueVals(restaurants, (r) => r.category), [restaurants]);
   const prefectures = useMemo(() => uniqueVals(restaurants, (r) => r.prefecture), [restaurants]);
@@ -281,23 +234,9 @@ export function ExploreClient() {
         </div>
       </div>
 
-      {loading ? (
-        <Spinner />
-      ) : loadError ? (
-        <div className="py-16 text-center">
-          <MapPin className="mx-auto h-12 w-12 text-muted-foreground/50" />
-          <p className="mt-4 text-muted-foreground">Failed to load places. Check your connection.</p>
-          <button
-            type="button"
-            onClick={load}
-            className="mt-4 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-          >
-            Try again
-          </button>
-        </div>
-      ) : view === "map" ? (
+      {view === "map" ? (
         <div className="overflow-hidden rounded-lg border border-border" style={{ height: "60vh" }}>
-          {!mapLoaded ? <Spinner /> : <MapView restaurants={mapRestaurants} language="en" />}
+          <MapView restaurants={mapRestaurants} language="en" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="py-16 text-center">

@@ -24,6 +24,7 @@ import { ChatGptDemo } from "@/components/ChatGptDemo";
 import { StatsSection } from "@/components/StatsSection";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
 import { RecentShowcase } from "@/components/RecentShowcase";
+import type { StorefrontSummaryItem } from "@/lib/sites/queries";
 
 type ViewState = "landing" | "loading" | "results" | "error";
 
@@ -351,7 +352,7 @@ function AuditResultsView({
 
 /* ------------------------------------------------------------------ */
 
-export function BusinessClient() {
+export function BusinessClient({ storefronts }: { storefronts: StorefrontSummaryItem[] }) {
   const [url, setUrl] = useState("");
   const [urlError, setUrlError] = useState<string | null>(null);
   const [viewState, setViewState] = useState<ViewState>("landing");
@@ -542,7 +543,7 @@ export function BusinessClient() {
 
       <StatsSection />
       <HowItWorksSection />
-      <RecentShowcase />
+      <RecentShowcase storefronts={storefronts} />
 
       <footer className="border-t border-border py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">

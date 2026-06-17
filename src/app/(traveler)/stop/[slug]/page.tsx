@@ -1,17 +1,9 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import Link from "next/link";
-import { MapPin, ArrowLeft, ExternalLink, Globe } from "lucide-react";
+import { notFound } from "next/navigation";
+import { MapPin, ExternalLink, Globe } from "lucide-react";
 import { CategoryIcon } from "@/components/icons";
-import { getRestaurantAction } from "@/lib/restaurants/actions";
-import type { Restaurant } from "@/lib/db/schema/restaurant";
-
-type State =
-  | { status: "loading" }
-  | { status: "loaded"; restaurant: Restaurant }
-  | { status: "not_found" };
+import { getRestaurant } from "@/lib/restaurants/queries";
+import { BackButton } from "./BackButton";
 
 function GemBadge() {
   return (
@@ -25,65 +17,14 @@ function GemBadge() {
   );
 }
 
-export default function StopPage() {
-  const params = useParams<{ slug: string }>();
-  const slug = params?.slug;
-  const [state, setState] = useState<State>({ status: "loading" });
-
-  useEffect(() => {
-    if (!slug) {
-      setState({ status: "not_found" });
-      return;
-    }
-    let active = true;
-    setState({ status: "loading" });
-    getRestaurantAction(slug)
-      .then((data) => {
-        if (!active) return;
-        if (!data) setState({ status: "not_found" });
-        else setState({ status: "loaded", restaurant: data });
-      })
-      .catch(() => {
-        if (active) setState({ status: "not_found" });
-      });
-    return () => { active = false; };
-  }, [slug]);
-
-  if (state.status === "loading") {
-    return (
-      <div className="flex justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
-  }
-
-  if (state.status === "not_found") {
-    return (
-      <section className="container mx-auto max-w-2xl px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold text-foreground">Place not found</h1>
-        <p className="mt-2 text-muted-foreground">This place could not be found.</p>
-        <Link
-          href="/explore"
-          className="mt-4 inline-block rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          Explore
-        </Link>
-      </section>
-    );
-  }
-
-  const r = state.restaurant;
+export default async function StopPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const r = await getRestaurant(slug);
+  if (!r) notFound();
 
   return (
     <section className="container mx-auto max-w-3xl px-4 py-6">
-      <button
-        type="button"
-        onClick={() => window.history.back()}
-        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back
-      </button>
+      <BackButton />
 
       <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
         <div className="flex items-start gap-4">
