@@ -1,10 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { MapPin, Globe, ArrowLeft } from "lucide-react";
-import { MDXRemote } from "next-mdx-remote/rsc";
 import { getRestaurant } from "@/lib/restaurants/queries";
 import { readRestaurantMdx } from "@/lib/restaurants/mdx-storage";
-import { mdxComponents } from "@/components/mdx-components";
+import { SafeMdx } from "@/components/SafeMdx";
 
 export async function generateMetadata({
   params,
@@ -112,7 +111,7 @@ export default async function RestaurantPage({
         {/* MDX Content */}
         {mdxSource ? (
           <article className="prose-custom">
-            <MDXRemote source={mdxSource} components={mdxComponents} />
+            <SafeMdx source={mdxSource} />
           </article>
         ) : (
           <div className="rounded-lg border border-border bg-muted/30 p-8 text-center text-muted-foreground">

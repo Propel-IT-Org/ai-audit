@@ -1,4 +1,12 @@
-import { pgTable, text, doublePrecision, boolean, integer, timestamp, index } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  doublePrecision,
+  boolean,
+  integer,
+  timestamp,
+  index,
+} from "drizzle-orm/pg-core";
 
 export const restaurant = pgTable(
   "restaurant",
