@@ -15,6 +15,13 @@
       "when": 1781624850135,
       "tag": "0001_huge_cargill",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781671441550,
+      "tag": "0002_eager_mongu",
+      "breakpoints": true
     }
   ]
 }

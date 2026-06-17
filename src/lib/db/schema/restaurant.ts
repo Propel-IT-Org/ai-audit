@@ -26,6 +26,7 @@ export const restaurant = pgTable(
     auditScore: integer("audit_score"),
     auditGrade: text("audit_grade"),
     mdxBody: text("mdx_body"),
+    mdxUrl: text("mdx_url"),
     publishedSubdomain: text("published_subdomain"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")

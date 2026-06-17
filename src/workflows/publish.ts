@@ -1,4 +1,4 @@
-import { getWritable, createHook } from "workflow";
+import { getWritable } from "workflow";
 import {
   buildInitialStatus,
   patchRunStatus,
@@ -6,9 +6,9 @@ import {
 } from "@/lib/workflow/status-store";
 import { buildPublishedSite, type PublishInput } from "@/lib/sites/publish";
 import { writePublishedSite } from "@/lib/sites/storage";
-import { applyEnrichment, enrichWithAudit, generateQuestionsForMissingFields, type CustomQuestion } from "@/lib/sites/ai-enrich";
+import { applyEnrichment, enrichWithAudit } from "@/lib/sites/ai-enrich";
 import { translateSiteToEnglish } from "@/lib/sites/translator";
-import type { PublishedSite, RestaurantData } from "@/lib/sites/types";
+import type { PublishedSite } from "@/lib/sites/types";
 import type { AuditReport } from "@/lib/types";
 
 export interface PublishWorkflowInput extends PublishInput {
@@ -42,20 +42,11 @@ export async function publishSiteWorkflow(
   try {
     const scraped = await scrapeStep(runId, input);
 
-    // Ask the user for missing fields. `createHook()` must run in the workflow
-    // body (not a step), so question generation, the suspend, and the merge are
-    // three separate steps bridged by the hook await here.
-    const questions = await customizationQuestionsStep(runId, scraped);
-    let customized = scraped;
-    if (questions.length > 0) {
-      using hook = createHook<Record<string, string>>({
-        token: `customize:${runId}`,
-      });
-      const answers = await hook;
-      customized = await applyCustomizationStep(runId, scraped, answers);
-    }
-
-    const translated = await translateStep(runId, customized);
+    // NOTE: the interactive "customization questions" suspend was removed — the
+    // current generate UI streams straight through and cannot answer a hook, so
+    // suspending here left the run waiting forever and the storefront was never
+    // persisted (404 on the published page). Run end-to-end instead.
+    const translated = await translateStep(runId, scraped);
     const enriched = await enrichStep(runId, translated, input.audit);
     const result = await persistStep(runId, enriched);
     await closeStreamStep();
@@ -131,88 +122,6 @@ async function scrapeStep(
     meta,
   });
   return site;
-}
-
-async function customizationQuestionsStep(
-  runId: string,
-  site: PublishedSite,
-): Promise<CustomQuestion[]> {
-  "use step";
-
-  const questions = await generateQuestionsForMissingFields(site);
-  if (!Array.isArray(questions) || questions.length === 0) {
-    return [];
-  }
-
-  // Save the questions to state so the frontend knows we are waiting for input
-  await patchRunStatus<PublishedSite>("publish", runId, {
-    state: "waiting_for_input",
-    message: "Waiting for user customization inputs...",
-    progress: 58,
-    meta: { questions },
-  });
-
-  await emit({
-    state: "waiting_for_input",
-    message: "Waiting for user customization inputs...",
-    progress: 58,
-    meta: { questions },
-  });
-
-  return questions;
-}
-
-async function applyCustomizationStep(
-  runId: string,
-  site: PublishedSite,
-  answers: Record<string, string>,
-): Promise<PublishedSite> {
-  "use step";
-
-  // Set running state again
-  await patchRunStatus<PublishedSite>("publish", runId, {
-    state: "running",
-    message: "Customization answers received. Merging...",
-    progress: 60,
-  });
-
-  await emit({
-    state: "running",
-    message: "Customization answers received. Merging...",
-    progress: 60,
-  });
-
-  // Merge the answers back into the scraped site object
-  const merged = { ...site };
-  const d = { ...merged.data };
-
-  if (answers.street) {
-    d.contact = { ...d.contact, street: answers.street };
-  }
-  if (answers.city) {
-    d.contact = { ...d.contact, city: answers.city };
-  }
-  if (answers.phone) {
-    d.contact = { ...d.contact, phone: answers.phone };
-  }
-  if (answers.description) {
-    d.description = answers.description;
-  }
-  if (answers.highlights) {
-    d.highlights = answers.highlights.split(",").map((s) => s.trim()).filter(Boolean);
-  }
-  if (d.industry === "restaurant") {
-    const r = d as RestaurantData;
-    if (answers.cuisine) {
-      r.cuisine = answers.cuisine.split(",").map((s) => s.trim()).filter(Boolean);
-    }
-    if (answers.hours) {
-      r.description = `${r.description || ""}\nOpening Hours: ${answers.hours}`.trim();
-    }
-  }
-
-  merged.data = d;
-  return merged;
 }
 
 async function translateStep(

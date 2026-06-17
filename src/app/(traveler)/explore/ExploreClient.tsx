@@ -73,7 +73,7 @@ function RestaurantCard({ r }: { r: Restaurant }) {
           {r.hiddenGem && <GemBadge />}
         </div>
 
-        {r.mdxBody && (
+        {(r.mdxUrl || r.mdxBody) && (
           <Link
             href={`/restaurants/${r.slug}`}
             className="pointer-events-auto relative z-20 mt-3 inline-block self-start text-xs font-medium text-[#223A70] hover:underline"

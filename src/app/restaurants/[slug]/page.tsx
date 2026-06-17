@@ -3,6 +3,7 @@ import Link from "next/link";
 import { MapPin, Globe, ArrowLeft } from "lucide-react";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { getRestaurant } from "@/lib/restaurants/queries";
+import { readRestaurantMdx } from "@/lib/restaurants/mdx-storage";
 import { mdxComponents } from "@/components/mdx-components";
 
 export async function generateMetadata({
@@ -27,6 +28,8 @@ export default async function RestaurantPage({
   const { slug } = await params;
   const r = await getRestaurant(slug);
   if (!r) notFound();
+
+  const mdxSource = r.mdxUrl ? await readRestaurantMdx(r.mdxUrl) : r.mdxBody;
 
   return (
     <div className="min-h-screen bg-background">
@@ -107,9 +110,9 @@ export default async function RestaurantPage({
         </div>
 
         {/* MDX Content */}
-        {r.mdxBody ? (
+        {mdxSource ? (
           <article className="prose-custom">
-            <MDXRemote source={r.mdxBody} components={mdxComponents} />
+            <MDXRemote source={mdxSource} components={mdxComponents} />
           </article>
         ) : (
           <div className="rounded-lg border border-border bg-muted/30 p-8 text-center text-muted-foreground">

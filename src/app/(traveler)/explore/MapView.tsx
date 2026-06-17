@@ -35,7 +35,7 @@ export default function MapView({ restaurants, language }: Props) {
                 <p className="mt-1 text-xs text-gray-600 line-clamp-3">{r.aiOverview}</p>
               )}
               <div className="mt-2 flex flex-col gap-1">
-                {r.mdxBody && (
+                {(r.mdxUrl || r.mdxBody) && (
                   <Link
                     href={`/restaurants/${r.slug}`}
                     className="inline-block text-sm font-medium text-[#223A70] hover:underline"

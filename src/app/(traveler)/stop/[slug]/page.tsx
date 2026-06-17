@@ -71,7 +71,7 @@ export default async function StopPage({ params }: { params: Promise<{ slug: str
         )}
 
         <div className="mt-4 flex flex-wrap gap-3">
-          {r.mdxBody && (
+          {(r.mdxUrl || r.mdxBody) && (
             <Link
               href={`/restaurants/${r.slug}`}
               className="inline-flex items-center gap-1 rounded-lg bg-kon2 px-4 py-2 text-sm font-semibold text-white hover:bg-kon"

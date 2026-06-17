@@ -40,7 +40,7 @@ const CATEGORY_OPTIONS = ["restaurant", "cafe", "stay", "experience", "other"] a
 const formSchema = z.object({
   nameEn: z.string().min(1, "English name is required"),
   nameJp: z.string().optional(),
-  slug: z.string().min(1, "Slug is required"),
+  slug: z.string().optional(),
   address: z.string().optional(),
   aiOverview: z.string().optional(),
   lat: z.string().optional(),
@@ -161,10 +161,9 @@ export function AdminForm() {
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={field.name}>
-                Slug <span className="text-destructive">*</span>
-              </FieldLabel>
-              <Input {...field} id={field.name} placeholder="auto-filled" aria-invalid={fieldState.invalid} />
+              <FieldLabel htmlFor={field.name}>Slug</FieldLabel>
+              <Input {...field} id={field.name} placeholder="auto-filled from name" aria-invalid={fieldState.invalid} />
+              <FieldDescription>Leave blank to auto-generate from the English name.</FieldDescription>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}

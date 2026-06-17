@@ -1,9 +1,11 @@
 "use server";
 
 import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { createRestaurant, updateRestaurant, getRestaurant } from "./queries";
+import { writeRestaurantMdx } from "./mdx-storage";
 
 const schema = z.object({
   slug: z.string().min(1),
@@ -46,13 +48,32 @@ export async function saveRestaurantAction(data: SaveRestaurantInput): Promise<{
   }
 
   try {
-    const existing = await getRestaurant(parsed.data.slug);
+    const { mdxBody, ...rest } = parsed.data;
+
+    // Store MDX content in Vercel Blob (not inline in Postgres). Persist the
+    // returned blob URL; clear the legacy inline column.
+    let mdxUrl: string | undefined;
+    if (mdxBody && mdxBody.trim()) {
+      mdxUrl = await writeRestaurantMdx(rest.slug, mdxBody);
+    }
+
+    const values = { ...rest, mdxUrl, mdxBody: null as string | null };
+
+    const existing = await getRestaurant(rest.slug);
     if (existing) {
-      await updateRestaurant(existing.id, parsed.data);
+      await updateRestaurant(existing.id, values);
     } else {
       const id = `r_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-      await createRestaurant({ id, ...parsed.data });
+      await createRestaurant({ id, ...values });
     }
+
+    // Server components cache these routes — revalidate so the new/updated
+    // pin and detail page appear immediately.
+    revalidatePath("/explore");
+    revalidatePath("/map");
+    revalidatePath(`/stop/${rest.slug}`);
+    revalidatePath(`/restaurants/${rest.slug}`);
+
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Database error" };

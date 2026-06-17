@@ -1,0 +1,1 @@
+ALTER TABLE "restaurant" ADD COLUMN "mdx_url" text;
