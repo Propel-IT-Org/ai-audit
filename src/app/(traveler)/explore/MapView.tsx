@@ -38,7 +38,7 @@ export default function MapView({ restaurants, language }: Props) {
                 {r.mdxBody && (
                   <Link
                     href={`/restaurants/${r.slug}`}
-                    className="inline-block text-sm font-medium text-blue-600 hover:underline"
+                    className="inline-block text-sm font-medium text-[#223A70] hover:underline"
                   >
                     View full page →
                   </Link>

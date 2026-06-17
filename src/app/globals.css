@@ -85,8 +85,9 @@
   --card-foreground: #1a1a1a;
   --popover: #ffffff;
   --popover-foreground: #1a1a1a;
-  --primary: #1a1a1a;
-  --primary-foreground: #faf8f4;
+  /* aivible Japan Blue — navy primary (#223A70) for basic app pages */
+  --primary: hsl(222 53% 29%);
+  --primary-foreground: #ffffff;
   --secondary: #efece5;
   --secondary-foreground: #1a1a1a;
   --muted: #efece5;
@@ -96,7 +97,7 @@
   --destructive: #c62828;
   --border: #e3ddd0;
   --input: #e3ddd0;
-  --ring: #c8102e;
+  --ring: hsl(222 53% 29%);
   --success: #2e7d32;
   --success-foreground: #ffffff;
   --warning: #ed6c02;
@@ -111,12 +112,12 @@
   --radius: 0.625rem;
   --sidebar: #faf8f4;
   --sidebar-foreground: #1a1a1a;
-  --sidebar-primary: #1a1a1a;
-  --sidebar-primary-foreground: #faf8f4;
+  --sidebar-primary: hsl(222 53% 29%);
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #efece5;
   --sidebar-accent-foreground: #1a1a1a;
   --sidebar-border: #e3ddd0;
-  --sidebar-ring: #c8102e;
+  --sidebar-ring: hsl(222 53% 29%);
 }
 
 .dark {
@@ -143,7 +144,7 @@
   --destructive: #ff6b6b;
   --border: #2a2820;
   --input: #2a2820;
-  --ring: #ff5a5a;
+  --ring: hsl(231 65% 65%);
   --success: #5cd071;
   --success-foreground: #0b1d0e;
   --warning: #ffb04a;
@@ -162,7 +163,7 @@
   --sidebar-accent: #2a2820;
   --sidebar-accent-foreground: #f3eee2;
   --sidebar-border: #2a2820;
-  --sidebar-ring: #ff5a5a;
+  --sidebar-ring: hsl(231 65% 65%);
 }
 
 @layer base {
