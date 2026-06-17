@@ -1,9 +1,14 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { MapPin, Globe, ArrowLeft } from "lucide-react";
+import { compileMDX } from "next-mdx-remote/rsc";
 import { getRestaurant } from "@/lib/restaurants/queries";
 import { readRestaurantMdx } from "@/lib/restaurants/mdx-storage";
+import { mdxComponents } from "@/components/mdx-components";
 import { SafeMdx } from "@/components/SafeMdx";
+import { RestaurantDetail, type RestaurantFrontmatter } from "./RestaurantDetail";
+
+const compileOptions = { parseFrontmatter: true } as const;
 
 export async function generateMetadata({
   params,
@@ -30,6 +35,45 @@ export default async function RestaurantPage({
 
   const mdxSource = r.mdxUrl ? await readRestaurantMdx(r.mdxUrl) : r.mdxBody;
 
+  // Parse frontmatter — the rich restaurant data lives there; the body is the
+  // AI-overview prose. Falls back to a simple layout on plain MDX / parse error.
+  let frontmatter: RestaurantFrontmatter = {};
+  let body: React.ReactNode = null;
+  if (mdxSource) {
+    try {
+      const compiled = await compileMDX<RestaurantFrontmatter>({
+        source: mdxSource,
+        options: compileOptions,
+        components: mdxComponents,
+      });
+      frontmatter = compiled.frontmatter;
+      body = compiled.content;
+    } catch {
+      frontmatter = {};
+      body = null;
+    }
+  }
+
+  const isRich = !!(frontmatter.name || frontmatter.menu || frontmatter.overview);
+
+  if (isRich) {
+    return (
+      <RestaurantDetail
+        data={frontmatter}
+        overview={body}
+        fallback={{
+          name: r.nameEn,
+          nameJp: r.nameJp,
+          lat: r.lat,
+          lng: r.lng,
+          address: r.address,
+          website: r.websiteUrl,
+        }}
+      />
+    );
+  }
+
+  // ---- Plain-MDX fallback (no structured frontmatter) ----
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto max-w-3xl px-4 py-8">
@@ -41,16 +85,11 @@ export default async function RestaurantPage({
           Back to explore
         </Link>
 
-        {/* Restaurant header */}
         <div className="mb-8">
           {r.imageUrl && (
             <div className="mb-6 overflow-hidden rounded-xl">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={r.imageUrl}
-                alt={r.nameEn}
-                className="h-64 w-full object-cover"
-              />
+              <img src={r.imageUrl} alt={r.nameEn} className="h-64 w-full object-cover" />
             </div>
           )}
 
@@ -108,7 +147,6 @@ export default async function RestaurantPage({
           )}
         </div>
 
-        {/* MDX Content */}
         {mdxSource ? (
           <article className="prose-custom">
             <SafeMdx source={mdxSource} />
