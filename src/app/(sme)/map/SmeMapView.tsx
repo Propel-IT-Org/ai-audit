@@ -1,46 +1,58 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useState } from "react";
 import Link from "next/link";
-import { gemPinIcon } from "@/components/map/markers";
+import {
+  MapProvider,
+  GoogleMap,
+  GemPin,
+  AdvancedMarker,
+  InfoWindow,
+} from "@/components/map/GoogleMap";
 import type { Restaurant } from "@/lib/db/schema/restaurant";
 
-const JAPAN_CENTER: [number, number] = [36.2, 138.2];
-const JAPAN_ZOOM = 5;
+const JAPAN_CENTER = { lat: 36.2, lng: 138.2 };
 
 export default function SmeMapView({ restaurants }: { restaurants: Restaurant[] }) {
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const active = restaurants.find((r) => r.id === activeId) ?? null;
+
   return (
-    <MapContainer
-      center={JAPAN_CENTER}
-      zoom={JAPAN_ZOOM}
-      style={{ height: "100%", width: "100%" }}
-      scrollWheelZoom
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-      />
-      {restaurants.map((r) => (
-        <Marker key={r.id} position={[r.lat as number, r.lng as number]} icon={gemPinIcon()}>
-          <Popup>
-            <div className="min-w-[180px]">
-              <p className="font-semibold">{r.nameEn}</p>
-              {r.address && <p className="text-xs text-gray-500">{r.address}</p>}
-              {r.aiOverview && (
-                <p className="mt-1 text-xs text-gray-600 line-clamp-3">{r.aiOverview}</p>
+    <MapProvider>
+      <GoogleMap defaultCenter={JAPAN_CENTER} defaultZoom={5} style={{ width: "100%", height: "100%" }}>
+        {restaurants.map((r) => (
+          <AdvancedMarker
+            key={r.id}
+            position={{ lat: r.lat as number, lng: r.lng as number }}
+            onClick={() => setActiveId(r.id)}
+          >
+            <GemPin />
+          </AdvancedMarker>
+        ))}
+
+        {active && (
+          <InfoWindow
+            position={{ lat: active.lat as number, lng: active.lng as number }}
+            onCloseClick={() => setActiveId(null)}
+          >
+            <div className="min-w-45">
+              <p className="font-semibold">{active.nameEn}</p>
+              {active.address && <p className="text-xs text-gray-500">{active.address}</p>}
+              {active.aiOverview && (
+                <p className="mt-1 line-clamp-3 text-xs text-gray-600">{active.aiOverview}</p>
               )}
               <div className="mt-2 flex flex-col gap-1">
-                {(r.mdxUrl || r.mdxBody) && (
+                {(active.mdxUrl || active.mdxBody) && (
                   <Link
-                    href={`/restaurants/${r.slug}`}
+                    href={`/restaurants/${active.slug}`}
                     className="inline-block text-sm font-medium text-[#223A70] hover:underline"
                   >
                     View full page →
                   </Link>
                 )}
-                {r.websiteUrl && (
+                {active.websiteUrl && (
                   <a
-                    href={r.websiteUrl}
+                    href={active.websiteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-block text-xs text-gray-500 hover:underline"
@@ -50,9 +62,9 @@ export default function SmeMapView({ restaurants }: { restaurants: Restaurant[] 
                 )}
               </div>
             </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+          </InfoWindow>
+        )}
+      </GoogleMap>
+    </MapProvider>
   );
 }

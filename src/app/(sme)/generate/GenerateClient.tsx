@@ -101,18 +101,20 @@ export function GenerateClient() {
 
   const abortRef = useRef<AbortController | null>(null);
 
-  // Auto-fill subdomain from URL until the user edits it manually.
-  useEffect(() => {
-    if (!touchedSub && url) setSubdomain(slugFromUrl(url));
-  }, [url, touchedSub]);
+  const onUrlChange = (v: string) => {
+    setUrl(v);
+    if (urlError) setUrlError(null);
+    // Auto-fill subdomain from URL until the user edits it manually.
+    if (!touchedSub) setSubdomain(v ? slugFromUrl(v) : "");
+  };
 
   // Debounced subdomain availability check.
   useEffect(() => {
-    if (!subdomain) {
-      setCheck(null);
-      return;
-    }
     const handle = setTimeout(async () => {
+      if (!subdomain) {
+        setCheck(null);
+        return;
+      }
       setChecking(true);
       try {
         const r = await fetch("/api/publish/check", {
@@ -401,7 +403,7 @@ export function GenerateClient() {
                 type="url"
                 placeholder="https://your-restaurant.jp"
                 value={url}
-                onChange={(e) => { setUrl(e.target.value); if (urlError) setUrlError(null); }}
+                onChange={(e) => onUrlChange(e.target.value)}
                 className={`h-14 bg-white pl-10 text-base shadow-sm ${urlError ? "border-red-500" : ""}`}
               />
             </div>
