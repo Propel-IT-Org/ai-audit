@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" fill="none">
+  <!-- AIVIBLE · "Bilingual search" — Shirube + search bar + JP/EN bubbles + pin -->
+  <rect width="320" height="180" fill="#F9ECD9"/>
+
+  <!-- search bar -->
+  <g>
+    <rect x="104" y="24" width="200" height="28" rx="14" fill="#FFFFFF" stroke="#E4DAC6" stroke-width="1.5"/>
+    <circle cx="121" cy="38" r="6" fill="none" stroke="#204E8E" stroke-width="2.4"/>
+    <path d="M126 43 L131 48" stroke="#204E8E" stroke-width="2.4" stroke-linecap="round"/>
+    <text x="140" y="42" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#9aa6b8">Search places, dishes, experiences…</text>
+  </g>
+
+  <!-- JP / EN speech bubbles -->
+  <g fill="#204E8E">
+    <path d="M120 70 h70 a8 8 0 0 1 8 8 v18 a8 8 0 0 1 -8 8 h-6 l14 14 l-22 -14 h-48 a8 8 0 0 1 -8 -8 v-18 a8 8 0 0 1 8 -8 Z"/>
+    <path d="M214 70 h62 a8 8 0 0 1 8 8 v18 a8 8 0 0 1 -8 8 h-30 l-8 10 v-10 h-24 a8 8 0 0 1 -8 -8 v-18 a8 8 0 0 1 8 -8 Z"/>
+  </g>
+  <text x="155" y="92" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">日本語</text>
+  <text x="247" y="92" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="800" fill="#fff" text-anchor="middle">EN</text>
+
+  <!-- pin where both meet -->
+  <path d="M188 128 C188 121 194 116 201 116 C208 116 214 121 214 128 C214 138 201 152 201 152 C201 152 188 138 188 128 Z" fill="#204E8E"/>
+  <circle cx="201" cy="127" r="4" fill="#F9ECD9"/>
+
+  <!-- Shirube pointing, far left -->
+  <g>
+    <path d="M22 96 q-7 5 -8 12" stroke="#204E8E" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+    <rect x="11" y="100" width="3.6" height="9" rx="1.8" fill="#204E8E"/>
+    <rect x="7" y="109" width="11" height="6" rx="1.6" fill="#C5432F"/>
+    <circle cx="14" cy="108" r="4" fill="#204E8E"/>
+    <path d="M58 94 q9 0 14 -5" stroke="#204E8E" stroke-width="6.8" fill="none" stroke-linecap="round"/>
+    <circle cx="74" cy="88" r="4.4" fill="#204E8E"/>
+    <path d="M76 85 L82 82.5" stroke="#204E8E" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <rect x="22" y="44" width="40" height="98" rx="12" fill="#204E8E"/>
+    <rect x="31" y="140" width="9" height="8" rx="3" fill="#204E8E"/>
+    <rect x="44" y="140" width="9" height="8" rx="3" fill="#204E8E"/>
+    <circle cx="34" cy="66" r="3.4" fill="#fff"/><circle cx="50" cy="66" r="3.4" fill="#fff"/>
+    <path d="M30 77 Q42 86 53 78 Q42 79.5 30 77 Z" fill="#FFC94F"/>
+    <path d="M54 76 L58.6 78.2 L55.4 81 Z" fill="#FFC94F"/>
+    <text x="42" y="108" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="8" font-weight="700" fill="#F9ECD9" text-anchor="middle" writing-mode="tb" letter-spacing="1">シルベ</text>
+  </g>
+</svg>

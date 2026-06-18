@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 86 100 135" fill="none">
+  <!-- ============================================================================
+       SHIRUBE — reusable mascot character (the navy guidepost / 道標).
+       Canonical pose: standing, pointing right, holding the 藍 hanko stamp in the
+       left hand, with the updated yellow SMILE-ARROW (the gold arrow IS the smile).
+       Lift this whole <g> into any comp. Internal coords live in the 320×320 comp
+       space (body at x42–92, y90–210), so it drops straight into the other
+       illustration-comp SVGs. To reposition: wrap in <g transform="translate(dx,dy)">
+       (or scale). To point the other way: <g transform="scale(-1,1)"> + shift x.
+       Palette — navy #204E8E · white #fff · yellow #FFC94F · seal red #C5432F · seal text #F4ECDD
+       ============================================================================ -->
+  <g id="shirube">
+    <!-- left arm holding the AI-verified hanko stamp -->
+    <path d="M44 152 q-11 6 -13 15" stroke="#204E8E" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <rect x="28" y="156" width="4.5" height="12" rx="2.2" fill="#204E8E"/>
+    <rect x="23" y="168" width="14" height="7" rx="2" fill="#C5432F"/>
+    <text x="30" y="173.6" font-family="serif" font-size="5.6" font-weight="700" fill="#F4ECDD" text-anchor="middle">藍</text>
+    <circle cx="31" cy="166" r="5" fill="#204E8E"/>
+    <!-- right arm → fist + short index finger (off the top of the hand) pointing -->
+    <path d="M90 150 q10 0 16 -6" stroke="#204E8E" stroke-width="8.5" fill="none" stroke-linecap="round"/>
+    <circle cx="108" cy="143" r="5.4" fill="#204E8E"/>
+    <path d="M110 139.5 L116 136.5" stroke="#204E8E" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <!-- body: rectangular guidepost -->
+    <rect x="42" y="90" width="50" height="120" rx="14" fill="#204E8E"/>
+    <!-- feet -->
+    <rect x="54" y="208" width="11" height="9" rx="3.5" fill="#204E8E"/>
+    <rect x="69" y="208" width="11" height="9" rx="3.5" fill="#204E8E"/>
+    <!-- eyes -->
+    <circle cx="58" cy="114" r="4" fill="#fff"/><circle cx="76" cy="114" r="4" fill="#fff"/>
+    <!-- yellow smile-arrow (the gold arrow IS the smile) -->
+    <path d="M54 125 Q67 136 79 126.5 Q67 128 54 125 Z" fill="#FFC94F"/>
+    <path d="M80 124 L85.5 126.6 L81.5 130 Z" fill="#FFC94F"/>
+    <!-- vertical シルベ (name) -->
+    <text x="67" y="161" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="10" font-weight="700" fill="#F9ECD9" text-anchor="middle" writing-mode="tb" letter-spacing="2">シルベ</text>
+  </g>
+</svg>

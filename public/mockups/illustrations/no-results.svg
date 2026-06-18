@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" fill="none">
+  <!-- AIVIBLE · "No results" — worried Shirube holding an empty-search card + corner waves -->
+  <rect width="320" height="320" fill="#F9ECD9"/>
+
+  <!-- corner seigaiha waves -->
+  <g fill="none" stroke="#204E8E" stroke-width="2.3">
+    <path d="M-8 312 a15 15 0 0 1 30 0 M22 312 a15 15 0 0 1 30 0 M52 312 a15 15 0 0 1 30 0 M-8 298 a15 15 0 0 1 30 0 M22 298 a15 15 0 0 1 30 0 M52 298 a15 15 0 0 1 30 0"/>
+    <path d="M238 312 a15 15 0 0 1 30 0 M268 312 a15 15 0 0 1 30 0 M298 312 a15 15 0 0 1 30 0 M238 298 a15 15 0 0 1 30 0 M268 298 a15 15 0 0 1 30 0 M298 298 a15 15 0 0 1 30 0"/>
+  </g>
+
+  <!-- card + sad Shirube together, leaning a bit -->
+  <g transform="rotate(-5 150 212)">
+    <!-- empty-search card held in the right hand -->
+    <rect x="196" y="120" width="58" height="62" rx="8" fill="#FFFFFF" stroke="#E4DAC6" stroke-width="1.5"/>
+    <circle cx="221" cy="146" r="9" fill="none" stroke="#204E8E" stroke-width="3"/>
+    <path d="M228 153 L235 160" stroke="#204E8E" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="216" cy="168" r="1.6" fill="#9aa6b8"/><circle cx="224" cy="168" r="1.6" fill="#9aa6b8"/><circle cx="232" cy="168" r="1.6" fill="#9aa6b8"/>
+    <!-- right arm holds the card -->
+    <path d="M166 150 q16 -2 26 -14" stroke="#204E8E" stroke-width="8.5" fill="none" stroke-linecap="round"/>
+    <circle cx="193" cy="135" r="5.6" fill="#204E8E"/>
+    <!-- left hand raised to the face -->
+    <path d="M120 150 q-9 -13 7 -25" stroke="#204E8E" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <circle cx="128" cy="123" r="5.4" fill="#204E8E"/>
+    <!-- body -->
+    <rect x="118" y="92" width="50" height="120" rx="14" fill="#204E8E"/>
+    <rect x="130" y="210" width="11" height="9" rx="3.5" fill="#204E8E"/>
+    <rect x="145" y="210" width="11" height="9" rx="3.5" fill="#204E8E"/>
+    <!-- sad brows (inner raised) + eyes -->
+    <path d="M127 113 L137 108 M159 113 L149 108" stroke="#16335e" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="138" cy="119" r="3.6" fill="#fff"/><circle cx="153" cy="119" r="3.6" fill="#fff"/>
+    <!-- gold frown -->
+    <path d="M135 135 Q145 130 155 135" stroke="#FFC94F" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <text x="145" y="167" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="9" font-weight="700" fill="#F9ECD9" text-anchor="middle" writing-mode="tb" letter-spacing="1.5">シルベ</text>
+  </g>
+</svg>
