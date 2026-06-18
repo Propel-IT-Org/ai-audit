@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — Plan a new trip</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    .hero-map {
+      background-color: #18243F;
+      background-image:
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900 min-h-screen flex flex-col">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between">
+    <a href="index.html" class="hover:text-white">← Business side</a>
+    <span class="tracking-widest uppercase hidden sm:inline">[Mockup v2 · Traveler 1/6 — Plan a new trip · destination-first, like Wanderlog]</span>
+    <a href="trip-canvas.html" class="text-white hover:text-indigo-300">Next: Your trip canvas →</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bg-white/90 border-b border-gray-100 sticky top-0 z-50 backdrop-blur-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-1">
+        <img src="icons/shirube.svg" alt="Shirube" class="w-7 h-7" />
+        <span class="text-xl font-bold text-gray-900">AIVIBLE</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6 text-sm text-gray-500">
+        <a href="plan-start.html" class="text-gray-900 font-medium" data-en="Plan a trip" data-jp="旅程をつくる">Plan a trip</a>
+        <a href="businesses.html" class="hover:text-gray-900 transition-colors" data-en="Explore" data-jp="さがす">Explore</a>
+        <a href="discover.html" class="hover:text-gray-900 transition-colors" data-en="Add places" data-jp="スポットを追加">Add places</a>
+        <span class="text-gray-200">|</span>
+        <a href="index.html" class="hover:text-indigo-700 text-indigo-600 font-medium transition-colors" data-en="For your business" data-jp="事業者の方へ">For your business</a>
+      </nav>
+      <button data-lang-toggle class="text-sm border border-gray-200 px-3 py-1 rounded-full hover:bg-gray-50 font-medium">日本語</button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main class="hero-map relative flex items-center justify-center px-4 py-10 md:py-12">
+    <!-- faint pins to evoke a map -->
+    <span class="absolute w-2 h-2 rounded-full bg-white/20" style="left:18%; top:30%;"></span>
+    <span class="absolute w-2 h-2 rounded-full bg-white/20" style="left:72%; top:24%;"></span>
+    <span class="absolute w-2 h-2 rounded-full bg-white/20" style="left:80%; top:62%;"></span>
+    <span class="absolute w-3 h-3 rounded-full" style="left:30%; top:66%; background:var(--gold);"></span>
+    <span class="absolute w-2 h-2 rounded-full bg-white/20" style="left:55%; top:48%;"></span>
+
+    <div class="relative w-full max-w-5xl text-center">
+      <p class="av-eyebrow text-gold-500 mb-1.5" style="color:var(--gold);" data-en="Plan your Japan trip" data-jp="日本の旅を計画する">Plan your Japan trip</p>
+      <h1 class="text-2xl md:text-3xl font-extrabold text-white leading-tight"
+          data-en="Where do you want to go?"
+          data-jp="どこへ行きますか？">Where do you want to go?</h1>
+      <p class="mt-1.5 text-xs md:text-sm text-indigo-100/75 max-w-lg mx-auto"
+         data-en="Build your days yourself — and we'll surface the verified local gems that English-only search hides."
+         data-jp="日程は自分で組み立て、英語だけの検索では見つからない認証済みの地元の名店をご提案します。">
+        Build your days yourself — and we'll surface the verified local gems that English-only search hides.</p>
+
+      <!-- PLAN-A-TRIP CARD -->
+      <div class="mt-5 bg-white rounded-2xl shadow-2xl p-5 md:p-6 text-left">
+        <!-- Where -->
+        <div>
+          <label class="text-[11px] font-bold uppercase tracking-wide text-gray-400" data-en="Where to?" data-jp="行き先">Where to?</label>
+          <div class="relative mt-1">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10">📍</span>
+            <select class="appearance-none w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-9 pr-8 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+              <option data-en="Kyoto" data-jp="京都">Kyoto</option>
+              <option data-en="Hakone" data-jp="箱根">Hakone</option>
+              <option data-en="Kanazawa" data-jp="金沢">Kanazawa</option>
+              <option data-en="Takayama (Hida)" data-jp="高山（飛騨）">Takayama (Hida)</option>
+              <option data-en="Kinosaki Onsen" data-jp="城崎温泉">Kinosaki Onsen</option>
+              <option data-en="Naoshima (art island)" data-jp="直島（アートの島）">Naoshima (art island)</option>
+              <option data-en="Onomichi" data-jp="尾道">Onomichi</option>
+              <option data-en="Yamanashi" data-jp="山梨">Yamanashi</option>
+              <option data-en="Kagoshima" data-jp="鹿児島">Kagoshima</option>
+            </select>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs">▾</span>
+          </div>
+        </div>
+
+        <!-- When — Agoda-style date-range picker -->
+        <div class="mt-3 relative">
+          <label class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-1 block" data-en="When?" data-jp="いつ？">When?</label>
+
+          <!-- check-in / check-out trigger fields -->
+          <div class="grid grid-cols-2 rounded-lg border border-gray-200 overflow-hidden divide-x divide-gray-200">
+            <button type="button" id="ci-field" class="flex items-center gap-3 bg-white px-4 py-2.5 text-left hover:bg-gray-50 transition-colors">
+              <svg class="w-5 h-5 text-gray-400 flex-none" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4" stroke-linecap="round"/></svg>
+              <span class="min-w-0">
+                <span id="ci-date" class="block text-sm font-bold text-gray-900 truncate">15 Jun 2026</span>
+                <span id="ci-dow" class="block text-[11px] text-gray-400">Monday</span>
+              </span>
+            </button>
+            <button type="button" id="co-field" class="flex items-center gap-3 bg-white px-4 py-2.5 text-left hover:bg-gray-50 transition-colors">
+              <svg class="w-5 h-5 text-gray-400 flex-none" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4" stroke-linecap="round"/></svg>
+              <span class="min-w-0">
+                <span id="co-date" class="block text-sm font-bold text-gray-900 truncate">19 Jun 2026</span>
+                <span id="co-dow" class="block text-[11px] text-gray-400">Friday</span>
+              </span>
+            </button>
+          </div>
+
+          <!-- POPOVER -->
+          <div id="cal-pop" class="hidden absolute left-0 top-full mt-2 z-30 w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 sm:p-6">
+            <!-- tabs -->
+            <div class="flex mb-5 border-b border-gray-100">
+              <button type="button" id="tab-cal" class="cal-tab flex-1 pb-2.5 text-sm font-bold text-center" data-en="Calendar" data-jp="カレンダー">Calendar</button>
+              <button type="button" id="tab-flex" class="cal-tab flex-1 pb-2.5 text-sm font-bold text-center" data-en="I'm flexible" data-jp="日程は柔軟">I'm flexible</button>
+            </div>
+
+            <!-- CALENDAR pane -->
+            <div id="pane-cal">
+              <div class="relative flex items-center mb-3">
+                <button type="button" id="cal-prev" class="absolute left-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 text-lg">‹</button>
+                <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 text-center font-bold text-sm text-gray-900">
+                  <span id="cal-m0-label"></span>
+                  <span id="cal-m1-label" class="hidden sm:block"></span>
+                </div>
+                <button type="button" id="cal-next" class="absolute right-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 text-lg">›</button>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
+                <div id="cal-m0"></div>
+                <div id="cal-m1" class="hidden sm:block"></div>
+              </div>
+            </div>
+
+            <!-- FLEXIBLE pane -->
+            <div id="pane-flex" class="hidden grid grid-cols-2 gap-3">
+              <div class="relative">
+                <label class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-1 block" data-en="How long?" data-jp="期間">How long?</label>
+                <select id="flex-length" class="appearance-none w-full rounded-lg border border-gray-200 bg-white py-2.5 px-3 pr-8 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                  <option value="2" data-en="Weekend · 2 days" data-jp="週末・2日間">Weekend · 2 days</option>
+                  <option value="3" data-en="3 days" data-jp="3日間">3 days</option>
+                  <option value="4" data-en="4 days" data-jp="4日間">4 days</option>
+                  <option value="5" data-en="5 days" data-jp="5日間">5 days</option>
+                  <option value="7" data-en="1 week" data-jp="1週間">1 week</option>
+                </select>
+                <span class="absolute right-3 bottom-3 text-gray-400 pointer-events-none text-xs">▾</span>
+              </div>
+              <div class="relative">
+                <label class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-1 block" data-en="Roughly when?" data-jp="おおよその時期">Roughly when?</label>
+                <select id="flex-month" class="appearance-none w-full rounded-lg border border-gray-200 bg-white py-2.5 px-3 pr-8 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                  <option data-en="Any time" data-jp="いつでも">Any time</option>
+                  <option data-en="Jul 2026" data-jp="2026年7月">Jul 2026</option>
+                  <option data-en="Aug 2026" data-jp="2026年8月">Aug 2026</option>
+                  <option data-en="Sep 2026" data-jp="2026年9月">Sep 2026</option>
+                  <option data-en="Oct 2026" data-jp="2026年10月">Oct 2026</option>
+                  <option data-en="Nov 2026" data-jp="2026年11月">Nov 2026</option>
+                </select>
+                <span class="absolute right-3 bottom-3 text-gray-400 pointer-events-none text-xs">▾</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+              <p class="text-[11px] font-medium text-gray-500" id="trip-length" data-en="5 days · 4 nights" data-jp="5日間・4泊">5 days · 4 nights</p>
+              <button type="button" id="cal-done" class="text-xs font-bold text-white rounded-lg px-4 py-2" style="background:var(--kon-2);" data-en="Done" data-jp="完了">Done</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- popular destinations -->
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs">
+          <span class="text-gray-400" data-en="Popular:" data-jp="人気:">Popular:</span>
+          <button class="rounded-full border border-gray-200 px-2.5 py-1 text-gray-600 hover:border-indigo-400 hover:text-gray-900 font-medium">Kyoto</button>
+          <button class="rounded-full border border-gray-200 px-2.5 py-1 text-gray-600 hover:border-indigo-400 hover:text-gray-900 font-medium">Hakone</button>
+          <button class="rounded-full border border-gray-200 px-2.5 py-1 text-gray-600 hover:border-indigo-400 hover:text-gray-900 font-medium" data-en="Yamanashi" data-jp="山梨">Yamanashi</button>
+          <button class="rounded-full border border-gray-200 px-2.5 py-1 text-gray-600 hover:border-indigo-400 hover:text-gray-900 font-medium" data-en="Kanazawa" data-jp="金沢">Kanazawa</button>
+        </div>
+
+        <a href="trip-canvas.html" class="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl text-white font-bold px-6 py-3.5 transition-colors"
+           style="background:var(--kon-2);" onmouseover="this.style.background='var(--kon)'" onmouseout="this.style.background='var(--kon-2)'"
+           data-en="Start planning →" data-jp="計画を始める →">Start planning →</a>
+
+        <p class="mt-3 text-center text-[11px] text-gray-400" data-en="Free · no signup to start · add collaborators anytime" data-jp="無料 · 登録不要で開始 · いつでも共同編集者を追加">Free · no signup to start · add collaborators anytime</p>
+      </div>
+
+      <!-- secondary entry: AI helper -->
+      <p class="mt-5 text-xs text-indigo-100/70">
+        <span data-en="Prefer a head start?" data-jp="さくっと始めたい？">Prefer a head start?</span>
+        <a href="building-trip.html" class="underline hover:text-white font-medium" data-en="✨ Let AI draft the days for me" data-jp="✨ AIに日程の下書きを任せる">✨ Let AI draft the days for me</a>
+      </p>
+    </div>
+  </main>
+
+  <!-- RECENTLY VERIFIED SMEs -->
+  <section class="bg-white border-t border-gray-100">
+    <div class="max-w-6xl mx-auto px-4 pt-8 pb-12 md:pt-10 md:pb-14">
+      <div class="flex items-end justify-between gap-4 mb-6">
+        <div>
+          <p class="av-eyebrow mb-1" style="color:var(--gold);" data-en="Freshly verified" data-jp="最近認証された店舗">Freshly verified</p>
+          <h2 class="text-xl md:text-2xl font-extrabold text-gray-900" data-en="Recently verified local businesses" data-jp="最近認証された地元の店舗">Recently verified local businesses</h2>
+          <p class="text-sm text-gray-500 mt-1 max-w-lg" data-en="Real SMEs we re-check regularly so AI can recommend them with confidence — many are JP-only finds you won't see in English search." data-jp="AIが自信を持って薦められるよう、定期的に再確認している実在の店舗。英語検索では見つからない日本語のみの名店も多数。">Real SMEs we re-check regularly so AI can recommend them with confidence — many are JP-only finds you won't see in English search.</p>
+        </div>
+        <a href="businesses.html" class="hidden sm:inline-flex text-sm font-bold text-indigo-600 hover:text-indigo-800 whitespace-nowrap" data-en="Browse all →" data-jp="すべて見る →">Browse all →</a>
+      </div>
+
+      <!-- cards injected from hidden-gems-data.js (same seed as the directory) -->
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4" id="recent-grid"></div>
+
+      <a href="businesses.html" class="sm:hidden mt-5 w-full inline-flex items-center justify-center text-sm font-bold text-indigo-600 hover:text-indigo-800" data-en="Browse all verified businesses →" data-jp="認証済みの店舗をすべて見る →">Browse all verified businesses →</a>
+    </div>
+  </section>
+
+  <!-- seed data + strip renderer (before lang.js so the EN/JP pass catches the cards) -->
+  <script src="hidden-gems-data.js"></script>
+  <script>
+  (function () {
+    var data = (window.HIDDEN_GEMS && window.HIDDEN_GEMS.businesses) || [];
+    var GRAD = { Restaurant:'from-orange-300 to-amber-400', Cafe:'from-rose-200 to-pink-300', Stay:'from-indigo-200 to-sky-300', Experience:'from-emerald-200 to-teal-300' };
+    var FRESH = ['Verified today','Verified 2d ago','Verified 3d ago','Verified 4d ago','Verified 5d ago','Verified 6d ago','Verified 1w ago','Verified 1w ago'];
+    var FRESH_JP = ['本日確認済み','2日前に確認済み','3日前に確認済み','4日前に確認済み','5日前に確認済み','6日前に確認済み','1週間前に確認済み','1週間前に確認済み'];
+    function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function priceShort(p){ return p ? esc(String(p).split('/')[0].trim()) : ''; }
+    var grid = document.getElementById('recent-grid');
+    grid.innerHTML = data.slice(0, 8).map(function (b, i) {
+      var gem = !!b.hidden_gem, grad = GRAD[b.category] || 'from-slate-200 to-slate-300', price = priceShort(b.price);
+      return '<a href="storefront.html" class="rounded-2xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">' +
+        '<div class="h-28 relative bg-gradient-to-br ' + grad + ' flex items-center justify-center text-3xl overflow-hidden">' +
+          '<span aria-hidden="true">' + (b.image_emoji || '📍') + '</span>' +
+          '<img src="' + esc(b.image_url) + '" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()">' +
+          (gem ? '<span class="absolute top-2 left-2 z-10 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/90 text-purple-700">💎 Hidden Gem</span>' : '') +
+        '</div>' +
+        '<div class="p-4">' +
+          '<div class="flex items-start justify-between gap-2"><h3 class="font-bold text-gray-900 text-sm leading-snug">' + esc(b.name_en) + ' <span class="font-normal text-gray-400">' + esc(b.name_jp) + '</span></h3>' +
+            (price ? '<span class="text-[11px] font-bold text-amber-700 whitespace-nowrap">' + price + '</span>' : '') + '</div>' +
+          '<div class="text-[11px] uppercase tracking-wide text-gray-400 mt-0.5">' + esc(b.subcategory) + ' · ' + esc(b.area) + '</div>' +
+          '<div class="flex items-center justify-between mt-3">' +
+            '<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style="background:#E8F5E9; color:#2E7D32;" data-en="✓ ' + FRESH[i] + '" data-jp="✓ ' + FRESH_JP[i] + '">✓ ' + FRESH[i] + '</span>' +
+            '<span class="text-[11px] font-bold text-indigo-600" data-en="View →" data-jp="見る →">View →</span>' +
+          '</div>' +
+        '</div></a>';
+    }).join('');
+    grid.querySelectorAll('img').forEach(function (img) {
+      var t = setTimeout(function () { if (!(img.complete && img.naturalWidth > 0)) img.remove(); }, 5000);
+      img.addEventListener('load', function () { clearTimeout(t); });
+      img.addEventListener('error', function () { clearTimeout(t); img.remove(); });
+    });
+  })();
+  </script>
+
+  <!-- When: Agoda-style two-month range calendar + flexible mode -->
+  <script>
+  (function () {
+    var MN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var DOW = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+    var out = document.getElementById('trip-length');
+    var fl = document.getElementById('flex-length'), fm = document.getElementById('flex-month');
+    var pop = document.getElementById('cal-pop');
+    var paneCal = document.getElementById('pane-cal'), paneFlex = document.getElementById('pane-flex');
+    var tabCal = document.getElementById('tab-cal'), tabFlex = document.getElementById('tab-flex');
+    var m0 = document.getElementById('cal-m0'), m1 = document.getElementById('cal-m1');
+    var lbl0 = document.getElementById('cal-m0-label'), lbl1 = document.getElementById('cal-m1-label');
+    var tab = 'cal';
+
+    function ymd(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+    function parse(s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var start = parse('2026-6-15'), end = parse('2026-6-19');
+    var view = new Date(start.getFullYear(), start.getMonth(), 1);
+
+    function setLabel(en, jp) {
+      out.dataset.en = en; out.dataset.jp = jp;
+      out.innerHTML = (document.documentElement.lang === 'ja') ? jp : en;
+    }
+    function fmt(d) { return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); }
+    function dow(d) { return d.toLocaleDateString('en-US', { weekday: 'long' }); }
+
+    function updateFields() {
+      document.getElementById('ci-date').textContent = start ? fmt(start) : 'Select date';
+      document.getElementById('ci-dow').textContent = start ? dow(start) : '';
+      document.getElementById('co-date').textContent = end ? fmt(end) : 'Select date';
+      document.getElementById('co-dow').textContent = end ? dow(end) : '';
+    }
+    function updateLen() {
+      if (tab === 'flex') {
+        var days = parseInt(fl.value, 10) || 2, nights = days - 1;
+        var mo = fm.options[fm.selectedIndex];
+        var whenEn = (mo.dataset.en === 'Any time') ? 'flexible dates' : ('around ' + mo.dataset.en);
+        var whenJp = (mo.dataset.jp === 'いつでも') ? '日程は柔軟' : (mo.dataset.jp + 'ごろ');
+        setLabel('~' + days + ' days · ' + nights + (nights === 1 ? ' night' : ' nights') + ' · ' + whenEn,
+                 '約' + days + '日間・' + nights + '泊・' + whenJp);
+      } else if (start && end) {
+        var n = Math.round((end - start) / 86400000), dy = n + 1;
+        setLabel(dy + (dy === 1 ? ' day' : ' days') + ' · ' + n + (n === 1 ? ' night' : ' nights'), dy + '日間・' + n + '泊');
+      } else if (start) {
+        setLabel('Select a check-out date', 'チェックアウト日を選択');
+      }
+    }
+
+    function renderMonth(host, y, m) {
+      var offset = (new Date(y, m, 1).getDay() + 6) % 7;   // Monday-first
+      var dim = new Date(y, m + 1, 0).getDate();
+      var h = '<div class="grid grid-cols-7 mb-1">' + DOW.map(function (d) {
+        return '<div class="text-[11px] font-semibold text-gray-400 text-center py-1">' + d + '</div>';
+      }).join('') + '</div><div class="grid grid-cols-7">';
+      for (var i = 0; i < offset; i++) h += '<div></div>';
+      for (var day = 1; day <= dim; day++) {
+        var d = new Date(y, m, day), t = d.getTime();
+        var past = d < today;
+        var isS = start && t === start.getTime(), isE = end && t === end.getTime();
+        var inR = start && end && d > start && d < end;
+        var isT = t === today.getTime();
+        var cell = 'h-9 flex items-center justify-center';
+        if (inR) cell += ' bg-indigo-50';
+        if (isS && end) cell += ' bg-indigo-50 rounded-l-full';
+        if (isE) cell += ' bg-indigo-50 rounded-r-full';
+        var btn = 'w-9 h-9 rounded-full text-sm flex items-center justify-center';
+        if (past) btn += ' text-gray-300 cursor-default';
+        else if (isS || isE) btn += ' text-white font-bold';
+        else { btn += ' text-gray-900 hover:bg-gray-100 cursor-pointer'; if (isT) btn += ' ring-1 ring-indigo-400 font-bold'; }
+        var style = (!past && (isS || isE)) ? ' style="background:var(--kon-2)"' : '';
+        h += '<div class="' + cell + '"><button type="button" class="' + btn + '"' + style + ' data-d="' + ymd(d) + '"' + (past ? ' disabled' : '') + '>' + day + '</button></div>';
+      }
+      host.innerHTML = h + '</div>';
+    }
+    function renderCals() {
+      var y = view.getFullYear(), m = view.getMonth();
+      var n = new Date(y, m + 1, 1);
+      lbl0.textContent = MN[m] + ' ' + y;
+      lbl1.textContent = MN[n.getMonth()] + ' ' + n.getFullYear();
+      renderMonth(m0, y, m);
+      renderMonth(m1, n.getFullYear(), n.getMonth());
+    }
+
+    paneCal.addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      var b = ev.target.closest('button[data-d]'); if (!b || b.disabled) return;
+      var d = parse(b.dataset.d);
+      if (!start || (start && end) || d <= start) { start = d; end = null; }
+      else { end = d; }
+      renderCals(); updateFields(); updateLen();
+    });
+    document.getElementById('cal-prev').addEventListener('click', function () { view.setMonth(view.getMonth() - 1); renderCals(); });
+    document.getElementById('cal-next').addEventListener('click', function () { view.setMonth(view.getMonth() + 1); renderCals(); });
+
+    function setTab(t) {
+      tab = t;
+      paneCal.classList.toggle('hidden', t !== 'cal');
+      paneFlex.classList.toggle('hidden', t !== 'flex');
+      [[tabCal, 'cal'], [tabFlex, 'flex']].forEach(function (p) {
+        var on = p[1] === t;
+        p[0].classList.toggle('text-indigo-600', on);
+        p[0].classList.toggle('border-b-2', on);
+        p[0].classList.toggle('border-indigo-600', on);
+        p[0].classList.toggle('text-gray-400', !on);
+      });
+      updateLen();
+    }
+    tabCal.addEventListener('click', function () { setTab('cal'); });
+    tabFlex.addEventListener('click', function () { setTab('flex'); });
+    fl.addEventListener('change', updateLen);
+    fm.addEventListener('change', updateLen);
+
+    function openPop() { pop.classList.remove('hidden'); }
+    function closePop() { pop.classList.add('hidden'); }
+    document.getElementById('ci-field').addEventListener('click', function (e) { e.stopPropagation(); setTab('cal'); openPop(); });
+    document.getElementById('co-field').addEventListener('click', function (e) { e.stopPropagation(); setTab('cal'); openPop(); });
+    document.getElementById('cal-done').addEventListener('click', closePop);
+    document.addEventListener('click', function (e) { if (!pop.contains(e.target)) closePop(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePop(); });
+
+    renderCals(); updateFields(); setTab('cal');
+  })();
+  </script>
+
+  <!-- ===== PERSISTENT BOTTOM NAV · Itinerary is the anchor, always reachable ===== -->
+  <div aria-hidden="true" class="h-20 flex-shrink-0"></div>
+  <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-[0_-1px_4px_rgba(0,0,0,0.05)]">
+    <div class="max-w-md mx-auto w-full flex items-end justify-around px-2 pt-1.5 pb-2">
+      <a href="indexmock.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/home.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Home" data-jp="ホーム">Home</span></a>
+      <a href="businesses.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/compass.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Explore" data-jp="さがす">Explore</span></a>
+      <a href="itinerary.html" class="flex flex-col items-center gap-1 flex-1 group"><span class="w-12 h-12 -mt-5 rounded-full flex items-center justify-center text-white text-xl shadow-lg ring-4 ring-white group-hover:brightness-110 transition" style="background:linear-gradient(135deg,#223A70,#18243F);"><img src="icons/itinerary-white.svg" width="26" height="26" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-bold text-[#223A70]" data-en="Itinerary" data-jp="旅程">Itinerary</span></a>
+      <a href="discover.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/gem.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Add" data-jp="追加">Add</span></a>
+      <a href="plan-start.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-[#223A70]"><span class="text-lg leading-none"><img src="icons/brush.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-semibold" data-en="Plan" data-jp="プラン">Plan</span></a>
+    </div>
+  </nav>
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

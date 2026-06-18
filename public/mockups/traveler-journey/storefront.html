@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kamogawa-kan 鴨川館 — Riverside ryokan with private onsen baths in Kyoto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    #sov-requested { display: none; }
+    #sov-requested:target { display: block; }
+  </style>
+</head>
+<body class="bg-orange-50/40 text-gray-900">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between">
+    <a href="sov.html" class="hover:text-white">← SoV request</a>
+    <span class="tracking-widest uppercase hidden sm:inline">[Mockup v2 — Flow 9/9: Public storefront — the EN site travelers &amp; AI see]</span>
+    <span class="flex items-center gap-3">
+      <button data-lang-toggle class="text-[10px] border border-gray-600 px-2 py-0.5 rounded-full hover:bg-gray-800 font-medium text-gray-300">日本語</button>
+      <a href="index.html" class="text-white hover:text-indigo-300">↺ Restart flow</a>
+    </span>
+  </div>
+
+  <!-- SoV REQUESTED BANNER (:target — shows when arriving from the SoV modal) -->
+  <div id="sov-requested" class="bg-green-50 border-b border-green-200 py-3 px-4 text-center text-sm text-green-700 font-medium"
+       data-en="✓ Share-of-Voice report requested — we'll email it to you within 2 business days."
+       data-jp="✓ シェア・オブ・ボイスレポートを受け付けました — 2営業日以内にメールでお届けします。">
+    ✓ Share-of-Voice report requested — we'll email it to you within 2 business days.
+  </div>
+
+  <!-- ===== PUBLIC STOREFRONT (intentionally English — this is the product output for international travelers &amp; AI) ===== -->
+  <main class="max-w-3xl mx-auto my-8 px-4">
+    <div class="bg-white rounded-2xl overflow-hidden shadow-lg border border-orange-100">
+
+      <!-- Hero -->
+      <div class="relative h-80 bg-gradient-to-br from-amber-800 via-orange-600 to-amber-300 flex items-end overflow-hidden" id="hero-wrap">
+        <img src="https://loremflickr.com/800/480/japan,ryokan,onsen/all?lock=101" alt="" loading="eager"
+             class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()"
+             id="hero-img">
+        <div class="absolute inset-0 bg-black/30"></div>
+        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 70% 20%, rgba(255,255,255,0.4) 0, transparent 40%);"></div>
+        <div class="relative z-10 p-6 sm:p-10 text-white">
+          <div class="text-[11px] uppercase tracking-[0.25em] opacity-80 mb-2">Ryokan · Kyoto, Japan</div>
+          <h1 class="text-2xl sm:text-4xl font-extrabold mb-2">Kamogawa-kan 鴨川館</h1>
+          <p class="text-sm sm:text-base opacity-95">Riverside ryokan with private onsen baths in the heart of Kyoto.</p>
+        </div>
+      </div>
+
+      <!-- Quick facts strip -->
+      <div class="grid grid-cols-3 divide-x divide-orange-100 border-b border-orange-100 text-center">
+        <div class="py-4">
+          <div class="text-lg font-extrabold text-amber-700">¥28,000~</div>
+          <div class="text-[11px] text-gray-400">per night</div>
+        </div>
+        <div class="py-4">
+          <div class="text-lg font-extrabold text-amber-700">12 min</div>
+          <div class="text-[11px] text-gray-400">from Kyoto Station</div>
+        </div>
+        <div class="py-4">
+          <div class="text-lg font-extrabold text-amber-700">Since 1932</div>
+          <div class="text-[11px] text-gray-400">family-run, 4 generations</div>
+        </div>
+      </div>
+
+      <!-- Traveler strip — links the public page into the consumer planning journey -->
+      <a href="plan-start.html" class="flex items-center gap-3 px-4 sm:px-10 py-3.5 border-b border-orange-100 bg-indigo-50/60 hover:bg-indigo-50 transition-colors group">
+        <span class="text-lg">🗺️</span>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-bold text-gray-900" data-en="Plan a trip around here" data-jp="このあたりを旅程に組み込む">Plan a trip around here</div>
+          <div class="text-xs text-gray-500" data-en="Let AIVIBLE build a Kyoto itinerary with verified local gems near this spot." data-jp="この周辺の認証済みの名店を含む京都の旅程をAIVIBLEが作成します。">Let AIVIBLE build a Kyoto itinerary with verified local gems near this spot.</div>
+        </div>
+        <span class="text-sm font-bold text-indigo-600 group-hover:text-indigo-800 flex-shrink-0" data-en="Build trip →" data-jp="旅程をつくる →">Build trip →</span>
+      </a>
+
+      <!-- About -->
+      <div class="px-4 sm:px-10 py-7 border-b border-orange-50">
+        <h2 class="font-bold mb-2 text-sm uppercase tracking-widest text-amber-600">About</h2>
+        <p class="text-[15px] text-gray-600 leading-relaxed">Family-run for four generations since 1932, Kamogawa-kan offers tatami rooms overlooking the Kamo River in central Kyoto. Guests enjoy private onsen baths, seasonal kaiseki dinners, and traditional hospitality, a short walk from Gion and Pontocho Alley.</p>
+      </div>
+
+      <!-- Features -->
+      <div class="px-4 sm:px-10 py-6 border-b border-orange-50">
+        <h2 class="font-bold mb-3 text-sm uppercase tracking-widest text-amber-600">What makes us special</h2>
+        <div class="flex flex-wrap gap-2">
+          <span class="text-xs bg-amber-100 text-amber-700 px-3 py-1.5 rounded-full font-medium">♨️ Private Onsen</span>
+          <span class="text-xs bg-amber-100 text-amber-700 px-3 py-1.5 rounded-full font-medium">🏯 Traditional Architecture</span>
+          <span class="text-xs bg-amber-100 text-amber-700 px-3 py-1.5 rounded-full font-medium">🍱 Kaiseki Cuisine</span>
+          <span class="text-xs bg-amber-100 text-amber-700 px-3 py-1.5 rounded-full font-medium">🌊 River View</span>
+          <span class="text-xs bg-amber-100 text-amber-700 px-3 py-1.5 rounded-full font-medium">🗣️ English-speaking Staff</span>
+        </div>
+      </div>
+
+      <!-- Rooms -->
+      <div class="px-4 sm:px-10 py-7 border-b border-orange-50">
+        <h2 class="font-bold mb-4 text-sm uppercase tracking-widest text-amber-600">Rooms &amp; Plans</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div class="border border-orange-100 rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
+            <div class="h-36 bg-gradient-to-br from-amber-200 to-orange-200 flex items-center justify-center text-4xl">🛏️</div>
+            <div class="p-4">
+              <div class="font-semibold text-gray-900">River-view Tatami Room</div>
+              <div class="text-xs text-gray-400 mt-1">Breakfast included · up to 3 guests · private bath</div>
+              <div class="flex items-center justify-between mt-3">
+                <div class="font-extrabold text-amber-700">¥28,000 <span class="text-[10px] font-normal text-gray-400">/ night</span></div>
+                <a href="#" class="text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded-lg transition-colors">Enquire</a>
+              </div>
+            </div>
+          </div>
+          <div class="border border-orange-100 rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
+            <div class="h-36 bg-gradient-to-br from-orange-100 to-amber-200 flex items-center justify-center text-4xl">🍱</div>
+            <div class="p-4">
+              <div class="font-semibold text-gray-900">Kaiseki Dinner Plan</div>
+              <div class="text-xs text-gray-400 mt-1">Seasonal 9-course dinner · room included</div>
+              <div class="flex items-center justify-between mt-3">
+                <div class="font-extrabold text-amber-700">¥42,000 <span class="text-[10px] font-normal text-gray-400">/ night</span></div>
+                <a href="#" class="text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded-lg transition-colors">Enquire</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gallery -->
+      <div class="px-4 sm:px-10 py-7 border-b border-orange-50">
+        <h2 class="font-bold mb-4 text-sm uppercase tracking-widest text-amber-600">Gallery</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="gallery-grid">
+          <!-- [0] ryokan room -->
+          <div class="h-24 rounded-xl bg-gradient-to-br from-stone-300 to-stone-400 relative overflow-hidden flex items-center justify-center text-2xl">
+            <span aria-hidden="true">🛏️</span>
+            <img src="https://loremflickr.com/320/200/japan,ryokan,room/all?lock=102" alt="Ryokan room" loading="lazy"
+                 class="absolute inset-0 w-full h-full object-cover rounded-xl" onerror="this.remove()">
+          </div>
+          <!-- [1] onsen bath -->
+          <div class="h-24 rounded-xl bg-gradient-to-br from-amber-200 to-amber-300 relative overflow-hidden flex items-center justify-center text-2xl">
+            <span aria-hidden="true">♨️</span>
+            <img src="https://loremflickr.com/320/200/japan,onsen,bath/all?lock=103" alt="Private onsen" loading="lazy"
+                 class="absolute inset-0 w-full h-full object-cover rounded-xl" onerror="this.remove()">
+          </div>
+          <!-- [2] kaiseki food -->
+          <div class="h-24 rounded-xl bg-gradient-to-br from-emerald-200 to-emerald-300 relative overflow-hidden flex items-center justify-center text-2xl">
+            <span aria-hidden="true">🍱</span>
+            <img src="https://loremflickr.com/320/200/japan,kaiseki,food/all?lock=104" alt="Kaiseki dinner" loading="lazy"
+                 class="absolute inset-0 w-full h-full object-cover rounded-xl" onerror="this.remove()">
+          </div>
+          <!-- [3] garden / exterior -->
+          <div class="h-24 rounded-xl bg-gradient-to-br from-rose-200 to-rose-300 relative overflow-hidden flex items-center justify-center text-2xl">
+            <span aria-hidden="true">🌿</span>
+            <img src="https://loremflickr.com/320/200/japan,garden,kyoto/all?lock=105" alt="Garden exterior" loading="lazy"
+                 class="absolute inset-0 w-full h-full object-cover rounded-xl" onerror="this.remove()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Access & Contact -->
+      <div class="px-4 sm:px-10 py-7">
+        <h2 class="font-bold mb-3 text-sm uppercase tracking-widest text-amber-600">Access &amp; Contact</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="text-sm text-gray-600 space-y-2">
+            <div>🚉 12 min from Kyoto Station by taxi</div>
+            <div>🚇 Karasuma Line → Karasuma-Oike, 5 min walk</div>
+            <div>📍 Oike-dori, Nakagyo-ku, Kyoto</div>
+            <div>📞 +81-75-000-0000</div>
+            <div>✉️ stay@kamogawakan.com</div>
+          </div>
+          <div class="relative bg-gradient-to-br from-emerald-50 to-teal-100 rounded-xl h-32 flex items-center justify-center overflow-hidden border border-gray-100">
+            <div class="absolute inset-0 opacity-20" style="background-image: repeating-linear-gradient(0deg, #94a3b8 0, #94a3b8 1px, transparent 0, transparent 50%), repeating-linear-gradient(90deg, #94a3b8 0, #94a3b8 1px, transparent 0, transparent 50%); background-size: 30px 30px;"></div>
+            <div class="text-center relative z-10">
+              <div class="text-3xl" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));">📍</div>
+              <div class="text-xs font-semibold text-gray-600 bg-white/80 px-3 py-1 rounded-full mt-1">Kyoto, Japan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Powered by -->
+      <div class="bg-amber-50 border-t border-orange-100 py-4 text-center">
+        <a href="index.html" class="text-[11px] text-gray-400 hover:text-gray-600"
+           data-en="<span class='japan-red'>●</span> Powered by <b>AIVIBLE</b> — AI-optimized &amp; verified · Get your own free AI site →"
+           data-jp="<span class='japan-red'>●</span> Powered by <b>AIVIBLE</b> — AI最適化・認証済み · あなたのお店の無料AIサイトを作る →">
+          <span class="japan-red">●</span> Powered by <b>AIVIBLE</b> — AI-optimized &amp; verified · Get your own free AI site →
+        </a>
+      </div>
+    </div>
+
+    <!-- AI-readability footnote -->
+    <div class="mt-6 mb-10 bg-gray-900 rounded-xl p-5 font-mono text-xs leading-relaxed">
+      <div class="text-green-400 mb-2">$ AI bot visiting aivible.tokyo/s/kamogawa-kan ...</div>
+      <div class="text-gray-400">✓ robots.txt welcomes AI crawlers &nbsp;·&nbsp; ✓ llms.txt present &nbsp;·&nbsp; ✓ Schema.org LodgingBusiness &nbsp;·&nbsp; ✓ English + Japanese &nbsp;·&nbsp; ✓ prices &amp; access quotable</div>
+      <div class="mt-3 text-green-400 border-t border-gray-700 pt-3"
+           data-en="✅ Result: AI can read, quote, and recommend this business. Score A."
+           data-jp="✅ 結果：AIはこのビジネスを読み取り、引用し、推薦できます。スコア A。">
+        ✅ Result: AI can read, quote, and recommend this business. Score A.</div>
+    </div>
+  </main>
+
+  <script>
+  // img fallback: remove any image that hasn't loaded in 5 s so gradient+emoji shows
+  (function () {
+    var imgs = document.querySelectorAll('#hero-img, #gallery-grid img');
+    imgs.forEach(function (img) {
+      var t = setTimeout(function () { if (!(img.complete && img.naturalWidth > 0)) img.remove(); }, 5000);
+      img.addEventListener('load', function () { clearTimeout(t); });
+      img.addEventListener('error', function () { clearTimeout(t); img.remove(); });
+    });
+  })();
+  </script>
+  <!-- ===== PERSISTENT BOTTOM NAV · Itinerary is the anchor, always reachable ===== -->
+  <div aria-hidden="true" class="h-20"></div>
+  <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-[0_-1px_4px_rgba(0,0,0,0.05)]">
+    <div class="max-w-md mx-auto w-full flex items-end justify-around px-2 pt-1.5 pb-2">
+      <a href="indexmock.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/home.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Home" data-jp="ホーム">Home</span></a>
+      <a href="businesses.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/compass.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Explore" data-jp="さがす">Explore</span></a>
+      <a href="itinerary.html" class="flex flex-col items-center gap-1 flex-1 group"><span class="w-12 h-12 -mt-5 rounded-full flex items-center justify-center text-white text-xl shadow-lg ring-4 ring-white group-hover:brightness-110 transition" style="background:linear-gradient(135deg,#223A70,#18243F);"><img src="icons/itinerary-white.svg" width="26" height="26" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-bold text-[#223A70]" data-en="Itinerary" data-jp="旅程">Itinerary</span></a>
+      <a href="discover.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/gem.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Add" data-jp="追加">Add</span></a>
+      <a href="plan-start.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/brush.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Plan" data-jp="プラン">Plan</span></a>
+    </div>
+  </nav>
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

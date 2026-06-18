@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 50" fill="none">
+  <!-- Shirube — flat Japan-blue stone guidepost. Brand mascot avatar. -->
+  <!-- body / post -->
+  <rect x="12" y="5" width="20" height="41" rx="9" fill="#223A70"/>
+  <!-- eyes -->
+  <circle cx="18" cy="17" r="2" fill="#fff"/>
+  <circle cx="26" cy="17" r="2" fill="#fff"/>
+  <!-- smile -->
+  <path d="M17.5 21.8 Q22 25.2 26.5 21.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  <!-- gold "this way" arrow — identity emblem -->
+  <path d="M18 28 L29 33.5 L18 39 Z" fill="#C8A859"/>
+  <!-- red hanko seal near base -->
+  <rect x="19" y="40.5" width="6" height="4.2" rx="1" fill="#D6452C"/>
+</svg>

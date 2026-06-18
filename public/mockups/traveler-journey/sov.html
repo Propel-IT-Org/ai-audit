@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — Step 8: Share-of-Voice request</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900 h-screen flex flex-col overflow-hidden">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between flex-shrink-0">
+    <a href="editor-paywall.html" class="hover:text-white">← Paywall</a>
+    <span class="tracking-widest uppercase">[Mockup v2 — Flow 8/9: SoV report request (modal)]</span>
+    <a href="storefront.html" class="text-white hover:text-indigo-300">Next: Public site →</a>
+  </div>
+
+  <!-- DIMMED EDITOR BACKDROP -->
+  <div class="relative flex-1 overflow-hidden">
+
+    <div class="absolute inset-0 opacity-40 pointer-events-none select-none" aria-hidden="true">
+      <header class="bg-white border-b border-gray-200">
+        <div class="px-4 py-2.5 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1"><img src="icons/shirube.svg" alt="Shirube" class="w-6 h-6" /><span class="text-lg font-bold text-gray-900">AIVIBLE</span></span>
+            <span class="text-gray-300">/</span>
+            <span class="text-sm font-medium text-gray-700">Kamogawa-kan</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="bg-indigo-50 border border-indigo-100 rounded-full px-3 py-1 text-xs font-bold text-indigo-600">⚡ 4</div>
+            <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 font-bold text-xs flex items-center justify-center">YT</span>
+          </div>
+        </div>
+      </header>
+      <div class="flex h-full">
+        <div class="w-[400px] bg-white border-r border-gray-200 h-full"></div>
+        <div class="flex-1 bg-gray-100 p-5">
+          <div class="max-w-3xl mx-auto bg-white rounded-xl h-96 border border-gray-200"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="absolute inset-0 bg-gray-900/40"></div>
+
+    <!-- ★ SoV MODAL -->
+    <div class="absolute inset-0 flex items-center justify-center p-4 overflow-y-auto">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-gray-100">
+
+        <div class="px-6 pt-6 pb-4 border-b border-gray-50 flex items-start justify-between">
+          <div>
+            <div class="text-[10px] font-bold text-purple-500 uppercase tracking-widest mb-1" data-en="AI Share-of-Voice Report" data-jp="AIシェア・オブ・ボイス（SoV）レポート">AI Share-of-Voice Report</div>
+            <h1 class="text-xl font-extrabold text-gray-900" data-en="How often does AI recommend you?" data-jp="AIはあなたを何回推薦している？">How often does AI recommend you?</h1>
+          </div>
+          <div class="flex items-center gap-2">
+            <button data-lang-toggle class="text-[10px] border border-gray-200 px-2 py-1 rounded-full hover:bg-gray-50 font-medium text-gray-500">日本語</button>
+            <a href="editor-2.html" class="text-gray-300 hover:text-gray-500 text-xl leading-none" title="Close">×</a>
+          </div>
+        </div>
+
+        <div class="px-6 py-5">
+          <p class="text-sm text-gray-500 mb-4"
+             data-en="We ask ChatGPT &amp; Perplexity the questions your customers actually ask — like <i>“best ryokan with private onsen in Kyoto”</i> — and measure how often <b>you</b> appear vs. your competitors."
+             data-jp="お客様が実際にAIへ聞く質問 — 例：<i>「京都 貸切露天風呂のある旅館 おすすめ」</i> — をChatGPTとPerplexityに投げかけ、競合と比べて<b>あなた</b>が何回登場するかを計測します。">
+            We ask ChatGPT &amp; Perplexity the questions your customers actually ask — like <i>“best ryokan with private onsen in Kyoto”</i> — and measure how often <b>you</b> appear vs. your competitors.</p>
+
+          <!-- Sample report preview -->
+          <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-5">
+            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3" data-en="Sample · Share of Voice across 25 AI queries" data-jp="サンプル · AIへの25の質問におけるシェア・オブ・ボイス">Sample · Share of Voice across 25 AI queries</div>
+            <div class="space-y-2.5">
+              <div>
+                <div class="flex justify-between text-[11px] mb-1"><span class="font-semibold text-gray-700" data-en="Competitor A" data-jp="競合A">Competitor A</span><span class="text-gray-400">64%</span></div>
+                <div class="h-2 bg-gray-200 rounded-full"><div class="h-2 bg-gray-400 rounded-full" style="width:64%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between text-[11px] mb-1"><span class="font-semibold text-gray-700" data-en="Competitor B" data-jp="競合B">Competitor B</span><span class="text-gray-400">41%</span></div>
+                <div class="h-2 bg-gray-200 rounded-full"><div class="h-2 bg-gray-400 rounded-full" style="width:41%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between text-[11px] mb-1"><span class="font-bold text-purple-600" data-en="Your business" data-jp="あなたのビジネス">Your business</span><span class="font-bold text-purple-600">8% → ?</span></div>
+                <div class="h-2 bg-purple-100 rounded-full"><div class="h-2 bg-purple-500 rounded-full" style="width:8%"></div></div>
+              </div>
+            </div>
+            <div class="text-[10px] text-gray-400 mt-3" data-en="Your report shows your real numbers — before and after your AIVIBLE site." data-jp="レポートでは、AIVIBLEサイト導入前後の実数値をお見せします。">Your report shows your real numbers — before and after your AIVIBLE site.</div>
+          </div>
+
+          <!-- Form -->
+          <div class="space-y-3 mb-5">
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1" data-en="Send the report to" data-jp="レポートの送付先">Send the report to</label>
+              <input type="email" value="yamada.taro@gmail.com" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1"><span data-en="Competitors to compare" data-jp="比較したい競合">Competitors to compare</span> <span class="text-gray-300 font-normal" data-en="(optional)" data-jp="（任意）">(optional)</span></label>
+              <input type="text" data-en-ph="e.g. hotel-kanra.co.jp, gion-ryokan.jp" data-jp-ph="例：hotel-kanra.co.jp、gion-ryokan.jp" placeholder="e.g. hotel-kanra.co.jp, gion-ryokan.jp" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
+            </div>
+          </div>
+
+          <a href="storefront.html#sov-requested" class="block w-full text-center bg-purple-500 hover:bg-purple-600 text-white font-bold py-3.5 rounded-xl transition-colors shadow-lg shadow-purple-100"
+             data-en="Request My Report — Free" data-jp="レポートを依頼する — 無料">
+            Request My Report — Free
+          </a>
+          <p class="text-center text-[11px] text-gray-400 mt-3"
+             data-en="Prepared by our team · delivered by email within 2 business days · free during beta"
+             data-jp="専門チームが作成 · 2営業日以内にメールでお届け · ベータ期間中は無料">
+            Prepared by our team · delivered by email within 2 business days · free during beta</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

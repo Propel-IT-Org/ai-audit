@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — Out of free chats today</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    .wl-num { width: 20px; height: 20px; border-radius: 9999px; background: #e5351a; color: #fff; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .wl-num.wl-num-gem { background: var(--gold); color: var(--kon); }
+  </style>
+</head>
+<body class="bg-white text-gray-900 h-screen flex flex-col overflow-hidden">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between flex-shrink-0">
+    <a href="trip-canvas.html" class="hover:text-white">← Trip canvas</a>
+    <span class="tracking-widest uppercase hidden sm:inline">[Mockup v2 · Traveler — Daily chats used up → share to unlock +5]</span>
+    <a href="plan-share.html" class="text-white hover:text-indigo-300">Next: Share for +5 →</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="border-b border-gray-100 bg-white flex-shrink-0">
+    <div class="px-4 py-2.5 flex items-center justify-between gap-3">
+      <a href="indexmock.html" class="flex items-center gap-1 flex-shrink-0"><img src="icons/shirube.svg" alt="Shirube" class="w-6 h-6" /><span class="text-lg font-bold text-gray-900">AIVIBLE</span></a>
+      <div class="min-w-0 text-center flex-1">
+        <div class="text-sm font-semibold text-gray-900 truncate" data-en="2 Days in Kyoto" data-jp="京都2日間">2 Days in Kyoto</div>
+        <div class="text-[10px] text-gray-400" data-en="6 stops · draft" data-jp="6スポット · 下書き">6 stops · draft</div>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <span class="flex items-center gap-1 bg-orange-50 border border-orange-200 rounded-full px-2.5 py-1">
+          <span class="text-xs font-bold text-orange-600">💬 0</span>
+          <span class="text-[10px] text-orange-400 hidden sm:inline" data-en="today" data-jp="本日">today</span>
+        </span>
+        <button data-lang-toggle class="text-xs border border-gray-200 px-2.5 py-1 rounded-full hover:bg-gray-50 font-medium">日本語</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CHAT (single column, focused on the cap fork) -->
+  <main class="flex-1 overflow-y-auto bg-white">
+    <div class="max-w-lg mx-auto w-full px-4 py-5 space-y-4">
+
+      <!-- recent exchange (context) -->
+      <div class="flex justify-end">
+        <div class="bg-[#223A70] text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[85%]" data-en="Swap day 2 for something more relaxed with a tea ceremony" data-jp="2日目をお茶体験中心のゆったりプランに変えて">Swap day 2 for something more relaxed with a tea ceremony</div>
+      </div>
+      <div class="flex gap-2.5">
+        <span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs flex-shrink-0 mt-0.5" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>
+        <div class="bg-gray-50 border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700" data-en="Done! Day 2 now centers on Uji — a tea ceremony at Tsuen, Japan's oldest tea house, plus a riverside stroll. 🍵" data-jp="完了！2日目は宇治中心に — 日本最古の茶屋「通圓」での茶体験と川沿いの散策にしました。🍵">Done! Day 2 now centers on Uji — a tea ceremony at Tsuen, Japan's oldest tea house, plus a riverside stroll. 🍵</div>
+      </div>
+      <div class="pl-9 text-[11px] text-gray-400" data-en="💬 Last free chat used · 0 left today" data-jp="💬 本日最後の無料チャットを使用 · 残り0回">💬 Last free chat used · 0 left today</div>
+
+      <!-- ★ CAP FORK PANEL -->
+      <div class="rounded-2xl border-2 border-indigo-200 bg-gradient-to-b from-white to-indigo-50 p-5 shadow-sm">
+        <div class="text-center mb-4">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-100 text-2xl mb-2">💬</div>
+          <h2 class="text-lg font-extrabold text-gray-900" data-en="You've used today's free chats" data-jp="本日の無料チャットを使い切りました">You've used today's free chats</h2>
+          <p class="text-xs text-gray-500 mt-1" data-en="You get 8 free planning chats a day. Share your trip to keep going now — or come back tomorrow." data-jp="無料の計画チャットは1日8回。今すぐ続けるには旅程をシェア — または明日また利用できます。">You get 8 free planning chats a day. Share your trip to keep going now — or come back tomorrow.</p>
+        </div>
+
+        <!-- Primary: share to unlock -->
+        <a href="plan-share.html" class="block rounded-xl bg-gradient-to-br from-gold-500/15 to-white border-2 border-gold-500/50 p-3.5 mb-2 hover:border-gold-500 transition-colors">
+          <div class="flex items-center justify-between mb-0.5">
+            <span class="text-[11px] font-bold text-gold-500 uppercase tracking-widest" data-en="Free · Recommended" data-jp="無料・おすすめ">Free · Recommended</span>
+            <span class="text-sm font-extrabold text-gold-500">+5 💬</span>
+          </div>
+          <div class="text-sm font-bold text-gray-900 mb-0.5" data-en="Share your trip → unlock 5 more chats" data-jp="旅程をシェア → チャット5回を解放">Share your trip → unlock 5 more chats</div>
+          <p class="text-[11px] text-gray-600" data-en="Send your Kyoto itinerary to a friend. +5 now, +5 more when they open it. →" data-jp="京都の旅程を友達に送信。今すぐ+5、相手が開くとさらに+5。→">Send your Kyoto itinerary to a friend. +5 now, +5 more when they open it. →</p>
+        </a>
+
+        <!-- Secondary: come back tomorrow -->
+        <div class="rounded-xl bg-white border border-gray-200 p-3.5 mb-2 flex items-center gap-3">
+          <span class="text-xl">🌙</span>
+          <div class="flex-1">
+            <div class="text-sm font-semibold text-gray-900" data-en="Come back tomorrow" data-jp="明日また利用する">Come back tomorrow</div>
+            <div class="text-[11px] text-gray-500" data-en="Your 8 free chats reset at midnight." data-jp="無料チャット8回は深夜0時にリセットされます。">Your 8 free chats reset at midnight.</div>
+          </div>
+        </div>
+
+        <!-- Tertiary: upgrade -->
+        <a href="#" class="block text-center text-[11px] text-gray-400 hover:text-indigo-500 mt-2" data-en="Travel a lot? Go Pro for unlimited planning →" data-jp="よく旅行する方へ：Proで無制限プランニング →">Travel a lot? Go Pro for unlimited planning →</a>
+      </div>
+
+      <p class="text-center text-[10px] text-gray-400" data-en="Your itinerary stays saved — only AI chat is paused." data-jp="旅程は保存されたまま — 一時停止するのはAIチャットのみ。">Your itinerary stays saved — only AI chat is paused.</p>
+    </div>
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="flex-shrink-0 bg-white border-t border-gray-100 shadow-[0_-1px_4px_rgba(0,0,0,0.05)]">
+    <div class="max-w-md mx-auto w-full flex items-end justify-around px-2 pt-1.5 pb-2">
+      <a href="indexmock.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700"><img src="icons/home.svg" width="22" height="22" alt="" /><span class="text-[10px] font-medium" data-en="Home" data-jp="ホーム">Home</span></a>
+      <a href="businesses.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700"><img src="icons/compass.svg" width="22" height="22" alt="" /><span class="text-[10px] font-medium" data-en="Explore" data-jp="さがす">Explore</span></a>
+      <a href="itinerary.html" class="flex flex-col items-center gap-1 flex-1 group"><span class="w-12 h-12 -mt-5 rounded-full flex items-center justify-center text-white text-xl shadow-lg ring-4 ring-white" style="background:linear-gradient(135deg,#223A70,#18243F);"><img src="icons/itinerary-white.svg" width="26" height="26" alt="" /></span><span class="text-[10px] font-bold text-[#223A70]" data-en="Itinerary" data-jp="旅程">Itinerary</span></a>
+      <a href="discover.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700"><img src="icons/gem.svg" width="22" height="22" alt="" /><span class="text-[10px] font-medium" data-en="Add" data-jp="追加">Add</span></a>
+      <a href="plan-start.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-[#223A70]"><img src="icons/brush.svg" width="22" height="22" alt="" /><span class="text-[10px] font-semibold" data-en="Plan" data-jp="プラン">Plan</span></a>
+    </div>
+  </nav>
+
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

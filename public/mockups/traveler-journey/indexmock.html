@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — Japan's AI visibility layer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    .hero-map {
+      background-color: #18243F;
+      background-image:
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+    .path-card { transition: transform .15s ease, box-shadow .15s ease; }
+    .path-card:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(24,36,63,.18); }
+  </style>
+</head>
+<body class="bg-white text-gray-900 min-h-screen flex flex-col">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between">
+    <span class="tracking-widest uppercase hidden sm:inline">[Mockup v2 — Front door · choose a journey]</span>
+    <span class="sm:hidden tracking-widest uppercase">[Mockup v2]</span>
+    <a href="index.html" class="text-white hover:text-indigo-300">SME audit demo →</a>
+  </div>
+
+  <!-- HEADER (unified nav) -->
+  <header class="bg-white/90 border-b border-gray-100 sticky top-0 z-50 backdrop-blur-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="indexmock.html" class="flex items-center gap-1">
+        <img src="icons/shirube.svg" alt="Shirube" class="w-7 h-7" />
+        <span class="text-xl font-bold text-gray-900">AIVIBLE</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-5 text-sm text-gray-500">
+        <a href="plan-start.html" class="hover:text-gray-900 transition-colors" data-en="Plan a trip" data-jp="旅程をつくる">Plan a trip</a>
+        <a href="businesses.html" class="hover:text-gray-900 transition-colors" data-en="Explore" data-jp="さがす">Explore</a>
+        <a href="discover.html" class="hover:text-gray-900 transition-colors" data-en="Add places" data-jp="スポットを追加">Add places</a>
+        <span class="text-gray-200">|</span>
+        <a href="index.html" class="hover:text-gray-900 transition-colors" data-en="For your business" data-jp="事業者の方へ">For your business</a>
+      </nav>
+      <button data-lang-toggle class="text-sm border border-gray-200 px-3 py-1 rounded-full hover:bg-gray-50 font-medium">日本語</button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main class="flex-1 hero-map relative flex items-center justify-center px-4 py-12 md:py-16">
+    <div class="relative w-full max-w-6xl">
+      <div class="grid items-center gap-8 md:grid-cols-2">
+        <div class="text-center md:text-left">
+          <p class="av-eyebrow mb-2" style="color:var(--gold);" data-en="Japan's AI visibility layer" data-jp="日本のAI可視化レイヤー">Japan's AI visibility layer</p>
+          <h1 class="text-3xl md:text-5xl font-extrabold text-white leading-tight"
+              data-en="Travelers ask AI. We make sure Japan's best places get recommended."
+              data-jp="旅行者はAIに尋ねる。日本の名店がきちんと薦められるように。">Travelers ask AI. We make sure Japan's best places get recommended.</h1>
+          <p class="mt-3 text-sm md:text-base text-indigo-100/80 max-w-xl mx-auto md:mx-0"
+             data-en="Plan a Japan trip with verified local gems — or make your business one of the places AI recommends."
+             data-jp="認証済みの地元の名店で日本の旅を計画。あるいは、あなたのお店をAIが薦める場所に。">Plan a Japan trip with verified local gems — or make your business one of the places AI recommends.</p>
+        </div>
+        <div class="overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10">
+          <img src="illustrations/hero-a.webp" alt="" class="w-full h-auto" />
+        </div>
+      </div>
+
+      <!-- TWO PATHS -->
+      <div class="mt-9 grid gap-5 md:grid-cols-2 text-left">
+
+        <!-- Traveler path -->
+        <a href="plan-start.html" class="path-card group bg-white rounded-2xl shadow-2xl p-6 flex flex-col">
+          <div class="flex items-center gap-3">
+            <span class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style="background:#EEF1F8;"><img src="icons/traveler-map.svg" width="28" height="28" alt="" style="display:inline-block;vertical-align:middle" /></span>
+            <div>
+              <div class="av-eyebrow" style="color:var(--gold);" data-en="For travelers" data-jp="旅行者の方へ">For travelers</div>
+              <h2 class="text-xl font-extrabold text-gray-900" data-en="Plan a trip to Japan" data-jp="日本旅行を計画する">Plan a trip to Japan</h2>
+            </div>
+          </div>
+          <p class="mt-3 text-sm text-gray-500 flex-1"
+             data-en="Search what you want to experience, build an AI-assisted itinerary, and discover verified local gems English-only search hides."
+             data-jp="体験したいことを検索し、AIで旅程を組み立て、英語検索では見つからない認証済みの名店を発見。">Search what you want to experience, build an AI-assisted itinerary, and discover verified local gems English-only search hides.</p>
+          <ul class="mt-4 space-y-1.5 text-[13px] text-gray-600">
+            <li class="flex items-center gap-2"><span class="text-indigo-500">✓</span> <span data-en="AI itinerary planner (chat with Shirube)" data-jp="AI旅程プランナー（シルベと相談）">AI itinerary planner (chat with Shirube)</span></li>
+            <li class="flex items-center gap-2"><span class="text-indigo-500">✓</span> <span data-en="Verified hidden gems on a live map" data-jp="地図上で認証済みの隠れた名店">Verified hidden gems on a live map</span></li>
+            <li class="flex items-center gap-2"><span class="text-indigo-500">✓</span> <span data-en="Bilingual JP + EN search" data-jp="日英バイリンガル検索">Bilingual JP + EN search</span></li>
+          </ul>
+          <span class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl text-white font-bold px-6 py-3 transition-colors" style="background:var(--kon-2);" data-en="Start planning →" data-jp="計画を始める →">Start planning →</span>
+        </a>
+
+        <!-- SME path -->
+        <a href="index.html" class="path-card group bg-white rounded-2xl shadow-2xl p-6 flex flex-col">
+          <div class="flex items-center gap-3">
+            <span class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style="background:#F3EFE2;"><img src="icons/noren.svg" width="28" height="28" alt="" style="display:inline-block;vertical-align:middle" /></span>
+            <div>
+              <div class="av-eyebrow" style="color:var(--gold);" data-en="For businesses" data-jp="事業者の方へ">For businesses</div>
+              <h2 class="text-xl font-extrabold text-gray-900" data-en="Make your business AI-visible" data-jp="お店をAIに見つけてもらう">Make your business AI-visible</h2>
+            </div>
+          </div>
+          <p class="mt-3 text-sm text-gray-500 flex-1"
+             data-en="See how ChatGPT, Gemini and Perplexity see your business today — then let AI build you a site their travelers can actually find."
+             data-jp="ChatGPT・Gemini・Perplexityにあなたのお店がどう見えているかを診断し、AIが旅行者に見つけられるサイトを構築。">See how ChatGPT, Gemini and Perplexity see your business today — then let AI build you a site their travelers can actually find.</p>
+          <ul class="mt-4 space-y-1.5 text-[13px] text-gray-600">
+            <li class="flex items-center gap-2"><span class="text-indigo-500">✓</span> <span data-en="Free AI-visibility audit (30 seconds)" data-jp="無料のAI可視化診断（30秒）">Free AI-visibility audit (30 seconds)</span></li>
+            <li class="flex items-center gap-2"><span class="text-indigo-500">✓</span> <span data-en="AI builds & refines your site" data-jp="AIがサイトを構築・改善">AI builds &amp; refines your site</span></li>
+            <li class="flex items-center gap-2"><span class="text-indigo-500">✓</span> <span data-en="Get recommended in AI itineraries" data-jp="AIの旅程に推薦される">Get recommended in AI itineraries</span></li>
+          </ul>
+          <span class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl font-bold px-6 py-3 border-2 transition-colors" style="border-color:var(--kon-2); color:var(--kon-2);" data-en="Check my business →" data-jp="お店を診断する →">Check my business →</span>
+        </a>
+      </div>
+
+      <p class="mt-6 text-xs text-indigo-100/70 text-center" data-en="The two sides connect: travelers' AI itineraries fill with the businesses we make visible." data-jp="両者はつながっています。旅行者のAI旅程は、私たちが可視化したお店で満たされます。">The two sides connect: travelers' AI itineraries fill with the businesses we make visible.</p>
+    </div>
+  </main>
+
+  <footer class="border-t border-gray-100 py-6 text-center text-xs text-gray-400">
+    © 2026 AIVIBLE · <span data-en="Verified discovery for Japan travel" data-jp="日本旅行のための認証済みディスカバリー">Verified discovery for Japan travel</span>
+  </footer>
+
+  <!-- ===== PERSISTENT BOTTOM NAV · Itinerary is the anchor, always reachable ===== -->
+  <div aria-hidden="true" class="h-20 flex-shrink-0"></div>
+  <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-[0_-1px_4px_rgba(0,0,0,0.05)]">
+    <div class="max-w-md mx-auto w-full flex items-end justify-around px-2 pt-1.5 pb-2">
+      <a href="indexmock.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-[#223A70]"><span class="text-lg leading-none"><img src="icons/home.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-semibold" data-en="Home" data-jp="ホーム">Home</span></a>
+      <a href="businesses.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/compass.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Explore" data-jp="さがす">Explore</span></a>
+      <a href="itinerary.html" class="flex flex-col items-center gap-1 flex-1 group"><span class="w-12 h-12 -mt-5 rounded-full flex items-center justify-center text-white text-xl shadow-lg ring-4 ring-white group-hover:brightness-110 transition" style="background:linear-gradient(135deg,#223A70,#18243F);"><img src="icons/itinerary-white.svg" width="26" height="26" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-bold text-[#223A70]" data-en="Itinerary" data-jp="旅程">Itinerary</span></a>
+      <a href="discover.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/gem.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Add" data-jp="追加">Add</span></a>
+      <a href="plan-start.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/brush.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Plan" data-jp="プラン">Plan</span></a>
+    </div>
+  </nav>
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

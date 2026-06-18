@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — Mockup Flows</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f9fafb; }
+    .eyebrow { font-size: .6rem; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: #C8A859; }
+    .screen-link { display: flex; flex-direction: column; gap: .25rem; padding: .75rem 1rem; border-radius: .75rem; border: 1px solid #e5e7eb; background: #fff; transition: box-shadow .15s, border-color .15s; text-decoration: none; }
+    .screen-link:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); border-color: #223A70; }
+    .screen-link .name { font-size: .875rem; font-weight: 600; color: #111827; }
+    .screen-link .desc { font-size: .75rem; color: #6b7280; }
+    .key-badge { display: inline-block; font-size: .6rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; background: #fdf2f8; color: #db2777; border: 1px solid #fbcfe8; border-radius: 9999px; padding: .1rem .5rem; margin-left: .4rem; vertical-align: middle; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+<!-- Header -->
+<div style="background:#18243F;" class="px-6 py-5 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+    <svg width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#F5EEDC"/><circle cx="22.5" cy="9.5" r="4.3" fill="#D6452C"/><path d="M0 23 C5.5 16 10.5 27 16 21.5 C21 16.5 26.5 25 32 19.5 L32 32 L0 32 Z" fill="#1F4788"/><circle cx="8.5" cy="23" r="1.25" fill="#fff"/><circle cx="17.5" cy="25" r="1" fill="#fff"/><circle cx="25.5" cy="24" r="1" fill="#fff"/></svg>
+    <span style="color:#fff;" class="font-extrabold text-base tracking-tight">AIVIBLE — Mockup Flows</span>
+  </div>
+  <span class="text-xs text-indigo-200/60 font-medium">G-Incubate · Jun 2026</span>
+</div>
+
+<main class="max-w-4xl mx-auto px-4 py-10 space-y-14">
+
+  <!-- Traveler journey -->
+  <section>
+    <p class="eyebrow mb-1">Traveler journey</p>
+    <h2 class="text-xl font-extrabold text-gray-900 mb-1">Tourist-facing flows</h2>
+    <p class="text-sm text-gray-500 mb-5">How a visitor plans a Japan trip, discovers hidden gems, and adds stops from social media links.</p>
+
+    <div class="grid sm:grid-cols-2 gap-3">
+
+      <div class="sm:col-span-2">
+        <a href="traveler-journey/sitemap.html" class="screen-link" style="border-color:#223A70; background:#f0f4ff;">
+          <span class="name">🗺️ Full journey sitemap</span>
+          <span class="desc">All screens in sequence — start here for orientation</span>
+        </a>
+      </div>
+
+      <a href="traveler-journey/index.html" class="screen-link">
+        <span class="name">FrontDoor <code class="text-[10px] font-mono text-gray-400">/</code></span>
+        <span class="desc">Two-card hero — traveler vs. SME entry</span>
+      </a>
+
+      <a href="traveler-journey/plan-start.html" class="screen-link">
+        <span class="name">Plan — form <code class="text-[10px] font-mono text-gray-400">/plan</code></span>
+        <span class="desc">Destination + dates + style presets</span>
+      </a>
+
+      <a href="traveler-journey/building-trip.html" class="screen-link">
+        <span class="name">Plan — AI generating</span>
+        <span class="desc">Shirube building the itinerary (loading state)</span>
+      </a>
+
+      <a href="traveler-journey/trip-canvas.html" class="screen-link">
+        <span class="name">Itinerary + map</span>
+        <span class="desc">Split panel — stop list + Leaflet map</span>
+      </a>
+
+      <a href="traveler-journey/trip-canvas-instagram.html" class="screen-link" style="border-color:#f9a8d4;">
+        <span class="name">Itinerary — URL paste flow <span class="key-badge">KEY DIFFERENTIATOR</span></span>
+        <span class="desc">Paste any link → Shirube reads it → adds stop to Day 1</span>
+      </a>
+
+      <a href="traveler-journey/itinerary.html" class="screen-link">
+        <span class="name">Itinerary detail</span>
+        <span class="desc">Day-by-day stop list view</span>
+      </a>
+
+      <a href="traveler-journey/itinerary-stop.html" class="screen-link">
+        <span class="name">Stop detail <code class="text-[10px] font-mono text-gray-400">/stop/:id</code></span>
+        <span class="desc">Business detail page</span>
+      </a>
+
+      <a href="traveler-journey/plan-cap.html" class="screen-link">
+        <span class="name">Free plan cap modal</span>
+        <span class="desc">"Save to keep planning" gate</span>
+      </a>
+
+      <a href="traveler-journey/plan-share.html" class="screen-link">
+        <span class="name">Share your trip</span>
+        <span class="desc">Share-to-earn traveler screen</span>
+      </a>
+
+      <a href="traveler-journey/discover.html" class="screen-link">
+        <span class="name">Discover <code class="text-[10px] font-mono text-gray-400">/discover</code></span>
+        <span class="desc">Bilingual JP + EN intent search</span>
+      </a>
+
+      <a href="traveler-journey/businesses.html" class="screen-link">
+        <span class="name">Explore <code class="text-[10px] font-mono text-gray-400">/explore</code></span>
+        <span class="desc">Verified gems list + map</span>
+      </a>
+
+      <a href="traveler-journey/ai-recommends.html" class="screen-link">
+        <span class="name">AI recommends</span>
+        <span class="desc">Shirube chat panel</span>
+      </a>
+
+      <a href="traveler-journey/login.html" class="screen-link">
+        <span class="name">Sign in</span>
+        <span class="desc">Google OAuth gate</span>
+      </a>
+
+      <a href="traveler-journey/sov.html" class="screen-link">
+        <span class="name">Share of Voice</span>
+        <span class="desc">AI ranking tracker view</span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- SME journey -->
+  <section>
+    <p class="eyebrow mb-1">SME journey</p>
+    <h2 class="text-xl font-extrabold text-gray-900 mb-1">Business-facing flows</h2>
+    <p class="text-sm text-gray-500 mb-5">How a Japanese tourism SME audits their AI visibility and generates an optimized English storefront.</p>
+
+    <div class="grid sm:grid-cols-2 gap-3">
+
+      <a href="sme-journey/index.html" class="screen-link">
+        <span class="name">Audit landing <code class="text-[10px] font-mono text-gray-400">/business</code></span>
+        <span class="desc">URL input → run audit</span>
+      </a>
+
+      <a href="sme-journey/analyzing.html" class="screen-link">
+        <span class="name">Analyzing</span>
+        <span class="desc">Audit in progress</span>
+      </a>
+
+      <a href="sme-journey/results.html" class="screen-link">
+        <span class="name">Audit results</span>
+        <span class="desc">Score ring + issue list + fix recommendations</span>
+      </a>
+
+      <a href="sme-journey/generating.html" class="screen-link">
+        <span class="name">Generating storefront</span>
+        <span class="desc">AI building the English website</span>
+      </a>
+
+      <a href="sme-journey/storefront.html" class="screen-link">
+        <span class="name">Storefront preview</span>
+        <span class="desc">Generated English business page</span>
+      </a>
+
+      <a href="sme-journey/editor.html" class="screen-link">
+        <span class="name">Storefront editor</span>
+        <span class="desc">Chat-edit interface — change content by chatting</span>
+      </a>
+
+      <a href="sme-journey/editor-2.html" class="screen-link">
+        <span class="name">Editor v2</span>
+        <span class="desc">With credits meter</span>
+      </a>
+
+      <a href="sme-journey/editor-paywall.html" class="screen-link">
+        <span class="name">Editor paywall</span>
+        <span class="desc">Credits exhausted / upgrade</span>
+      </a>
+
+      <a href="sme-journey/editor-refer.html" class="screen-link">
+        <span class="name">Refer another SME</span>
+        <span class="desc">Share-to-earn for business owners</span>
+      </a>
+
+      <a href="sme-journey/editor-referred.html" class="screen-link">
+        <span class="name">Referred landing</span>
+        <span class="desc">Invite recipient view</span>
+      </a>
+
+      <a href="sme-journey/login.html" class="screen-link">
+        <span class="name">Sign in</span>
+        <span class="desc">Google OAuth gate</span>
+      </a>
+
+      <a href="sme-journey/sov.html" class="screen-link">
+        <span class="name">Share of Voice</span>
+        <span class="desc">AI ranking tracker upsell</span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- Design reference -->
+  <section>
+    <p class="eyebrow mb-1">Design reference</p>
+    <h2 class="text-xl font-extrabold text-gray-900 mb-4">Brand assets</h2>
+    <div class="grid sm:grid-cols-2 gap-3">
+      <a href="traveler-journey/logo-concepts.html" class="screen-link">
+        <span class="name">Logo concepts archive</span>
+        <span class="desc">Concepts #1–5 — vote winner was #2 + #5 + #3</span>
+      </a>
+      <a href="../../docs/DESIGN-SYSTEM.md" class="screen-link">
+        <span class="name">Design system docs</span>
+        <span class="desc">docs/DESIGN-SYSTEM.md — tokens, type, components, illustrations</span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="border-t border-gray-100 py-6 text-center text-xs text-gray-400 mt-10">
+  AIVIBLE mockup flows · Japan Blue Index · G-Incubate 2026
+</footer>
+
+</body>
+</html>

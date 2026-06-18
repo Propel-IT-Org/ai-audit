@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — Your AI-built Kyoto trip</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    /* ---- map (reused from generating.html) ---- */
+    .map-grid {
+      background-color: #EEF2F0;
+      background-image:
+        linear-gradient(rgba(31,71,136,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31,71,136,.07) 1px, transparent 1px);
+      background-size: 26px 26px;
+    }
+    .pin {
+      position: absolute; transform: translate(-50%, -50%);
+      width: 26px; height: 26px; border-radius: 9999px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; color: #fff; background: var(--kon-2);
+      box-shadow: 0 3px 8px rgba(24,36,63,.35); border: 2px solid #fff;
+    }
+    .pin-you { background: var(--gold); color: var(--kon); }
+    .pin-you::after {
+      content: ""; position: absolute; inset: -6px; border-radius: 9999px;
+      border: 2px solid var(--gold); opacity: 0; animation: ring 1.8s ease-out infinite;
+    }
+    @keyframes ring { 0% { opacity: .7; transform: scale(.7); } 100% { opacity: 0; transform: scale(1.6); } }
+
+    /* Wanderlog-style numbered teardrop pin */
+    .wl-pin { width:28px; height:28px; border-radius:50% 50% 50% 0; background:#e5351a; transform:rotate(-45deg);
+      border:2px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+    .wl-pin span { transform:rotate(45deg); color:#fff; font-weight:800; font-size:12px; line-height:1; }
+    .wl-pin.wl-gem { background:var(--gold); } .wl-pin.wl-gem span { color:var(--kon); }
+    .nearby-dot { width:12px; height:12px; border-radius:9999px; background:#223A70; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.3); opacity:.6; }
+    /* Wanderlog-style itinerary card bits */
+    .numpin { width:22px; height:22px; border-radius:9999px; background:#e5351a; color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 1px 2px rgba(0,0,0,.25); }
+    .numpin.gem { background:var(--gold); color:var(--kon); }
+    .timeline { border-left:2px dotted #E5E7EB; margin-left:10px; }
+    .actbtn { display:inline-flex; align-items:center; gap:4px; }
+    .reaction { font-size:12px; line-height:1; padding:3px 6px; border-radius:9999px; border:1px solid #eee; background:#fff; cursor:pointer; }
+    .reaction:hover { background:#f6f6f7; }
+    .walk { display:flex; align-items:center; gap:6px; font-size:11px; color:#9CA3AF; padding:6px 0 6px 34px; }
+    .leaflet-popup-content { margin:10px 12px; }
+    /* Shirube typing indicator */
+    .typing-dot { width:7px; height:7px; border-radius:9999px; background:#9CA3AF; display:inline-block;
+      animation:dot-bounce 1.2s ease-in-out infinite; }
+    .typing-dot:nth-child(2) { animation-delay:.2s; }
+    .typing-dot:nth-child(3) { animation-delay:.4s; }
+    @keyframes dot-bounce { 0%,60%,100% { transform:translateY(0); opacity:.6; } 30% { transform:translateY(-5px); opacity:1; } }
+    /* User typing indicator (blinking cursor) */
+    .typing-cursor { display:inline-block; width:2px; height:13px; background:#818CF8; border-radius:1px; margin-left:1px; vertical-align:middle;
+      animation:blink .85s step-end infinite; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+    /* ---- mobile pane toggle (3 panes: chat / stops / map) ---- */
+    #mobile-tabs { display: none; }
+    @media (max-width: 767px) {
+      #mobile-tabs { display: flex; }
+      #pane-chat, #pane-stops, #pane-map { width: 100%; }
+      body[data-mobile-pane="chat"]  #pane-stops, body[data-mobile-pane="chat"]  #pane-map   { display: none; }
+      body[data-mobile-pane="stops"] #pane-chat,  body[data-mobile-pane="stops"] #pane-map   { display: none; }
+      body[data-mobile-pane="map"]   #pane-chat,  body[data-mobile-pane="map"]   #pane-stops { display: none; }
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900 h-screen flex flex-col overflow-hidden" data-mobile-pane="chat">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between flex-shrink-0">
+    <a href="discover.html" class="hover:text-white">← Add places</a>
+    <span class="tracking-widest uppercase hidden sm:inline">[Mockup v2 · Traveler 4/6 — Your itinerary · built by you, refined with AI (Wanderlog-style)]</span>
+    <a href="itinerary-stop.html" class="text-white hover:text-indigo-300">Next: Stop detail →</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="border-b border-gray-100 bg-white flex-shrink-0">
+    <div class="px-4 py-2.5 flex items-center justify-between gap-3">
+      <a href="index.html" class="flex items-center gap-1 flex-shrink-0">
+        <span class="japan-red text-lg leading-none">●</span>
+        <span class="text-lg font-bold text-gray-900">AIVIBLE</span>
+      </a>
+      <div class="min-w-0 text-center flex-1">
+        <div class="text-sm font-semibold text-gray-900 truncate" data-en="2 Days in Kyoto · onsen + kaiseki near Gion" data-jp="京都2日間 · 祇園の温泉＋懐石">2 Days in Kyoto · onsen + kaiseki near Gion</div>
+        <div class="text-[10px] text-gray-400 flex items-center justify-center gap-1">
+          <span class="w-3.5 h-3.5 rounded-full bg-gray-900 text-white flex items-center justify-center text-[7px]">AI</span>
+          <span data-en="6 stops · 3 verified gems · refined with AI" data-jp="6スポット · 認証済み3件 · AIで調整">6 stops · 3 verified gems · refined with AI</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button class="hidden sm:inline-flex text-xs font-bold text-white bg-indigo-500 hover:bg-indigo-600 px-3 py-1.5 rounded-lg" data-en="♡ Save trip" data-jp="♡ 旅程を保存">♡ Save trip</button>
+        <button data-lang-toggle class="text-xs border border-gray-200 px-2.5 py-1 rounded-full hover:bg-gray-50 font-medium">日本語</button>
+      </div>
+    </div>
+    <!-- mobile pane toggle -->
+    <div id="mobile-tabs" class="border-t border-gray-100 p-1.5 gap-1.5">
+      <button data-pane="chat"  onclick="document.body.dataset.mobilePane='chat'"  class="flex-1 text-xs font-semibold py-1.5 rounded-lg bg-[#223A70] text-white" data-en="💬 Shirube" data-jp="💬 シルベ">💬 Shirube</button>
+      <button data-pane="stops" onclick="document.body.dataset.mobilePane='stops'" class="flex-1 text-xs font-semibold py-1.5 rounded-lg text-gray-500" data-en="📋 Stops" data-jp="📋 スポット">📋 Stops</button>
+      <button data-pane="map"   onclick="document.body.dataset.mobilePane='map'"   class="flex-1 text-xs font-semibold py-1.5 rounded-lg text-gray-500" data-en="🗺 Map" data-jp="🗺 地図">🗺 Map</button>
+    </div>
+  </header>
+
+  <!-- MAIN 2-REGION LAYOUT -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- LEFT: Shirube trip-planner chat (primary sidebar — mirrors the SME editor) -->
+    <aside id="pane-chat" class="w-full md:w-[360px] md:flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
+      <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between gap-2.5 flex-shrink-0">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-8 h-8 rounded-full flex items-center justify-center text-white text-base flex-shrink-0" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>
+          <div class="min-w-0">
+            <div class="text-sm font-bold text-gray-900 truncate" data-en="Shirube · Trip Planner" data-jp="シルベ · 旅程プランナー">Shirube · Trip Planner</div>
+            <div class="text-[11px] text-green-500 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span><span data-en="Refining your Kyoto trip" data-jp="京都の旅程を調整中">Refining your Kyoto trip</span></div>
+          </div>
+        </div>
+        <!-- daily chat credits (used up) -->
+        <button onclick="openCapModal()" class="flex-shrink-0 flex items-center gap-1 bg-orange-50 border border-orange-200 rounded-full px-2.5 py-1 hover:bg-orange-100 transition-colors" title="Daily free chats — resets at midnight">
+          <span class="text-xs font-bold text-orange-600">💬 0</span>
+          <span class="text-[10px] text-orange-400 hidden sm:inline" data-en="today" data-jp="本日">today</span>
+        </button>
+      </div>
+
+      <div class="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-4">
+        <div class="flex gap-2.5">
+          <span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs flex-shrink-0 mt-0.5" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>
+          <div class="bg-gray-50 border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 leading-relaxed" data-en="Here's your <b>2 days in Kyoto</b> — 6 stops, <span class='text-purple-600 font-semibold'>3 verified gems</span>. The numbered pins are on the map →" data-jp="<b>京都2日間</b>の旅程です — 6スポット、<span class='text-purple-600 font-semibold'>認証済み3件</span>。番号付きピンは地図に表示中 →">Here's your <b>2 days in Kyoto</b> — 6 stops, <span class="text-purple-600 font-semibold">3 verified gems</span>. The numbered pins are on the map →</div>
+        </div>
+
+        <div class="flex justify-end">
+          <div class="bg-indigo-500 text-white text-sm rounded-2xl rounded-tr-sm px-3.5 py-2 max-w-[85%]" data-en="We're travelling with my parents — keep it relaxed, more food, less walking." data-jp="両親と一緒です。ゆったりめで、食事多め、歩く距離は控えめに。">We're travelling with my parents — keep it relaxed, more food, less walking.</div>
+        </div>
+        <div class="flex gap-2.5">
+          <span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs flex-shrink-0 mt-0.5" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>
+          <div class="bg-gray-50 border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 leading-relaxed" data-en="Done — I swapped the Fushimi Inari summit hike for the lower shrine loop, added a kaiseki lunch, and kept Kamogawa-kan as your onsen stay. Travel time per day is now under 40 min." data-jp="完了です。伏見稲荷は山頂登山から下部の周回コースに変更し、懐石ランチを追加、温泉宿は鴨川館のままにしました。1日の移動時間は40分未満になりました。">Done — I swapped the Fushimi Inari summit hike for the lower shrine loop, added a kaiseki lunch, and kept Kamogawa-kan as your onsen stay. Travel time per day is now under 40 min.</div>
+        </div>
+
+        <div class="pl-9 flex flex-wrap gap-2">
+          <button class="text-xs border border-gray-200 bg-white text-gray-600 px-3 py-1.5 rounded-full hover:border-indigo-200 hover:text-indigo-600 transition-colors" data-en="👨‍👩‍👧 Family-friendly" data-jp="👨‍👩‍👧 家族向け">👨‍👩‍👧 Family-friendly</button>
+          <button class="text-xs border border-gray-200 bg-white text-gray-600 px-3 py-1.5 rounded-full hover:border-indigo-200 hover:text-indigo-600 transition-colors" data-en="🍱 More food" data-jp="🍱 食事多め">🍱 More food</button>
+          <button class="text-xs border border-gray-200 bg-white text-gray-600 px-3 py-1.5 rounded-full hover:border-indigo-200 hover:text-indigo-600 transition-colors" data-en="💎 Add hidden gems" data-jp="💎 名店を追加">💎 Add hidden gems</button>
+        </div>
+
+        <!-- User typing a new message (typing cursor active) -->
+        <div class="flex justify-end">
+          <div class="bg-indigo-500 text-white text-sm rounded-2xl rounded-tr-sm px-3.5 py-2 max-w-[85%] leading-relaxed">
+            Can you add a sake tasting stop on Day 2?<span class="typing-cursor"></span>
+          </div>
+        </div>
+
+        <!-- Shirube 3-dot typing indicator -->
+        <div id="shirube-typing" class="flex gap-2.5 items-end">
+          <span class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>
+          <div class="bg-gray-50 border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-100 p-3 flex-shrink-0">
+        <div class="flex items-end gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-indigo-400">
+          <!-- At the daily cap: typing or sending opens the cap modal instead of chatting -->
+          <textarea id="shirube-input" rows="1" readonly onfocus="openCapModal()" onmousedown="event.preventDefault();openCapModal()" data-en-ph="Ask Shirube to reshape your trip…" data-jp-ph="旅程の変更をシルベに頼む…" placeholder="Ask Shirube to reshape your trip…" class="flex-1 bg-transparent text-sm resize-none focus:outline-none placeholder:text-gray-400 cursor-pointer"></textarea>
+          <button onclick="openCapModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-white flex-shrink-0" style="background:var(--kon-2);" title="Send">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </button>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-2 px-1 text-center" data-en="💬 0 of 8 free chats left today · resets at midnight" data-jp="💬 本日の無料チャット残り0/8回 · 深夜0時にリセット">💬 0 of 8 free chats left today · resets at midnight</p>
+      </div>
+    </aside>
+
+    <!-- ★ DAILY-CAP MODAL — share to unlock, or pay for extra (resets daily) -->
+    <div id="cap-modal" class="fixed inset-0 z-[2000] hidden items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div class="absolute inset-0 bg-[#0C1320]/70" onclick="closeCapModal()"></div>
+      <div class="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl p-5">
+        <button onclick="closeCapModal()" aria-label="Close" class="absolute top-3 right-3 w-8 h-8 rounded-full hover:bg-gray-100 text-gray-400 text-xl leading-none flex items-center justify-center">&times;</button>
+        <div class="text-center mb-4">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-orange-50 text-2xl mb-2">💬</div>
+          <h2 class="text-lg font-extrabold text-gray-900" data-en="You've used today's free chats" data-jp="本日の無料チャットを使い切りました">You've used today's free chats</h2>
+          <p class="text-xs text-gray-500 mt-1" data-en="You get 8 free AI chats a day to refine your trip. Get more now — or they reset at midnight." data-jp="旅程の調整に使えるAIチャットは1日8回まで。今すぐ追加するか、深夜0時のリセットをお待ちください。">You get 8 free AI chats a day to refine your trip. Get more now — or they reset at midnight.</p>
+        </div>
+
+        <!-- Option 1: share to unlock -->
+        <a href="plan-share.html" class="block rounded-xl bg-gradient-to-br from-gold-500/15 to-white border-2 border-gold-500/50 p-3.5 mb-2 hover:border-gold-500 transition-colors">
+          <div class="flex items-center justify-between mb-0.5">
+            <span class="text-[11px] font-bold text-gold-500 uppercase tracking-widest" data-en="Free · Recommended" data-jp="無料・おすすめ">Free · Recommended</span>
+            <span class="text-sm font-extrabold text-gold-500">+5 💬</span>
+          </div>
+          <div class="text-sm font-bold text-gray-900 mb-0.5" data-en="Share your trip with others" data-jp="旅程を友達にシェア">Share your trip with others</div>
+          <p class="text-[11px] text-gray-600" data-en="Send your itinerary to a friend → +5 chats now, +5 more when they open it. →" data-jp="旅程を友達に送信 → 今すぐ+5、相手が開くとさらに+5。→">Send your itinerary to a friend → +5 chats now, +5 more when they open it. →</p>
+        </a>
+
+        <!-- Option 2: pay for extra -->
+        <a href="#" class="block rounded-xl bg-white border border-gray-200 p-3.5 mb-2 hover:border-indigo-300 transition-colors">
+          <div class="flex items-center justify-between mb-0.5">
+            <span class="text-[11px] font-bold text-indigo-600 uppercase tracking-widest" data-en="Pro · Unlimited" data-jp="Pro・無制限">Pro · Unlimited</span>
+            <span class="text-sm font-extrabold text-gray-900" data-en="¥980<span class='text-[10px] font-normal text-gray-400'>/mo</span>" data-jp="¥980<span class='text-[10px] font-normal text-gray-400'>/月</span>">¥980<span class="text-[10px] font-normal text-gray-400">/mo</span></span>
+          </div>
+          <div class="text-sm font-bold text-gray-900 mb-0.5" data-en="Pay for unlimited planning" data-jp="課金で無制限プランニング">Pay for unlimited planning</div>
+          <p class="text-[11px] text-gray-600" data-en="No daily limit — keep refining as much as you want. →" data-jp="1日の上限なし — 好きなだけ調整できます。→">No daily limit — keep refining as much as you want. →</p>
+        </a>
+
+        <p class="text-center text-[11px] text-gray-400 mt-2" data-en="🌙 Or come back tomorrow — your 8 free chats reset at midnight." data-jp="🌙 または明日また — 無料チャット8回は深夜0時にリセットされます。">🌙 Or come back tomorrow — your 8 free chats reset at midnight.</p>
+      </div>
+    </div>
+
+    <!-- MIDDLE: stop list -->
+    <aside id="pane-stops" class="w-full md:w-96 border-r border-gray-100 overflow-y-auto flex-shrink-0">
+      <div class="px-4 py-2.5 bg-gray-50 border-b border-gray-100 sticky top-0 z-10">
+        <h3 class="font-bold text-sm text-gray-900">Day 1</h3>
+        <p class="text-[11px] text-gray-400" data-en="Southern Higashiyama → Gion" data-jp="東山南部 → 祇園">Southern Higashiyama → Gion</p>
+      </div><div class="px-3 py-3 border-b border-gray-50"><div class="flex gap-2.5"><span class="numpin">1</span><div class="flex-1 min-w-0"><div class="flex gap-2.5"><div class="flex-1 min-w-0"><a href="itinerary-stop.html" class="font-bold text-sm text-gray-900 hover:text-indigo-600 leading-snug">Fushimi Inari Shrine</a><p class="text-[11px] text-gray-500 mt-0.5 line-clamp-2"><span class="text-gray-700 font-medium">Open 24 hours</span> · Vermilion torii gates winding up the mountain.</p><p class="text-[11px] text-gray-400 italic mt-1 line-clamp-2">From the web: famous Shinto shrine with thousands of red torii gates.</p></div><div class="w-20 h-16 rounded-lg bg-gradient-to-br from-red-300 to-orange-300 relative overflow-hidden flex-shrink-0 flex items-center justify-center text-lg"><span aria-hidden="true">⛩️</span><img src="https://loremflickr.com/160/120/japan,shrine,torii/all?lock=301" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()"></div></div><div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px]"><button class="actbtn font-semibold text-indigo-600"><span>✓</span> <span data-en="Mark as visited" data-jp="訪問済み">Mark as visited</span></button><button class="actbtn text-gray-400 hover:text-gray-700">🕐 <span data-en="Add time" data-jp="時間">Add time</span></button><button class="actbtn text-gray-400 hover:text-gray-700">📎 <span data-en="Attach" data-jp="添付">Attach</span></button><button class="actbtn text-gray-400 hover:text-gray-700">💲 <span data-en="Add cost" data-jp="費用">Add cost</span></button></div><div class="flex gap-1 mt-2"><button class="reaction">👍</button><button class="reaction">👎</button><button class="reaction">❤️</button><button class="reaction">😀</button></div></div></div></div><div class="walk"><span>🚶</span><span>12 min · 0.6 mi</span><span class="text-gray-300">·</span><span class="text-indigo-500 font-medium">Directions</span></div><div class="px-3 py-3 border-b border-gray-50"><div class="flex gap-2.5"><span class="numpin">2</span><div class="flex-1 min-w-0"><div class="flex gap-2.5"><div class="flex-1 min-w-0"><a href="itinerary-stop.html" class="font-bold text-sm text-gray-900 hover:text-indigo-600 leading-snug">Nishiki Market</a><p class="text-[11px] text-gray-500 mt-0.5 line-clamp-2"><span class="text-gray-700 font-medium">Open 9AM–6PM</span> · &ldquo;Kyoto&rsquo;s kitchen&rdquo; — 400m of food stalls.</p><p class="text-[11px] text-gray-400 italic mt-1 line-clamp-2">From the web: covered market street lined with food stalls and shops.</p></div><div class="w-20 h-16 rounded-lg bg-gradient-to-br from-amber-200 to-yellow-300 relative overflow-hidden flex-shrink-0 flex items-center justify-center text-lg"><span aria-hidden="true">🍡</span><img src="https://loremflickr.com/160/120/japan,market,food/all?lock=302" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()"></div></div><div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px]"><button class="actbtn font-semibold text-indigo-600"><span>✓</span> <span data-en="Mark as visited" data-jp="訪問済み">Mark as visited</span></button><button class="actbtn text-gray-400 hover:text-gray-700">🕐 <span data-en="Add time" data-jp="時間">Add time</span></button><button class="actbtn text-gray-400 hover:text-gray-700">📎 <span data-en="Attach" data-jp="添付">Attach</span></button><button class="actbtn text-gray-400 hover:text-gray-700">💲 <span data-en="Add cost" data-jp="費用">Add cost</span></button></div><div class="flex gap-1 mt-2"><button class="reaction">👍</button><button class="reaction">👎</button><button class="reaction">❤️</button><button class="reaction">😀</button></div></div></div></div><div class="walk"><span>🚶</span><span>8 min · 0.4 mi</span><span class="text-gray-300">·</span><span class="text-indigo-500 font-medium">Directions</span></div><div class="px-3 py-3 border-b border-gray-50"><div class="flex gap-2.5"><span class="numpin gem">3</span><div class="flex-1 min-w-0"><div class="flex gap-2.5"><div class="flex-1 min-w-0"><a href="itinerary-stop.html" class="font-bold text-sm text-gray-900 hover:text-indigo-600 leading-snug">Tonari Ramen</a> <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700">💎</span><p class="text-[11px] text-gray-500 mt-0.5 line-clamp-2"><span class="text-gray-700 font-medium">Open 11AM–3PM</span> · 8-seat counter, oyster-chicken paitan ramen. JP-only.</p></div><div class="w-20 h-16 rounded-lg bg-gradient-to-br from-orange-200 to-amber-300 relative overflow-hidden flex-shrink-0 flex items-center justify-center text-lg"><span aria-hidden="true">🍜</span><img src="https://loremflickr.com/160/120/japan,ramen/all?lock=303" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()"></div></div><div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px]"><button class="actbtn font-semibold text-indigo-600"><span>✓</span> <span data-en="Mark as visited" data-jp="訪問済み">Mark as visited</span></button><button class="actbtn text-gray-400 hover:text-gray-700">🕐 <span data-en="Add time" data-jp="時間">Add time</span></button><button class="actbtn text-gray-400 hover:text-gray-700">📎 <span data-en="Attach" data-jp="添付">Attach</span></button><button class="actbtn text-gray-400 hover:text-gray-700">💲 <span data-en="Add cost" data-jp="費用">Add cost</span></button></div><div class="flex gap-1 mt-2"><button class="reaction">👍</button><button class="reaction">👎</button><button class="reaction">❤️</button><button class="reaction">😀</button></div></div></div></div><div class="walk"><span>🚶</span><span>5 min · 0.2 mi</span><span class="text-gray-300">·</span><span class="text-indigo-500 font-medium">Directions</span></div><div class="px-3 py-3 border-b border-gray-50"><div class="flex gap-2.5"><span class="numpin gem">★</span><div class="flex-1 min-w-0"><div class="flex gap-2.5"><div class="flex-1 min-w-0"><a href="itinerary-stop.html" class="font-bold text-sm text-gray-900 hover:text-indigo-600 leading-snug">Kamogawa-kan 鴨川館</a> <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700">💎</span><p class="text-[11px] text-gray-500 mt-0.5 line-clamp-2"><span class="text-gray-700 font-medium">Check-in 3PM · Overnight</span> · Riverside ryokan, private onsen + kaiseki, 5 min from Gion.</p><p class="text-[11px] text-gray-400 italic mt-1 line-clamp-2">From the web: family-run ryokan on the Kamo River, est. 1932.</p></div><div class="w-20 h-16 rounded-lg bg-gradient-to-br from-amber-700 to-orange-400 relative overflow-hidden flex-shrink-0 flex items-center justify-center text-lg"><span aria-hidden="true">♨️</span><img src="https://loremflickr.com/160/120/japan,ryokan,onsen/all?lock=304" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()"></div></div><div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px]"><button class="actbtn font-semibold text-indigo-600"><span>✓</span> <span data-en="Mark as visited" data-jp="訪問済み">Mark as visited</span></button><button class="actbtn text-gray-400 hover:text-gray-700">🕐 <span data-en="Add time" data-jp="時間">Add time</span></button><button class="actbtn text-gray-400 hover:text-gray-700">📎 <span data-en="Attach" data-jp="添付">Attach</span></button><button class="actbtn text-gray-400 hover:text-gray-700">💲 <span data-en="Add cost" data-jp="費用">Add cost</span></button></div><div class="flex gap-1 mt-2"><button class="reaction">👍</button><button class="reaction">👎</button><button class="reaction">❤️</button><button class="reaction">😀</button></div></div></div></div>      <div class="px-4 py-2.5 bg-gray-50 border-y border-gray-100 sticky top-0 z-10">
+        <h3 class="font-bold text-sm text-gray-900">Day 2</h3>
+        <p class="text-[11px] text-gray-400" data-en="Pontocho → Arashiyama" data-jp="先斗町 → 嵐山">Pontocho → Arashiyama</p>
+      </div><div class="px-3 py-3 border-b border-gray-50"><div class="flex gap-2.5"><span class="numpin gem">5</span><div class="flex-1 min-w-0"><div class="flex gap-2.5"><div class="flex-1 min-w-0"><a href="itinerary-stop.html" class="font-bold text-sm text-gray-900 hover:text-indigo-600 leading-snug">Yamanaka Soba 山中そば</a> <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700">💎</span><p class="text-[11px] text-gray-500 mt-0.5 line-clamp-2"><span class="text-gray-700 font-medium">Open 11AM–4PM</span> · Hand-cut soba in a 100-year machiya near Pontocho.</p></div><div class="w-20 h-16 rounded-lg bg-gradient-to-br from-stone-300 to-emerald-200 relative overflow-hidden flex-shrink-0 flex items-center justify-center text-lg"><span aria-hidden="true">🍲</span><img src="https://loremflickr.com/160/120/japan,soba,noodles/all?lock=305" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()"></div></div><div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px]"><button class="actbtn font-semibold text-indigo-600"><span>✓</span> <span data-en="Mark as visited" data-jp="訪問済み">Mark as visited</span></button><button class="actbtn text-gray-400 hover:text-gray-700">🕐 <span data-en="Add time" data-jp="時間">Add time</span></button><button class="actbtn text-gray-400 hover:text-gray-700">📎 <span data-en="Attach" data-jp="添付">Attach</span></button><button class="actbtn text-gray-400 hover:text-gray-700">💲 <span data-en="Add cost" data-jp="費用">Add cost</span></button></div><div class="flex gap-1 mt-2"><button class="reaction">👍</button><button class="reaction">👎</button><button class="reaction">❤️</button><button class="reaction">😀</button></div></div></div></div><div class="walk"><span>🚶</span><span>18 min train · 6 mi</span><span class="text-gray-300">·</span><span class="text-indigo-500 font-medium">Directions</span></div><div class="px-3 py-3 border-b border-gray-50"><div class="flex gap-2.5"><span class="numpin">6</span><div class="flex-1 min-w-0"><div class="flex gap-2.5"><div class="flex-1 min-w-0"><a href="itinerary-stop.html" class="font-bold text-sm text-gray-900 hover:text-indigo-600 leading-snug">Arashiyama Bamboo Grove</a><p class="text-[11px] text-gray-500 mt-0.5 line-clamp-2"><span class="text-gray-700 font-medium">Open 24 hours</span> · Towering bamboo paths and the Katsura riverside.</p><p class="text-[11px] text-gray-400 italic mt-1 line-clamp-2">From the web: iconic bamboo forest path on Kyoto&rsquo;s western edge.</p></div><div class="w-20 h-16 rounded-lg bg-gradient-to-br from-green-300 to-emerald-400 relative overflow-hidden flex-shrink-0 flex items-center justify-center text-lg"><span aria-hidden="true">🎍</span><img src="https://loremflickr.com/160/120/japan,bamboo,arashiyama/all?lock=306" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()"></div></div><div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px]"><button class="actbtn font-semibold text-indigo-600"><span>✓</span> <span data-en="Mark as visited" data-jp="訪問済み">Mark as visited</span></button><button class="actbtn text-gray-400 hover:text-gray-700">🕐 <span data-en="Add time" data-jp="時間">Add time</span></button><button class="actbtn text-gray-400 hover:text-gray-700">📎 <span data-en="Attach" data-jp="添付">Attach</span></button><button class="actbtn text-gray-400 hover:text-gray-700">💲 <span data-en="Add cost" data-jp="費用">Add cost</span></button></div><div class="flex gap-1 mt-2"><button class="reaction">👍</button><button class="reaction">👎</button><button class="reaction">❤️</button><button class="reaction">😀</button></div></div></div></div>
+    </aside>
+
+    <!-- RIGHT: real greyscale map with Wanderlog pins -->
+    <div id="pane-map" class="flex-1 relative overflow-hidden">
+      <div id="kyoto-map" class="absolute inset-0 z-0"></div>
+      <div class="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-sm border border-gray-100 rounded-lg px-3 py-1.5 shadow-sm pointer-events-none">
+        <div class="text-[11px] font-bold text-gray-900 flex items-center gap-1"><span class="japan-red">●</span> <span data-en="Your Kyoto route" data-jp="京都のルート">Your Kyoto route</span></div>
+        <div class="text-[10px] text-gray-400" data-en="6 stops · AI-optimized" data-jp="6スポット・AI最適化">6 stops · AI-optimized</div>
+      </div>
+      <div class="absolute bottom-3 right-3 z-[1000] bg-white/95 backdrop-blur-sm border border-gray-100 rounded-full px-3 py-1 text-[10px] text-gray-500 shadow-sm pointer-events-none">
+        <span class="japan-red">●</span> <span data-en="Verified stops · gold = hidden gem" data-jp="認証済み · 金色＝隠れた名店">Verified stops · gold = hidden gem</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // img fallback: thumbnail photos — remove slow/broken so gradient+emoji shows
+  (function () {
+    document.querySelectorAll('#pane-stops img').forEach(function (img) {
+      var t = setTimeout(function () { if (!(img.complete && img.naturalWidth > 0)) img.remove(); }, 5000);
+      img.addEventListener('load', function () { clearTimeout(t); });
+      img.addEventListener('error', function () { clearTimeout(t); img.remove(); });
+    });
+  })();
+  </script>
+  <script>
+  (function () {
+    if (!window.L || !document.getElementById('kyoto-map')) return;
+    var STOPS = [
+      { l: '1', name: 'Fushimi Inari Shrine',    day: 1, c: [34.9671, 135.7727], gem: false },
+      { l: '2', name: 'Nishiki Market',          day: 1, c: [35.0050, 135.7649], gem: false },
+      { l: '3', name: 'Tonari Ramen',            day: 1, c: [35.0042, 135.7710], gem: true,  grade: null },
+      { l: '★', name: 'Kamogawa-kan',            day: 1, c: [35.0125, 135.7725], gem: true,  grade: 'A' },
+      { l: '5', name: 'Yamanaka Soba',           day: 2, c: [35.0048, 135.7705], gem: true,  grade: null },
+      { l: '6', name: 'Arashiyama Bamboo Grove', day: 2, c: [35.0094, 135.6722], gem: false }
+    ];
+    var map = L.map('kyoto-map', { zoomControl: true, scrollWheelZoom: false }).setView([35.0, 135.74], 11);
+    window.__itinMap = map;
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, subdomains: 'abcd', attribution: '&copy; OpenStreetMap &copy; CARTO' }).addTo(map);
+    function pin(s){ return L.divIcon({ className:'', html:'<div class="wl-pin'+(s.gem?' wl-gem':'')+'"><span>'+s.l+'</span></div>', iconSize:[28,28], iconAnchor:[14,28], popupAnchor:[0,-30] }); }
+    var routePts=STOPS.map(function(s){return s.c;}); if(routePts.length>1) L.polyline(routePts,{color:'#223A70',weight:2,opacity:.4,dashArray:'4 5'}).addTo(map);
+    var markers=[];
+    STOPS.forEach(function(s){
+      var m=L.marker(s.c,{icon:pin(s)}).addTo(map);
+      var badge=s.gem?(' &middot; <b style="color:#9a7b27">&#128142; '+(s.grade?('Score '+s.grade):'Verified')+'</b>'):'';
+      m.bindTooltip(s.l+'. '+s.name,{direction:'top',offset:[0,-30]});
+      m.bindPopup('<b>'+s.l+'. '+s.name+'</b><br><span style="font-size:11px;color:#888">Day '+s.day+badge+'</span><br><a href="itinerary-stop.html" style="color:#223A70;font-weight:700;font-size:12px">Open stop &rarr;</a>');
+      markers.push(m);
+    });
+    // nearby attractions from Overpass / OpenStreetMap (real coords)
+    [{name:'Golden Pavilion (Kinkaku-ji)',c:[35.0395,135.7285]},{name:'Kyoto National Museum',c:[34.9900,135.7729]},{name:'Two-year Slope (Ninenzaka)',c:[34.9981,135.7808]},{name:'Shinkyogoku Street',c:[35.0062,135.7673]}].forEach(function(a){
+      var m=L.marker(a.c,{icon:L.divIcon({className:'',html:'<div class="nearby-dot"></div>',iconSize:[12,12],iconAnchor:[6,6]})}).addTo(map);
+      m.bindTooltip(a.name,{direction:'top',offset:[0,-6]});
+      m.bindPopup('<b>'+a.name+'</b><br><span style="font-size:11px;color:#888">Nearby attraction · OpenStreetMap</span><br><a href="discover.html" style="color:#223A70;font-weight:700;font-size:12px">+ Add to trip</a>');
+      markers.push(m);
+    });
+    if(markers.length) map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
+    setTimeout(function(){map.invalidateSize();},150);
+  })();
+  </script>
+  <!-- ===== PERSISTENT BOTTOM NAV · Itinerary is the anchor, always reachable ===== -->
+  <nav class="flex-shrink-0 bg-white border-t border-gray-100 shadow-[0_-1px_4px_rgba(0,0,0,0.05)]">
+    <div class="max-w-md mx-auto w-full flex items-end justify-around px-2 pt-1.5 pb-2">
+      <a href="indexmock.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/home.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Home" data-jp="ホーム">Home</span></a>
+      <a href="businesses.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/compass.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Explore" data-jp="さがす">Explore</span></a>
+      <a href="itinerary.html" class="flex flex-col items-center gap-1 flex-1 group"><span class="w-12 h-12 -mt-5 rounded-full flex items-center justify-center text-white text-xl shadow-lg ring-4 ring-[#C8A859] group-hover:brightness-110 transition" style="background:linear-gradient(135deg,#223A70,#18243F);"><img src="icons/itinerary-white.svg" width="26" height="26" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-bold text-[#223A70]" data-en="Itinerary" data-jp="旅程">Itinerary</span></a>
+      <a href="discover.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/gem.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Add" data-jp="追加">Add</span></a>
+      <a href="plan-start.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/brush.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Plan" data-jp="プラン">Plan</span></a>
+    </div>
+  </nav>
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script>
+    // mobile pane toggle highlight (3 panes) + map resize
+    document.getElementById('mobile-tabs').addEventListener('click', function () {
+      var active = document.body.dataset.mobilePane;
+      this.querySelectorAll('button').forEach(function (b) {
+        b.className = b.className.replace('bg-[#223A70] text-white', 'text-gray-500');
+        if (b.dataset.pane === active) b.className = b.className.replace('text-gray-500', 'bg-[#223A70] text-white');
+      });
+      setTimeout(function () { if (window.__itinMap) window.__itinMap.invalidateSize(); }, 60);
+    });
+  </script>
+  <script>
+    // Daily-cap modal: shown when a capped user tries to chat with Shirube again.
+    function openCapModal() {
+      var m = document.getElementById('cap-modal');
+      if (!m) return;
+      m.classList.remove('hidden'); m.classList.add('flex');
+      var ta = document.getElementById('shirube-input'); if (ta) ta.blur();
+    }
+    function closeCapModal() {
+      var m = document.getElementById('cap-modal');
+      if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+    }
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeCapModal(); });
+    // Scroll chat to show the typing indicator on load
+    window.addEventListener('load', function() {
+      var typing = document.getElementById('shirube-typing');
+      if (typing) typing.scrollIntoView({ behavior: 'instant', block: 'end' });
+    });
+  </script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

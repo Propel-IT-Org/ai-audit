@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE Editor — Step 7: Out of credits</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    #joined { display: none; }
+    #joined:target { display: flex; }
+    #joined:target + .waitlist-form { display: none; }
+    /* Mobile: show one pane at a time (chat or preview). Desktop keeps both. */
+    @media (max-width: 767px) {
+      body[data-mobile-pane="chat"] #pane-preview { display: none; }
+      body[data-mobile-pane="preview"] #pane-chat { display: none; }
+    }
+  </style>
+</head>
+<body data-mobile-pane="chat" class="bg-gray-100 text-gray-900 h-screen flex flex-col overflow-hidden">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between flex-shrink-0">
+    <a href="editor-2.html" class="hover:text-white">← After an edit</a>
+    <span class="tracking-widest uppercase">[Mockup v2 — Flow 7/9: 0 credits → fork: refer (+50) or upgrade]</span>
+    <a href="editor-refer.html" class="text-white hover:text-indigo-300">Next: Refer a friend →</a>
+  </div>
+
+  <!-- EDITOR TOPBAR -->
+  <header class="bg-white border-b border-gray-200 flex-shrink-0">
+    <div class="px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2 sm:gap-3">
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <a href="index.html" class="flex items-center gap-1 flex-shrink-0">
+          <span class="japan-red text-lg leading-none">●</span>
+          <span class="text-lg font-bold text-gray-900">AIVIBLE</span>
+        </a>
+        <span class="text-gray-300 hidden sm:inline">/</span>
+        <span class="text-sm font-medium text-gray-700 hidden sm:inline truncate">Kamogawa-kan</span>
+        <span class="text-[10px] bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full uppercase tracking-wide hidden sm:inline" data-en="Live" data-jp="公開中">Live</span>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+        <div class="flex items-center gap-1.5 bg-orange-50 border border-orange-200 rounded-full px-2.5 sm:px-3 py-1">
+          <span class="text-xs font-bold text-orange-600">⚡ 0</span>
+          <span class="text-[11px] text-orange-400 hidden sm:inline" data-en="free edits left" data-jp="無料編集が残っていません">free edits left</span>
+        </div>
+        <a href="storefront.html" class="text-xs font-semibold text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 hidden md:inline-block" data-en="View live site ↗" data-jp="公開サイトを見る ↗">View live site ↗</a>
+        <button data-lang-toggle class="text-xs border border-gray-200 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 font-medium">日本語</button>
+        <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 font-bold text-xs flex items-center justify-center flex-shrink-0">YT</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE PANE TOGGLE (Chat / Preview) — desktop shows both side by side -->
+  <div class="md:hidden flex-shrink-0 border-b border-gray-200 bg-white px-3 py-2 flex gap-1">
+    <button id="mp-chat" class="flex-1 text-xs font-semibold py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors">💬 <span data-en="Chat" data-jp="チャット">Chat</span></button>
+    <button id="mp-preview" class="flex-1 text-xs font-semibold py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors">👁 <span data-en="Preview" data-jp="プレビュー">Preview</span></button>
+  </div>
+
+  <!-- SPLIT LAYOUT -->
+  <div class="flex-1 flex overflow-hidden">
+
+    <!-- ◀ CHAT PANEL -->
+    <aside id="pane-chat" class="w-full md:w-[400px] md:flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
+
+      <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2.5 flex-shrink-0">
+        <span class="w-8 h-8 rounded-full bg-[#F5EEDC] flex items-center justify-center text-white text-sm"><img src="icons/shirube.svg" alt="Shirube" style="width:60%;height:60%" /></span>
+        <div>
+          <div class="text-sm font-bold text-gray-900" data-en="Shirube · AI Visibility Assistant" data-jp="シルベ · AI可視化アシスタント">Shirube · AI Visibility Assistant</div>
+          <div class="text-[11px] text-orange-500 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-orange-400 rounded-full"></span><span data-en="Free edits used up" data-jp="無料編集を使い切りました">Free edits used up</span></div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+
+        <div class="text-center text-[10px] text-gray-300 uppercase tracking-widest" data-en="— earlier today —" data-jp="— 本日のやり取り —">— earlier today —</div>
+
+        <div class="flex justify-end">
+          <div class="bg-indigo-500 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[85%]" data-en="Mention our onsen in the tagline" data-jp="キャッチコピーに温泉を入れて">Mention our onsen in the tagline</div>
+        </div>
+        <div class="pl-9 text-[11px] text-gray-400" data-en="✓ Applied · ⚡ 4 left" data-jp="✓ 反映済み・⚡ 残り4回">✓ Applied · ⚡ 4 left</div>
+
+        <div class="flex justify-end">
+          <div class="bg-indigo-500 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[85%]" data-en="Add room prices — tatami room is ¥28,000/night, kaiseki plan ¥42,000" data-jp="料金を追加して — 和室は1泊28,000円、会席プランは42,000円">Add room prices — tatami room is ¥28,000/night, kaiseki plan ¥42,000</div>
+        </div>
+        <div class="pl-9 text-[11px] text-gray-400" data-en="✓ Applied · ⚡ 3 left" data-jp="✓ 反映済み・⚡ 残り3回">✓ Applied · ⚡ 3 left</div>
+
+        <div class="flex justify-end">
+          <div class="bg-indigo-500 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[85%]" data-en="Add access — 12 min from Kyoto Station by taxi, Karasuma Line to Oike" data-jp="アクセスを追加 — 京都駅からタクシー12分、烏丸線で御池まで">Add access — 12 min from Kyoto Station by taxi, Karasuma Line to Oike</div>
+        </div>
+        <div class="pl-9 text-[11px] text-gray-400" data-en="✓ Applied · ⚡ 2 left" data-jp="✓ 反映済み・⚡ 残り2回">✓ Applied · ⚡ 2 left</div>
+
+        <div class="flex justify-end">
+          <div class="bg-indigo-500 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[85%]" data-en="Make the about section mention we're family-run for 4 generations" data-jp="紹介文に「四代続く家族経営」と入れて">Make the about section mention we're family-run for 4 generations</div>
+        </div>
+        <div class="pl-9 text-[11px] text-gray-400" data-en="✓ Applied · ⚡ 1 left" data-jp="✓ 反映済み・⚡ 残り1回">✓ Applied · ⚡ 1 left</div>
+
+        <div class="flex justify-end">
+          <div class="bg-indigo-500 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[85%]" data-en="Use a warmer color theme" data-jp="もっと温かみのある配色にして">Use a warmer color theme</div>
+        </div>
+
+        <div class="flex gap-2.5">
+          <span class="w-7 h-7 rounded-full bg-[#F5EEDC] flex items-center justify-center text-white text-xs flex-shrink-0 mt-0.5"><img src="icons/shirube.svg" alt="Shirube" style="width:60%;height:60%" /></span>
+          <div class="space-y-2 max-w-[85%]">
+            <div class="bg-gray-50 border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 leading-relaxed"
+                 data-en="Switched your site to the <b>Warm</b> theme — softer earth tones that match a traditional ryokan. That was a great session: your site went from a bare translation to something AI can really sell. 🏆"
+                 data-jp="サイトを<b>「あたたかい」</b>テーマに切り替えました — 伝統的な旅館に合う、やわらかなアースカラーです。素晴らしいセッションでした：ただの翻訳サイトから、AIがしっかり推薦できるサイトになりましたよ。🏆">
+              Switched your site to the <b>Warm</b> theme — softer earth tones that match a traditional ryokan. That was a great session: your site went from a bare translation to something AI can really sell. 🏆
+            </div>
+            <div class="flex items-center gap-2 text-[11px]">
+              <span class="bg-green-50 text-green-700 border border-green-100 px-2 py-0.5 rounded-full font-semibold" data-en="✓ Applied" data-jp="✓ 反映済み">✓ Applied</span>
+              <span class="text-orange-500 font-semibold" data-en="Last free credit used · ⚡ 0 left" data-jp="最後の無料クレジットを使用・⚡ 残り0回">Last free credit used · ⚡ 0 left</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ★ PAYWALL PANEL -->
+      <div class="border-t border-gray-100 p-4 flex-shrink-0 bg-gradient-to-b from-white to-indigo-50">
+        <div class="rounded-2xl border-2 border-indigo-200 bg-white p-4 shadow-sm">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-base">🔒</span>
+            <span class="text-sm font-bold text-gray-900" data-en="You've used your 5 free AI edits" data-jp="無料のAI編集5回を使い切りました">You've used your 5 free AI edits</span>
+          </div>
+          <p class="text-xs text-gray-500 mb-3" data-en="Keep improving your AI visibility — invite a friend for more free edits, or upgrade:" data-jp="AI可視化を続けましょう — 友達を招待して無料編集を増やすか、アップグレード：">Keep improving your AI visibility — invite a friend for more free edits, or upgrade:</p>
+
+          <!-- ★ FREE PATH: refer a fellow business owner → +50 edits -->
+          <a href="editor-refer.html" class="block bg-gradient-to-br from-gold-500/10 to-white border-2 border-gold-500/50 rounded-xl p-3 mb-2 hover:border-gold-500 transition-colors">
+            <div class="flex items-center justify-between mb-0.5">
+              <span class="text-[11px] font-bold text-gold-500 uppercase tracking-widest" data-en="Free · Invite &amp; earn" data-jp="無料・紹介で獲得">Free · Invite &amp; earn</span>
+              <span class="text-sm font-extrabold text-gold-500">+50 ⚡</span>
+            </div>
+            <div class="text-sm font-bold text-gray-900 mb-0.5" data-en="Invite a fellow business owner" data-jp="他の事業者を招待する">Invite a fellow business owner</div>
+            <p class="text-[11px] text-gray-600" data-en="Get 50 free edits when they build their first storefront — they get 10 to start. →" data-jp="相手が最初のストアフロントを作成すると、あなたに50回の無料編集。相手にも10回プレゼント。→">Get 50 free edits when they build their first storefront — they get 10 to start. →</p>
+          </a>
+          <div class="text-center text-[10px] text-gray-400 my-2 uppercase tracking-widest" data-en="— or upgrade for unlimited —" data-jp="— または無制限にアップグレード —">— or upgrade for unlimited —</div>
+
+          <!-- Tier 1: Self-Development (highlighted) -->
+          <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3 mb-2 relative">
+            <span class="absolute -top-2 right-3 bg-indigo-500 text-white text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full" data-en="Most popular" data-jp="人気">Most popular</span>
+            <div class="text-[11px] font-bold text-indigo-600 uppercase tracking-widest mb-0.5" data-en="Self-Development" data-jp="セルフプラン">Self-Development</div>
+            <div class="flex items-baseline gap-1 mb-1.5">
+              <span class="text-xl font-extrabold text-gray-900">¥4,980</span>
+              <span class="text-xs text-gray-500" data-en="/month" data-jp="／月">/month</span>
+            </div>
+            <ul class="text-[11px] text-gray-600 space-y-1">
+              <li class="flex gap-1.5"><span class="text-indigo-500">✓</span> <span data-en="Unlimited AI edits — you chat, we apply" data-jp="AI編集が無制限 — チャットするだけ">Unlimited AI edits — you chat, we apply</span></li>
+              <li class="flex gap-1.5"><span class="text-indigo-500">✓</span> <span data-en="Quarterly Share-of-Voice snapshot" data-jp="四半期ごとのSoVスナップショット">Quarterly Share-of-Voice snapshot</span></li>
+              <li class="flex gap-1.5"><span class="text-indigo-500">✓</span> <span data-en="Custom domain" data-jp="独自ドメイン対応">Custom domain</span></li>
+            </ul>
+          </div>
+
+          <!-- Tier 2: Dev-Supported -->
+          <div class="bg-white border border-gray-200 rounded-xl p-3 mb-3">
+            <div class="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-0.5" data-en="Dev-Supported" data-jp="おまかせプラン">Dev-Supported</div>
+            <div class="flex items-baseline gap-1 mb-1.5">
+              <span class="text-xl font-extrabold text-gray-900">¥39,800</span>
+              <span class="text-xs text-gray-500" data-en="/month" data-jp="／月">/month</span>
+            </div>
+            <ul class="text-[11px] text-gray-600 space-y-1">
+              <li class="flex gap-1.5"><span class="text-gray-400">✓</span> <span data-en="Our team makes the improvements for you" data-jp="改善作業はすべて当社チームが代行">Our team makes the improvements for you</span></li>
+              <li class="flex gap-1.5"><span class="text-gray-400">✓</span> <span data-en="Monthly Share-of-Voice report &amp; action plan" data-jp="毎月のSoVレポート＆改善プラン">Monthly Share-of-Voice report &amp; action plan</span></li>
+              <li class="flex gap-1.5"><span class="text-gray-400">✓</span> <span data-en="Priority support" data-jp="優先サポート">Priority support</span></li>
+            </ul>
+          </div>
+
+          <!-- Joined confirmation (CSS :target) -->
+          <div id="joined" class="items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-2.5 text-xs text-green-700 font-medium"
+               data-en="✓ You're on the list! We'll email you when Pro launches (very soon)."
+               data-jp="✓ 登録完了！Pro公開時（まもなく）にメールでお知らせします。">
+            ✓ You're on the list! We'll email you when Pro launches (very soon).
+          </div>
+
+          <!-- Waitlist form -->
+          <div class="waitlist-form">
+            <div class="flex gap-2">
+              <input type="email" value="yamada.taro@gmail.com" class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+              <a href="#joined" class="bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold px-4 py-2 rounded-lg whitespace-nowrap transition-colors" data-en="Join the waitlist" data-jp="順番待ちに登録">Join the waitlist</a>
+            </div>
+            <p class="text-[10px] text-gray-400 mt-2 text-center" data-en="Pro launches soon — waitlist members get their first month free." data-jp="Proはまもなく公開 — 順番待ち登録で初月無料。">Pro launches soon — waitlist members get their first month free.</p>
+          </div>
+        </div>
+        <p class="text-center text-[10px] text-gray-400 mt-2" data-en="Your site stays live — only AI editing is paused." data-jp="サイトは公開されたまま — 一時停止するのはAI編集のみです。">Your site stays live — only AI editing is paused.</p>
+      </div>
+    </aside>
+
+    <!-- ▶ LIVE PREVIEW — warm theme, all edits applied (product output stays EN) -->
+    <main id="pane-preview" class="flex-1 w-full overflow-y-auto bg-gray-100 p-4 sm:p-5">
+      <div class="max-w-3xl mx-auto">
+
+        <div class="bg-white rounded-t-xl border border-gray-200 px-4 py-2.5 flex items-center gap-2 sticky top-0 z-10">
+          <div class="flex gap-1.5">
+            <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+            <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+            <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+          </div>
+          <div class="flex-1 bg-gray-100 rounded px-3 py-1 text-xs text-gray-500 font-mono text-center">🔒 aivible.tokyo/s/kamogawa-kan</div>
+          <span class="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full" data-en="Warm theme" data-jp="「あたたかい」テーマ">Warm theme</span>
+        </div>
+
+        <div class="bg-orange-50/60 border-x border-b border-gray-200 rounded-b-xl overflow-hidden shadow-sm">
+
+          <div class="relative h-64 bg-gradient-to-br from-amber-800 via-orange-600 to-amber-300 flex items-end">
+            <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 70% 20%, rgba(255,255,255,0.4) 0, transparent 40%);"></div>
+            <div class="relative p-8 text-white">
+              <div class="text-[10px] uppercase tracking-[0.2em] opacity-80 mb-2">Ryokan · Kyoto</div>
+              <h1 class="text-3xl font-extrabold mb-1.5">Kamogawa-kan 鴨川館</h1>
+              <p class="text-sm opacity-95">Riverside ryokan with private onsen baths in the heart of Kyoto.</p>
+            </div>
+          </div>
+
+          <div class="px-8 py-6 border-b border-orange-100/60">
+            <h2 class="font-bold text-gray-900 mb-2 text-sm uppercase tracking-widest text-amber-600">About</h2>
+            <p class="text-sm text-gray-600 leading-relaxed">Family-run for four generations since 1932, Kamogawa-kan offers tatami rooms overlooking the Kamo River in central Kyoto. Guests enjoy private onsen baths, seasonal kaiseki dinners, and traditional hospitality, a short walk from Gion and Pontocho Alley.</p>
+          </div>
+
+          <div class="px-8 py-5 border-b border-orange-100/60 flex flex-wrap gap-2">
+            <span class="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full">Private Onsen</span>
+            <span class="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full">Traditional Architecture</span>
+            <span class="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full">Kaiseki Cuisine</span>
+            <span class="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full">River View</span>
+            <span class="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full">Multilingual Staff</span>
+          </div>
+
+          <div class="px-8 py-6 border-b border-orange-100/60">
+            <h2 class="font-bold text-gray-900 mb-4 text-sm uppercase tracking-widest text-amber-600">Rooms &amp; Plans</h2>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="border border-orange-100 bg-white rounded-xl overflow-hidden">
+                <div class="h-24 bg-gradient-to-br from-amber-200 to-orange-200 flex items-center justify-center text-2xl">🛏️</div>
+                <div class="p-3">
+                  <div class="text-sm font-semibold text-gray-900">River-view Tatami Room</div>
+                  <div class="text-xs text-gray-400 mt-0.5">Breakfast included · up to 3 guests</div>
+                  <div class="text-sm font-bold text-amber-700 mt-1.5">¥28,000 <span class="text-[10px] font-normal text-gray-400">/ night</span></div>
+                </div>
+              </div>
+              <div class="border border-orange-100 bg-white rounded-xl overflow-hidden">
+                <div class="h-24 bg-gradient-to-br from-orange-100 to-amber-200 flex items-center justify-center text-2xl">🍱</div>
+                <div class="p-3">
+                  <div class="text-sm font-semibold text-gray-900">Kaiseki Dinner Plan</div>
+                  <div class="text-xs text-gray-400 mt-0.5">Seasonal 9-course dinner</div>
+                  <div class="text-sm font-bold text-amber-700 mt-1.5">¥42,000 <span class="text-[10px] font-normal text-gray-400">/ night</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="px-8 py-6">
+            <h2 class="font-bold text-gray-900 mb-3 text-sm uppercase tracking-widest text-amber-600">Access &amp; Contact</h2>
+            <div class="text-sm text-gray-600 space-y-1.5">
+              <div>🚉 12 min from Kyoto Station by taxi · Karasuma Line to Karasuma-Oike (5 min walk)</div>
+              <div>📍 Oike-dori, Nakagyo-ku, Kyoto</div>
+              <div>📞 +81-75-000-0000</div>
+              <div>✉️ stay@kamogawakan.com</div>
+            </div>
+          </div>
+
+          <div class="bg-amber-50 border-t border-orange-100 py-3 text-center text-[11px] text-gray-400">
+            <span class="japan-red">●</span> Powered by <b>AIVIBLE</b> — AI-optimized &amp; verified
+          </div>
+        </div>
+
+        <div class="h-6"></div>
+      </div>
+    </main>
+
+  </div>
+
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+
+  <!-- MOBILE PANE TOGGLE -->
+  <script>
+  (function () {
+    var body = document.body,
+        chat = document.getElementById("mp-chat"),
+        prev = document.getElementById("mp-preview");
+    if (!chat || !prev) return;
+    function set(pane) {
+      body.setAttribute("data-mobile-pane", pane);
+      var on = chat, off = prev;
+      if (pane === "preview") { on = prev; off = chat; }
+      on.className = on.className.replace(/\s*(bg-\[#223A70\]|text-white|text-gray-500)/g, "") + " bg-[#223A70] text-white";
+      off.className = off.className.replace(/\s*(bg-\[#223A70\]|text-white|text-gray-500)/g, "") + " text-gray-500";
+    }
+    chat.addEventListener("click", function () { set("chat"); });
+    prev.addEventListener("click", function () { set("preview"); });
+    set("chat");
+  })();
+  </script>
+  <script src="_superseded.js"></script>
+</body>
+</html>
