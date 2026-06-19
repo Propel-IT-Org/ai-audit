@@ -170,32 +170,110 @@ export async function generateItinerary(
   };
 }
 
-/** Re-plan an existing itinerary given a free-text customization request. */
+interface CustomizePlan {
+  reply?: string;
+  days?: { dayNumber?: number; title?: string; area?: string; stopSlugs?: string[] }[];
+}
+
+/** Apply a free-text change to an existing itinerary without re-planning from scratch. */
 export async function customizeItinerary(
   current: Itinerary,
   message: string,
 ): Promise<{ itinerary: Itinerary; reply: string }> {
   const client = getClient();
-  const candidates = await getCandidates(current.destination);
-
-  if (!client || !candidates.length) {
-    return {
-      itinerary: current,
-      reply: "I can't adjust the plan right now — AI planning is unavailable.",
-    };
+  if (!client) {
+    return { itinerary: current, reply: "AI planning is unavailable right now." };
   }
 
-  const days =
-    (await claudePlan(
-      client,
-      { destination: current.destination, style: message },
-      current.totalDays,
-      candidates,
-    )) ?? current.days;
+  const candidates = await getCandidates(current.destination);
 
-  const itinerary: Itinerary = { ...current, days, meta: { source: "claude" } };
-  return {
-    itinerary,
-    reply: `Updated your ${current.destination} itinerary for: "${message}". Check the days and map.`,
-  };
+  // Merged resolution map: current stops by slug (full ItineraryStop) + fresh candidates
+  const currentStopsBySlug = new Map<string, ItineraryStop>();
+  current.days.forEach((d) => d.stops.forEach((s) => currentStopsBySlug.set(s.slug, s)));
+  const candidatesBySlug = new Map(candidates.map((r) => [r.slug, r]));
+
+  const currentDays = current.days.map((d) => ({
+    dayNumber: d.dayNumber,
+    title: d.title,
+    area: d.area,
+    stops: d.stops.map((s) => ({ slug: s.slug, name: s.name })),
+  }));
+
+  const pool = candidates.map((r) => ({
+    slug: r.slug,
+    name: r.nameEn,
+    category: r.category,
+    area: r.area ?? r.prefecture,
+    hiddenGem: !!r.hiddenGem,
+  }));
+
+  const prompt = `Current itinerary for "${current.destination}":
+${JSON.stringify(currentDays)}
+
+Additional places available to add:
+${JSON.stringify(pool)}
+
+User request: "${message}"
+
+Apply the user's request. You may remove, add, reorder, or replace stops. Keep everything not mentioned unchanged. Only use slugs from the current itinerary or the additional list.
+
+Return ONLY JSON (no prose, no markdown):
+{"reply":"<one sentence describing what you changed>","days":[{"dayNumber":1,"title":"Day 1 — area","area":"area","stopSlugs":["slug-a","slug-b"]}]}`;
+
+  try {
+    const res = await client.messages.create({
+      model: MODEL,
+      max_tokens: 2000,
+      system: "You are an expert Japan travel planner. Output ONLY valid JSON.",
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    const txt = res.content
+      .map((c) => ("text" in c && typeof c.text === "string" ? c.text : ""))
+      .join("\n")
+      .trim();
+
+    const parsed = parseJsonLenient(txt) as CustomizePlan;
+    if (!parsed?.days?.length) {
+      return { itinerary: current, reply: "Couldn't apply that change — try rephrasing." };
+    }
+
+    const days: ItineraryDay[] = [];
+    parsed.days.forEach((d, i) => {
+      const stops = (d.stopSlugs ?? [])
+        .map((slug) => {
+          const existing = currentStopsBySlug.get(slug);
+          if (existing) return existing;
+          const r = candidatesBySlug.get(slug);
+          return r ? toStop(r) : null;
+        })
+        .filter((s): s is ItineraryStop => !!s);
+
+      if (stops.length) {
+        days.push({
+          dayNumber: d.dayNumber ?? i + 1,
+          title: d.title ?? `Day ${i + 1} — ${current.destination}`,
+          area: d.area ?? null,
+          stops,
+        });
+      }
+    });
+
+    // Renumber sequentially to close gaps from removed stops/days
+    days.forEach((d, i) => { d.dayNumber = i + 1; });
+
+    const itinerary: Itinerary = {
+      ...current,
+      days: days.length ? days : current.days,
+      totalDays: days.length || current.totalDays,
+      meta: { source: "claude" },
+    };
+
+    return {
+      itinerary,
+      reply: parsed.reply ?? `Updated your ${current.destination} itinerary.`,
+    };
+  } catch {
+    return { itinerary: current, reply: "Couldn't apply that change — try rephrasing." };
+  }
 }

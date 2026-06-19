@@ -6,7 +6,7 @@ import {
 } from "@/lib/workflow/status-store";
 import { buildPublishedSite, type PublishInput } from "@/lib/sites/publish";
 import { writePublishedSite } from "@/lib/sites/storage";
-import { applyEnrichment, enrichWithAudit, generateQuestionsForMissingFields, type CustomQuestion } from "@/lib/sites/ai-enrich";
+import { applyEnrichment, enrichWithAudit, generateQuestionsForMissingFields, generateStructuredMenu, type CustomQuestion } from "@/lib/sites/ai-enrich";
 import { translateSiteToEnglish } from "@/lib/sites/translator";
 import type { PublishedSite, RestaurantData } from "@/lib/sites/types";
 import type { AuditReport } from "@/lib/types";
@@ -58,7 +58,8 @@ export async function publishSiteWorkflow(
 
     const translated = await translateStep(runId, customized);
     const enriched = await enrichStep(runId, translated, input.audit);
-    const result = await persistStep(runId, enriched);
+    const menuFilled = await structuredMenuStep(runId, enriched);
+    const result = await persistStep(runId, menuFilled);
     await closeStreamStep();
     return result;
   } catch (err) {
@@ -289,6 +290,29 @@ async function enrichStep(
     meta: enrichMeta,
   });
   return merged;
+}
+
+async function structuredMenuStep(
+  runId: string,
+  site: PublishedSite,
+): Promise<PublishedSite> {
+  "use step";
+  if (site.data.industry !== "restaurant") return site;
+  const menuSections = (site.data as RestaurantData).menu?.sections ?? [];
+  if (menuSections.length >= 3) return site;
+
+  await patchRunStatus<PublishedSite>("publish", runId, {
+    state: "running",
+    message: "Building menu from the web…",
+    progress: 88,
+  });
+  await emit({ state: "running", message: "Building menu from the web…", progress: 88 });
+
+  const result = await generateStructuredMenu(site);
+  if (!result) return site;
+
+  const data = { ...(site.data as RestaurantData), menu: result };
+  return { ...site, data };
 }
 
 async function persistStep(

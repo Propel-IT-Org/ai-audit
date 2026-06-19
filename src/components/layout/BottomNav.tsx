@@ -11,7 +11,7 @@ import {
   type IconProps,
 } from "@/components/icons";
 
-const ITINERARY_HREF = "/itinerary/japan-2-weeks";
+const ITINERARY_HREF = "/plan";
 
 type IconComponent = (props: IconProps) => React.JSX.Element;
 

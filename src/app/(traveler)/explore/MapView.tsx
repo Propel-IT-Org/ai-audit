@@ -6,6 +6,7 @@ import {
   MapProvider,
   GoogleMap,
   GemPin,
+  PlacePin,
   AdvancedMarker,
   InfoWindow,
 } from "@/components/map/GoogleMap";
@@ -31,9 +32,21 @@ export default function MapView({ restaurants, language }: Props) {
             position={{ lat: r.lat as number, lng: r.lng as number }}
             onClick={() => setActiveId(r.id)}
           >
-            <GemPin />
+            {r.hiddenGem ? <GemPin /> : <PlacePin />}
           </AdvancedMarker>
         ))}
+
+        {/* legend */}
+        <div className="absolute left-3 top-3 z-10 flex flex-col gap-1.5 rounded-lg border border-border bg-white/90 px-3 py-2 text-xs shadow backdrop-blur-sm">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#C8A859] text-white text-[10px] font-bold">★</span>
+            <span className="text-foreground">Hidden gem</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="inline-block h-3.5 w-3.5 rounded-full bg-[#223A70]" />
+            <span className="text-foreground">Place</span>
+          </div>
+        </div>
 
         {active && (
           <InfoWindow

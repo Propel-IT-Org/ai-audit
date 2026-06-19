@@ -76,6 +76,10 @@ export function GemPin() {
   return <PinShell color="#C8A859">★</PinShell>;
 }
 
+export function PlacePin() {
+  return <PinShell color="#223A70" />;
+}
+
 export function NumberedPin({ n }: { n: number }) {
   return (
     <PinShell color="#223A70" size={32}>

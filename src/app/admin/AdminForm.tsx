@@ -5,7 +5,8 @@ import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { saveRestaurantAction } from "@/lib/restaurants/admin-actions";
+import { saveRestaurantAction, parseRestaurantMdxAction } from "@/lib/restaurants/admin-actions";
+import type { Restaurant } from "@/lib/db/schema/restaurant";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -71,8 +72,26 @@ const defaultValues: FormValues = {
   mdxBody: "",
 };
 
-export function AdminForm() {
+export function AdminForm({ initial, mode = "create" }: { initial?: Restaurant; mode?: "create" | "edit" }) {
   "use no memo";
+
+  const initialValues: FormValues = initial
+    ? {
+        nameEn: initial.nameEn ?? "",
+        nameJp: initial.nameJp ?? "",
+        slug: initial.slug ?? "",
+        address: initial.address ?? "",
+        aiOverview: initial.aiOverview ?? "",
+        lat: initial.lat != null ? String(initial.lat) : "",
+        lng: initial.lng != null ? String(initial.lng) : "",
+        category: initial.category ?? "",
+        prefecture: initial.prefecture ?? "",
+        imageUrl: initial.imageUrl ?? "",
+        websiteUrl: initial.websiteUrl ?? "",
+        hiddenGem: initial.hiddenGem ?? false,
+        mdxBody: "",
+      }
+    : defaultValues;
 
   const fileRef = useRef<HTMLInputElement>(null);
   const {
@@ -82,7 +101,7 @@ export function AdminForm() {
     getValues,
     reset,
     formState: { isSubmitting },
-  } = useForm<FormValues>({ resolver: zodResolver(formSchema), defaultValues });
+  } = useForm<FormValues>({ resolver: zodResolver(formSchema), defaultValues: initialValues });
 
   const mdxBody = useWatch({ control, name: "mdxBody" });
 
@@ -94,7 +113,15 @@ export function AdminForm() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setValue("mdxBody", await file.text());
+    const text = await file.text();
+    setValue("mdxBody", text);
+    const { fields } = await parseRestaurantMdxAction(text);
+    const current = getValues();
+    let filled = 0;
+    (Object.entries(fields) as [keyof FormValues, string][]).forEach(([k, v]) => {
+      if (!current[k]) { setValue(k, v); filled++; }
+    });
+    if (filled > 0) toast.success(`${filled} field${filled > 1 ? "s" : ""} auto-filled from MDX`);
   };
 
   const onSubmit = async (values: FormValues) => {
@@ -115,9 +142,8 @@ export function AdminForm() {
     });
 
     if (result.ok) {
-      toast.success("Restaurant saved successfully!");
-      reset(defaultValues);
-      if (fileRef.current) fileRef.current.value = "";
+      toast.success(mode === "edit" ? "Restaurant updated!" : "Restaurant saved!");
+      if (mode === "create") { reset(defaultValues); if (fileRef.current) fileRef.current.value = ""; }
     } else {
       toast.error(result.error ?? "Failed to save. Please try again.");
     }
@@ -327,7 +353,7 @@ export function AdminForm() {
 
         <FieldContent>
           <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? "Saving…" : "Save Restaurant"}
+            {isSubmitting ? "Saving…" : mode === "edit" ? "Update Restaurant" : "Save Restaurant"}
           </Button>
         </FieldContent>
       </FieldGroup>

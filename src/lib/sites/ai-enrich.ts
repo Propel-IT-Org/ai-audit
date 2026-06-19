@@ -3,6 +3,7 @@ import type { AuditReport, CheckResult } from "../types";
 import type {
   GeoEnrichment,
   GuestReview,
+  MenuSection,
   PublishedSite,
   RatingSummary,
   RestaurantData,
@@ -675,5 +676,70 @@ function sanitizeQuestions(parsed: unknown): CustomQuestion[] {
     });
   }
   return out;
+}
+
+/**
+ * Use Claude + web_search to build a structured menu for a restaurant whose
+ * scraped menu came up empty. Returns undefined if Claude finds nothing or
+ * if the AI client is unavailable.
+ */
+export async function generateStructuredMenu(
+  site: PublishedSite,
+): Promise<{ sections: MenuSection[] } | undefined> {
+  if (site.data.industry !== "restaurant") return undefined;
+  const claude = getClient();
+  if (!claude) return undefined;
+
+  const r = site.data as RestaurantData;
+  const name = r.name;
+  const cuisine = r.cuisine?.join(", ") ?? "";
+  const city = r.contact?.city ?? r.contact?.region ?? "";
+  const sourceUrl = site.subdomain ?? "";
+
+  const prompt = `Search the web for the menu of "${name}"${cuisine ? `, a ${cuisine} restaurant` : ""}${city ? ` in ${city}` : ""}.${sourceUrl ? ` Their website: ${sourceUrl}` : ""}
+
+Make at least 3 searches to gather menu information from their website, food review sites (Tabelog, Google Maps, TripAdvisor), and any social media. Only include dishes you found concrete evidence for.
+
+Return ONLY valid JSON (no prose, no markdown fences):
+{"sections":[{"title":"<section name>","items":[{"name":"<dish name>","description":"<optional short description>","price":"<price if found>"}]}]}
+
+If you cannot find sufficient menu data, return: {"sections":[]}`;
+
+  try {
+    const res = await claude.messages.create({
+      model: "claude-opus-4-7",
+      max_tokens: 3000,
+      system: "You are a restaurant data researcher. Output ONLY valid JSON.",
+      tools: [{ name: "web_search", type: "web_search_20260209" as const, max_uses: 5 }],
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    const txt = res.content
+      .map((c) => ("text" in c && typeof c.text === "string" ? c.text : ""))
+      .join("\n")
+      .trim();
+
+    const parsed = parseJsonLenient(txt) as { sections?: unknown[] };
+    if (!Array.isArray(parsed?.sections) || parsed.sections.length === 0) return undefined;
+
+    const sections: MenuSection[] = (parsed.sections as Record<string, unknown>[])
+      .slice(0, 20)
+      .map((sec) => ({
+        title: String(sec.title ?? "Menu"),
+        items: (Array.isArray(sec.items) ? (sec.items as Record<string, unknown>[]) : [])
+          .slice(0, 50)
+          .map((item) => ({
+            name: String(item.name ?? "").slice(0, 100),
+            description: item.description ? String(item.description).slice(0, 200) : undefined,
+            price: item.price ? String(item.price).slice(0, 20) : undefined,
+          }))
+          .filter((item) => item.name),
+      }))
+      .filter((sec) => sec.items.length > 0);
+
+    return sections.length > 0 ? { sections } : undefined;
+  } catch {
+    return undefined;
+  }
 }
 

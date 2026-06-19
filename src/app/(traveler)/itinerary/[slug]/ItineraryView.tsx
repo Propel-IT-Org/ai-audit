@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Sparkles, Send, MapPin, Star, ArrowLeft, X } from "lucide-react";
+import { toast } from "sonner";
 import {
   MapProvider,
   GoogleMap,
@@ -50,14 +51,17 @@ function DayRoute({ stops, color }: { stops: ItineraryStop[]; color: string }) {
   const routes = useMapsLibrary("routes");
   useEffect(() => {
     if (!map || !routes || stops.length < 2) return;
-    const service = new routes.DirectionsService();
-    const renderer = new routes.DirectionsRenderer({
+    let renderer: google.maps.DirectionsRenderer | null = null;
+    let fallback: google.maps.Polyline | null = null;
+
+    renderer = new routes.DirectionsRenderer({
       map,
       suppressMarkers: true,
       preserveViewport: true,
       polylineOptions: { strokeColor: color, strokeWeight: 4, strokeOpacity: 0.85 },
     });
-    service
+
+    new routes.DirectionsService()
       .route({
         origin: { lat: stops[0].lat, lng: stops[0].lng },
         destination: { lat: stops[stops.length - 1].lat, lng: stops[stops.length - 1].lng },
@@ -65,11 +69,24 @@ function DayRoute({ stops, color }: { stops: ItineraryStop[]; color: string }) {
         travelMode: google.maps.TravelMode.DRIVING,
         optimizeWaypoints: false,
       })
-      .then((res) => renderer.setDirections(res))
+      .then((res) => renderer?.setDirections(res))
       .catch(() => {
-        /* route unavailable — pins still show */
+        renderer?.setMap(null);
+        renderer = null;
+        fallback = new google.maps.Polyline({
+          path: stops.map((s) => ({ lat: s.lat, lng: s.lng })),
+          geodesic: true,
+          strokeColor: color,
+          strokeWeight: 4,
+          strokeOpacity: 0.85,
+          map,
+        });
       });
-    return () => renderer.setMap(null);
+
+    return () => {
+      renderer?.setMap(null);
+      fallback?.setMap(null);
+    };
   }, [map, routes, stops, color]);
   return null;
 }
@@ -90,9 +107,10 @@ function ItineraryMap({
   return (
     <GoogleMap defaultCenter={{ lat: 36.2, lng: 138.2 }} defaultZoom={6} style={{ width: "100%", height: "100%" }}>
       <FitBounds stops={allStops} />
-      {itinerary.days.map((d, i) => (
-        <DayRoute key={d.dayNumber} stops={d.stops} color={DAY_COLORS[i % DAY_COLORS.length]} />
-      ))}
+      {itinerary.days.map((d, i) => {
+        const sig = d.stops.map((s) => `${s.lat},${s.lng}`).join("|");
+        return <DayRoute key={`day-${d.dayNumber}-${sig}`} stops={d.stops} color={DAY_COLORS[i % DAY_COLORS.length]} />;
+      })}
       {allStops.map((s) => (
         <AdvancedMarker key={s.id} position={{ lat: s.lat, lng: s.lng }} onClick={() => onSelect(s)}>
           {s.hiddenGem ? <GemPin /> : <NumberedPin n={numberOf.get(s.id) ?? 1} />}
@@ -141,19 +159,23 @@ export function ItineraryView({ initial }: { initial: Itinerary }) {
     if (!msg || busy) return;
     setInput("");
     setBusy(true);
+    const snapshot = itinerary;
     setTurns((t) => [...t, { role: "user", content: msg }, { role: "assistant", content: "", pending: true }]);
-    const res = await customizeItineraryAction(itinerary.slug, msg);
+    const res = await customizeItineraryAction(snapshot.slug, msg, snapshot);
     setBusy(false);
-    setTurns((t) => {
-      const next = [...t];
-      const idx = next.findIndex((x) => x.pending);
-      const reply = res.ok ? res.reply : res.error;
-      if (idx !== -1) next[idx] = { role: "assistant", content: reply };
-      return next;
-    });
     if (res.ok) {
+      setTurns((t) => {
+        const next = [...t];
+        const idx = next.findIndex((x) => x.pending);
+        if (idx !== -1) next[idx] = { role: "assistant", content: res.reply };
+        return next;
+      });
       setItinerary(res.itinerary);
       setSelected(null);
+    } else {
+      // Drop pending bubble, show toast
+      setTurns((t) => t.filter((x) => !x.pending));
+      toast.error(res.error);
     }
   };
 

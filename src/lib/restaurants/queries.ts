@@ -52,6 +52,10 @@ export async function getRestaurantsForMap(): Promise<Restaurant[]> {
     .where(and(isNotNull(restaurant.lat), isNotNull(restaurant.lng)));
 }
 
+export async function deleteRestaurant(id: string): Promise<void> {
+  await db.delete(restaurant).where(eq(restaurant.id, id));
+}
+
 export async function createRestaurant(data: typeof restaurant.$inferInsert): Promise<Restaurant> {
   const rows = await db.insert(restaurant).values(data).returning();
   return rows[0];

@@ -1,7 +1,7 @@
 "use server";
 
 import { generateItinerary, customizeItinerary } from "./generate";
-import { readItinerary, writeItinerary, newItinerarySlug } from "./storage";
+import { writeItinerary, newItinerarySlug } from "./storage";
 import type { Itinerary, PlanItineraryInput } from "./types";
 
 export async function planItineraryAction(
@@ -26,12 +26,15 @@ export async function planItineraryAction(
 export async function customizeItineraryAction(
   slug: string,
   message: string,
+  current: Itinerary,
 ): Promise<{ ok: true; itinerary: Itinerary; reply: string } | { ok: false; error: string }> {
   try {
-    const current = await readItinerary(slug);
-    if (!current) return { ok: false, error: "Itinerary not found." };
     const { itinerary, reply } = await customizeItinerary(current, message);
-    await writeItinerary(itinerary);
+    try {
+      await writeItinerary(itinerary);
+    } catch {
+      // blob write failure — return updated state to client anyway
+    }
     return { ok: true, itinerary, reply };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Failed to update itinerary." };
