@@ -49,9 +49,12 @@ export async function publishSiteWorkflow(
     const questions = await customizationQuestionsStep(runId, scraped);
     let customized = scraped;
     if (questions.length > 0) {
+      // Register the hook FIRST — then notify the client so that resumeHook()
+      // can never be called before the hook exists in durable storage.
       using hook = createHook<Record<string, string>>({
         token: `customize:${runId}`,
       });
+      await notifyWaitingStep(runId, questions);
       const answers = await hook;
       customized = await applyCustomizationStep(runId, scraped, answers);
     }
@@ -146,7 +149,9 @@ async function customizationQuestionsStep(
     return [];
   }
 
-  // Save the questions to state so the frontend knows we are waiting for input
+  // Persist to status store so polling clients can see we need input.
+  // Do NOT emit the SSE here — the hook must be registered first (see
+  // notifyWaitingStep) or resumeHook() races against hook registration.
   await patchRunStatus<PublishedSite>("publish", runId, {
     state: "waiting_for_input",
     message: "Waiting for user customization inputs...",
@@ -154,14 +159,28 @@ async function customizationQuestionsStep(
     meta: { questions },
   });
 
+  return questions;
+}
+
+async function notifyWaitingStep(
+  runId: string,
+  questions: CustomQuestion[],
+): Promise<void> {
+  "use step";
+  // Hook is already registered in durable storage before this step runs.
+  // Now it is safe to tell the client to submit answers.
+  await patchRunStatus<PublishedSite>("publish", runId, {
+    state: "waiting_for_input",
+    message: "Waiting for user customization inputs...",
+    progress: 58,
+    meta: { questions },
+  });
   await emit({
     state: "waiting_for_input",
     message: "Waiting for user customization inputs...",
     progress: 58,
     meta: { questions },
   });
-
-  return questions;
 }
 
 async function applyCustomizationStep(
