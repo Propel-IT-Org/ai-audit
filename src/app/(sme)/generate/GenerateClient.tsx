@@ -14,19 +14,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import type { AuditReport } from "@/lib/types";
 
-type ViewState = "landing" | "publishing" | "questions" | "done" | "error";
-
-interface CustomQuestion {
-  key: string;
-  label: string;
-  question: string;
-  placeholder?: string;
-  type: "text" | "tel" | "textarea" | "checkbox-group";
-  options?: string[];
-}
+type ViewState = "landing" | "publishing" | "done" | "error";
 
 interface SubdomainCheck {
   ok: boolean;
@@ -93,9 +83,6 @@ export function GenerateClient() {
   const [urlError, setUrlError] = useState<string | null>(null);
   const [viewState, setViewState] = useState<ViewState>("landing");
   const [progress, setProgress] = useState<{ message: string; pct?: number } | null>(null);
-  const [questions, setQuestions] = useState<CustomQuestion[]>([]);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [runId, setRunId] = useState<string | null>(null);
   const [publishedSubdomain, setPublishedSubdomain] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -104,7 +91,6 @@ export function GenerateClient() {
   const onUrlChange = (v: string) => {
     setUrl(v);
     if (urlError) setUrlError(null);
-    // Auto-fill subdomain from URL until the user edits it manually.
     if (!touchedSub) setSubdomain(v ? slugFromUrl(v) : "");
   };
 
@@ -147,7 +133,7 @@ export function GenerateClient() {
     async (
       body: ReadableStream<Uint8Array>,
       signal: AbortSignal,
-    ): Promise<"questions" | "completed" | "ended"> => {
+    ): Promise<"completed" | "ended"> => {
       const reader = body.getReader();
       const decoder = new TextDecoder();
       let buf = "";
@@ -164,13 +150,7 @@ export function GenerateClient() {
             if (!line) continue;
             const payload = line.slice(5).trim();
             if (!payload || payload === "[DONE]") continue;
-            let ev: {
-              state?: string;
-              message?: string;
-              progress?: number;
-              meta?: { questions?: CustomQuestion[] };
-              error?: string;
-            };
+            let ev: { state?: string; message?: string; progress?: number; error?: string };
             try {
               ev = JSON.parse(payload);
             } catch {
@@ -178,11 +158,6 @@ export function GenerateClient() {
             }
             if (typeof ev.message === "string" || typeof ev.progress === "number") {
               setProgress({ message: ev.message ?? ev.state ?? "Working…", pct: ev.progress });
-            }
-            if (ev.state === "waiting_for_input" && ev.meta?.questions?.length) {
-              setQuestions(ev.meta.questions);
-              await reader.cancel().catch(() => {});
-              return "questions";
             }
             if (ev.state === "completed") {
               await reader.cancel().catch(() => {});
@@ -201,7 +176,7 @@ export function GenerateClient() {
     [],
   );
 
-  /** Poll durable status until terminal/questions. Used after /resume. */
+  /** Poll durable status until terminal. Used when SSE stream ends without a terminal event. */
   const pollStatus = useCallback(async (id: string, signal: AbortSignal) => {
     while (!signal.aborted) {
       await new Promise((res) => setTimeout(res, 1500));
@@ -216,15 +191,9 @@ export function GenerateClient() {
         message?: string;
         progress?: number;
         error?: string;
-        meta?: { questions?: CustomQuestion[] };
       };
       if (typeof s.message === "string" || typeof s.progress === "number") {
         setProgress({ message: s.message ?? "Working…", pct: s.progress });
-      }
-      if (s.state === "waiting_for_input" && s.meta?.questions?.length) {
-        setQuestions(s.meta.questions);
-        setViewState("questions");
-        return;
       }
       if (s.state === "completed") {
         setViewState("done");
@@ -277,15 +246,12 @@ export function GenerateClient() {
 
       const id = r.headers.get("x-run-id");
       const sub = r.headers.get("x-subdomain") ?? subdomain;
-      setRunId(id);
       setPublishedSubdomain(sub);
 
       if (!r.body) throw new Error("Server returned no stream.");
       const outcome = await consumeStream(r.body, ctrl.signal);
 
-      if (outcome === "questions") {
-        setViewState("questions");
-      } else if (outcome === "completed") {
+      if (outcome === "completed") {
         setViewState("done");
       } else if (id) {
         // Stream ended without a terminal event — fall back to polling.
@@ -298,38 +264,10 @@ export function GenerateClient() {
     }
   }, [url, subdomain, industry, check, consumeStream, pollStatus]);
 
-  const submitAnswers = useCallback(async () => {
-    if (!runId) return;
-    setViewState("publishing");
-    setProgress({ message: "Applying your answers…", pct: 60 });
-    const ctrl = new AbortController();
-    abortRef.current = ctrl;
-    try {
-      const r = await fetch("/api/publish/resume", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ runId, answers }),
-        signal: ctrl.signal,
-      });
-      if (!r.ok) {
-        const j = (await r.json().catch(() => ({}))) as { error?: string };
-        throw new Error(j.error ?? `Resume failed: ${r.status}`);
-      }
-      await pollStatus(runId, ctrl.signal);
-    } catch (e) {
-      if (e instanceof Error && e.name === "AbortError") return;
-      setErrorMsg(e instanceof Error ? e.message : "Something went wrong.");
-      setViewState("error");
-    }
-  }, [runId, answers, pollStatus]);
-
   const restart = () => {
     abortRef.current?.abort();
     setViewState("landing");
     setProgress(null);
-    setQuestions([]);
-    setAnswers({});
-    setRunId(null);
     setPublishedSubdomain(null);
     setErrorMsg(null);
   };
@@ -338,18 +276,6 @@ export function GenerateClient() {
 
   if (viewState === "publishing") {
     return <PublishingView progress={progress} onCancel={restart} />;
-  }
-
-  if (viewState === "questions") {
-    return (
-      <QuestionsView
-        questions={questions}
-        answers={answers}
-        setAnswers={setAnswers}
-        onSubmit={submitAnswers}
-        onCancel={restart}
-      />
-    );
   }
 
   if (viewState === "done" && publishedSubdomain) {
@@ -530,99 +456,6 @@ function PublishingView({
         <Button variant="ghost" onClick={onCancel} className="mt-8 text-muted-foreground hover:text-foreground">
           Cancel
         </Button>
-      </div>
-    </div>
-  );
-}
-
-function QuestionsView({
-  questions,
-  answers,
-  setAnswers,
-  onSubmit,
-  onCancel,
-}: {
-  questions: CustomQuestion[];
-  answers: Record<string, string>;
-  setAnswers: (fn: (prev: Record<string, string>) => Record<string, string>) => void;
-  onSubmit: () => void;
-  onCancel: () => void;
-}) {
-  const setAns = (key: string, value: string) =>
-    setAnswers((prev) => ({ ...prev, [key]: value }));
-
-  const toggleOption = (key: string, opt: string) =>
-    setAnswers((prev) => {
-      const cur = (prev[key] ? prev[key].split(",") : []).map((s) => s.trim()).filter(Boolean);
-      const next = cur.includes(opt) ? cur.filter((o) => o !== opt) : [...cur, opt];
-      return { ...prev, [key]: next.join(", ") };
-    });
-
-  return (
-    <div className="min-h-screen bg-background py-12">
-      <div className="container mx-auto max-w-xl px-4">
-        <p className="av-eyebrow mb-2 text-kon2">A few quick details</p>
-        <h1 className="mb-2 text-2xl font-extrabold text-foreground">
-          Help us complete your storefront
-        </h1>
-        <p className="mb-8 text-sm text-muted-foreground">
-          We couldn&apos;t find a few details on your site. Fill what you can — skip the rest.
-        </p>
-
-        <div className="space-y-6">
-          {questions.map((q) => (
-            <div key={q.key}>
-              <label className="mb-1 block text-sm font-semibold text-foreground">{q.label}</label>
-              <p className="mb-2 text-xs text-muted-foreground">{q.question}</p>
-
-              {q.type === "textarea" ? (
-                <Textarea
-                  rows={3}
-                  placeholder={q.placeholder}
-                  value={answers[q.key] ?? ""}
-                  onChange={(e) => setAns(q.key, e.target.value)}
-                />
-              ) : q.type === "checkbox-group" && q.options?.length ? (
-                <div className="flex flex-wrap gap-2">
-                  {q.options.map((opt) => {
-                    const active = (answers[q.key] ?? "").split(",").map((s) => s.trim()).includes(opt);
-                    return (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => toggleOption(q.key, opt)}
-                        className={`rounded-full border px-3 py-1 text-sm transition-colors ${
-                          active
-                            ? "border-kon2 bg-kon2 text-white"
-                            : "border-border bg-background text-foreground hover:bg-muted"
-                        }`}
-                      >
-                        {opt}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <Input
-                  type={q.type === "tel" ? "tel" : "text"}
-                  placeholder={q.placeholder}
-                  value={answers[q.key] ?? ""}
-                  onChange={(e) => setAns(q.key, e.target.value)}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8 flex items-center gap-3">
-          <Button onClick={onSubmit} className="bg-kon2 font-bold text-white hover:bg-kon">
-            Continue
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-          <Button variant="ghost" onClick={onCancel} className="text-muted-foreground hover:text-foreground">
-            Cancel
-          </Button>
-        </div>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { getWritable, createHook } from "workflow";
+import { getWritable } from "workflow";
 import {
   buildInitialStatus,
   patchRunStatus,
@@ -6,7 +6,7 @@ import {
 } from "@/lib/workflow/status-store";
 import { buildPublishedSite, type PublishInput } from "@/lib/sites/publish";
 import { writePublishedSite } from "@/lib/sites/storage";
-import { applyEnrichment, enrichWithAudit, generateQuestionsForMissingFields, generateStructuredMenu, type CustomQuestion } from "@/lib/sites/ai-enrich";
+import { applyEnrichment, enrichWithAudit, generateStructuredMenu } from "@/lib/sites/ai-enrich";
 import { translateSiteToEnglish } from "@/lib/sites/translator";
 import type { PublishedSite, RestaurantData } from "@/lib/sites/types";
 import type { AuditReport } from "@/lib/types";
@@ -17,7 +17,7 @@ export interface PublishWorkflowInput extends PublishInput {
 }
 
 interface PublishEvent {
-  state: "running" | "waiting_for_input" | "completed" | "failed";
+  state: "running" | "completed" | "failed";
   message: string;
   progress?: number;
   result?: PublishedSite;
@@ -27,10 +27,11 @@ interface PublishEvent {
 }
 
 /**
- * Publish workflow: crawl source → scrape into typed site → AI-enrich from
- * audit report → persist to blob. Streams progress as SSE chunks via
- * `workflow.getWritable()`. After completion, `<subdomain>.<apex>` serves the
- * templated site plus /llms.txt, /llms-full.txt, /robots.txt, /sitemap.xml.
+ * Publish workflow: scrape → translate → enrich (Claude + web_search) →
+ * structured menu (restaurant only) → persist to blob.
+ *
+ * Linear pipeline — no user-input suspension. The AI enrichment step fills
+ * missing fields (phone, address, hours, cuisine, etc.) via web_search.
  */
 export async function publishSiteWorkflow(
   runId: string,
@@ -41,25 +42,7 @@ export async function publishSiteWorkflow(
   await initPublishRun(runId, input);
   try {
     const scraped = await scrapeStep(runId, input);
-
-    // Ask the user for missing fields. `createHook()` must run in the workflow
-    // body (not a step), so question generation, the suspend, and the merge are
-    // three separate steps bridged by the hook await here. The generate UI reads
-    // the `waiting_for_input` event, collects answers, and POSTs /api/publish/resume.
-    const questions = await customizationQuestionsStep(runId, scraped);
-    let customized = scraped;
-    if (questions.length > 0) {
-      // Register the hook FIRST — then notify the client so that resumeHook()
-      // can never be called before the hook exists in durable storage.
-      using hook = createHook<Record<string, string>>({
-        token: `customize:${runId}`,
-      });
-      await notifyWaitingStep(runId, questions);
-      const answers = await hook;
-      customized = await applyCustomizationStep(runId, scraped, answers);
-    }
-
-    const translated = await translateStep(runId, customized);
+    const translated = await translateStep(runId, scraped);
     const enriched = await enrichStep(runId, translated, input.audit);
     const menuFilled = await structuredMenuStep(runId, enriched);
     const result = await persistStep(runId, menuFilled);
@@ -88,13 +71,7 @@ async function initPublishRun(
   initial.message = `Scraping ${input.sourceUrl}…`;
   initial.progress = 5;
   await writeRunStatus(initial);
-
-  await emit({
-    state: "running",
-    message: initial.message,
-    progress: initial.progress,
-    meta: initial.meta,
-  });
+  await emit({ state: "running", message: initial.message, progress: initial.progress, meta: initial.meta });
 }
 
 async function scrapeStep(
@@ -102,187 +79,50 @@ async function scrapeStep(
   input: PublishWorkflowInput,
 ): Promise<PublishedSite> {
   "use step";
-  await patchRunStatus<PublishedSite>("publish", runId, {
-    state: "running",
-    message: `Crawling ${input.sourceUrl}…`,
-    progress: 25,
-  });
-  await emit({
-    state: "running",
-    message: `Crawling ${input.sourceUrl}…`,
-    progress: 25,
-  });
+  await patchRunStatus<PublishedSite>("publish", runId, { state: "running", message: `Crawling ${input.sourceUrl}…`, progress: 20 });
+  await emit({ state: "running", message: `Crawling ${input.sourceUrl}…`, progress: 20 });
 
   const site = await buildPublishedSite(input);
 
   const meta = {
     industry: site.industry,
     gallery: site.data.gallery.length,
-    menuSections:
-      site.data.industry === "restaurant"
-        ? (site.data.menu?.sections.length ?? 0)
-        : 0,
+    menuSections: site.data.industry === "restaurant" ? (site.data.menu?.sections.length ?? 0) : 0,
   };
   await patchRunStatus<PublishedSite>("publish", runId, {
     state: "running",
     message: `Extracted ${site.data.industry} data for ${site.data.name}.`,
-    progress: 55,
+    progress: 40,
     meta,
   });
-  await emit({
-    state: "running",
-    message: `Extracted ${site.data.industry} data for ${site.data.name}.`,
-    progress: 55,
-    meta,
-  });
+  await emit({ state: "running", message: `Extracted ${site.data.industry} data for ${site.data.name}.`, progress: 40, meta });
   return site;
 }
 
-async function customizationQuestionsStep(
-  runId: string,
-  site: PublishedSite,
-): Promise<CustomQuestion[]> {
-  "use step";
-
-  const questions = await generateQuestionsForMissingFields(site);
-  if (!Array.isArray(questions) || questions.length === 0) {
-    return [];
-  }
-
-  // Persist to status store so polling clients can see we need input.
-  // Do NOT emit the SSE here — the hook must be registered first (see
-  // notifyWaitingStep) or resumeHook() races against hook registration.
-  await patchRunStatus<PublishedSite>("publish", runId, {
-    state: "waiting_for_input",
-    message: "Waiting for user customization inputs...",
-    progress: 58,
-    meta: { questions },
-  });
-
-  return questions;
-}
-
-async function notifyWaitingStep(
-  runId: string,
-  questions: CustomQuestion[],
-): Promise<void> {
-  "use step";
-  // Hook is already registered in durable storage before this step runs.
-  // Now it is safe to tell the client to submit answers.
-  await patchRunStatus<PublishedSite>("publish", runId, {
-    state: "waiting_for_input",
-    message: "Waiting for user customization inputs...",
-    progress: 58,
-    meta: { questions },
-  });
-  await emit({
-    state: "waiting_for_input",
-    message: "Waiting for user customization inputs...",
-    progress: 58,
-    meta: { questions },
-  });
-}
-
-async function applyCustomizationStep(
-  runId: string,
-  site: PublishedSite,
-  answers: Record<string, string>,
-): Promise<PublishedSite> {
-  "use step";
-
-  await patchRunStatus<PublishedSite>("publish", runId, {
-    state: "running",
-    message: "Customization answers received. Merging...",
-    progress: 60,
-  });
-  await emit({
-    state: "running",
-    message: "Customization answers received. Merging...",
-    progress: 60,
-  });
-
-  // Merge the answers back into the scraped site object
-  const merged = { ...site };
-  const d = { ...merged.data };
-
-  if (answers.street) d.contact = { ...d.contact, street: answers.street };
-  if (answers.city) d.contact = { ...d.contact, city: answers.city };
-  if (answers.phone) d.contact = { ...d.contact, phone: answers.phone };
-  if (answers.description) d.description = answers.description;
-  if (answers.highlights) {
-    d.highlights = answers.highlights.split(",").map((s) => s.trim()).filter(Boolean);
-  }
-  if (d.industry === "restaurant") {
-    const r = d as RestaurantData;
-    if (answers.cuisine) {
-      r.cuisine = answers.cuisine.split(",").map((s) => s.trim()).filter(Boolean);
-    }
-    if (answers.hours) {
-      r.description = `${r.description || ""}\nOpening Hours: ${answers.hours}`.trim();
-    }
-  }
-
-  merged.data = d;
-  return merged;
-}
-
-async function translateStep(
-  runId: string,
-  site: PublishedSite,
-): Promise<PublishedSite> {
+async function translateStep(runId: string, site: PublishedSite): Promise<PublishedSite> {
   "use step";
   if (site.source?.isEnglish) {
-    const skipMsg = "Source already in English — skipping translation.";
-    await patchRunStatus<PublishedSite>("publish", runId, {
-      state: "running",
-      message: skipMsg,
-      progress: 62,
-    });
-    await emit({ state: "running", message: skipMsg, progress: 62 });
+    const msg = "Source already in English — skipping translation.";
+    await patchRunStatus<PublishedSite>("publish", runId, { state: "running", message: msg, progress: 50 });
+    await emit({ state: "running", message: msg, progress: 50 });
     return { ...site, translated: true };
   }
   const startMsg = `Translating ${site.source?.language ?? "source"} → English…`;
-  await patchRunStatus<PublishedSite>("publish", runId, {
-    state: "running",
-    message: startMsg,
-    progress: 62,
-  });
-  await emit({ state: "running", message: startMsg, progress: 62 });
+  await patchRunStatus<PublishedSite>("publish", runId, { state: "running", message: startMsg, progress: 50 });
+  await emit({ state: "running", message: startMsg, progress: 50 });
 
   const { site: out, notes } = await translateSiteToEnglish(site);
-  const doneMsg = out.translated
-    ? "Translated to English."
-    : notes[0] ?? "Translation step finished.";
-  await patchRunStatus<PublishedSite>("publish", runId, {
-    state: "running",
-    message: doneMsg,
-    progress: 70,
-    meta: { translateNotes: notes },
-  });
-  await emit({
-    state: "running",
-    message: doneMsg,
-    progress: 70,
-    meta: { translateNotes: notes },
-  });
+  const doneMsg = out.translated ? "Translated to English." : notes[0] ?? "Translation finished.";
+  await patchRunStatus<PublishedSite>("publish", runId, { state: "running", message: doneMsg, progress: 60, meta: { translateNotes: notes } });
+  await emit({ state: "running", message: doneMsg, progress: 60, meta: { translateNotes: notes } });
   return out;
 }
 
-async function enrichStep(
-  runId: string,
-  site: PublishedSite,
-  audit?: AuditReport,
-): Promise<PublishedSite> {
+async function enrichStep(runId: string, site: PublishedSite, audit?: AuditReport): Promise<PublishedSite> {
   "use step";
-  const msg = audit
-    ? "Enriching with audit findings (Claude)…"
-    : "Generating GEO content (Claude)…";
-  await patchRunStatus<PublishedSite>("publish", runId, {
-    state: "running",
-    message: msg,
-    progress: 75,
-  });
-  await emit({ state: "running", message: msg, progress: 75 });
+  const msg = audit ? "Enriching with audit findings (Claude)…" : "Generating GEO content (Claude)…";
+  await patchRunStatus<PublishedSite>("publish", runId, { state: "running", message: msg, progress: 65 });
+  await emit({ state: "running", message: msg, progress: 65 });
 
   const enrichment = await enrichWithAudit(site, audit);
   const merged = applyEnrichment(site, enrichment);
@@ -293,62 +133,30 @@ async function enrichStep(
     faqCount: enrichment.faqs?.length ?? 0,
     notes: enrichment.notes,
   };
-  const doneMsg = enrichment.faqs?.length
-    ? `Generated ${enrichment.faqs.length} FAQs + GEO copy.`
-    : "GEO enrichment finished.";
-  await patchRunStatus<PublishedSite>("publish", runId, {
-    state: "running",
-    message: doneMsg,
-    progress: 85,
-    meta: enrichMeta,
-  });
-  await emit({
-    state: "running",
-    message: doneMsg,
-    progress: 85,
-    meta: enrichMeta,
-  });
+  const doneMsg = enrichment.faqs?.length ? `Generated ${enrichment.faqs.length} FAQs + GEO copy.` : "GEO enrichment finished.";
+  await patchRunStatus<PublishedSite>("publish", runId, { state: "running", message: doneMsg, progress: 80, meta: enrichMeta });
+  await emit({ state: "running", message: doneMsg, progress: 80, meta: enrichMeta });
   return merged;
 }
 
-async function structuredMenuStep(
-  runId: string,
-  site: PublishedSite,
-): Promise<PublishedSite> {
+async function structuredMenuStep(runId: string, site: PublishedSite): Promise<PublishedSite> {
   "use step";
   if (site.data.industry !== "restaurant") return site;
   const menuSections = (site.data as RestaurantData).menu?.sections ?? [];
   if (menuSections.length >= 3) return site;
 
-  await patchRunStatus<PublishedSite>("publish", runId, {
-    state: "running",
-    message: "Building menu from the web…",
-    progress: 88,
-  });
+  await patchRunStatus<PublishedSite>("publish", runId, { state: "running", message: "Building menu from the web…", progress: 88 });
   await emit({ state: "running", message: "Building menu from the web…", progress: 88 });
 
   const result = await generateStructuredMenu(site);
   if (!result) return site;
-
-  const data = { ...(site.data as RestaurantData), menu: result };
-  return { ...site, data };
+  return { ...site, data: { ...(site.data as RestaurantData), menu: result } };
 }
 
-async function persistStep(
-  runId: string,
-  site: PublishedSite,
-): Promise<PublishedSite> {
+async function persistStep(runId: string, site: PublishedSite): Promise<PublishedSite> {
   "use step";
-  await patchRunStatus<PublishedSite>("publish", runId, {
-    state: "running",
-    message: "Publishing to subdomain…",
-    progress: 92,
-  });
-  await emit({
-    state: "running",
-    message: "Publishing to subdomain…",
-    progress: 92,
-  });
+  await patchRunStatus<PublishedSite>("publish", runId, { state: "running", message: "Publishing to subdomain…", progress: 92 });
+  await emit({ state: "running", message: "Publishing to subdomain…", progress: 92 });
 
   const url = await writePublishedSite(site);
   const apex = process.env.SITE_PUBLIC_APEX ?? "shorobik.com";
@@ -361,30 +169,14 @@ async function persistStep(
     result: site,
     meta: { blobUrl: url ?? "" },
   });
-
-  await emit({
-    state: "completed",
-    message: `Published at ${plannedUrl}`,
-    progress: 100,
-    result: site,
-    plannedUrl,
-  });
-
+  await emit({ state: "completed", message: `Published at ${plannedUrl}`, progress: 100, result: site, plannedUrl });
   return site;
 }
 
 async function markPublishFailed(runId: string, message: string): Promise<void> {
   "use step";
-  await patchRunStatus<PublishedSite>("publish", runId, {
-    state: "failed",
-    error: message,
-    message: `Publish failed: ${message}`,
-  });
-  await emit({
-    state: "failed",
-    message: `Publish failed: ${message}`,
-    error: message,
-  });
+  await patchRunStatus<PublishedSite>("publish", runId, { state: "failed", error: message, message: `Publish failed: ${message}` });
+  await emit({ state: "failed", message: `Publish failed: ${message}`, error: message });
 }
 
 async function emit(payload: PublishEvent): Promise<void> {
@@ -393,21 +185,10 @@ async function emit(payload: PublishEvent): Promise<void> {
   try {
     await writer.write(`data: ${JSON.stringify(payload)}\n\n`);
   } finally {
-    try {
-      writer.releaseLock();
-    } catch {
-      /* already released */
-    }
+    try { writer.releaseLock(); } catch { /* already released */ }
   }
 }
 
-/**
- * Closes the default writable in its own step, run after the final `emit`.
- * Buffered chunk writes flush at the step boundary, so the stream's
- * `X-Stream-Done` is only sent once the last chunk has landed — avoids the
- * HTTP 409 "stream is completing, cannot write new chunks" race that crashes
- * the run when write + close share a step.
- */
 async function closeStreamStep(): Promise<void> {
   "use step";
   try {
