@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none">
+  <!-- AIVIBLE · "Success" — appear-in-AI card + celebrating Shirube -->
+  <rect width="320" height="240" fill="#F9ECD9"/>
+
+  <!-- gold sparkles (top) -->
+  <g stroke="#E6A93C" stroke-width="3" stroke-linecap="round">
+    <line x1="104" y1="14" x2="110" y2="22"/><line x1="116" y1="10" x2="118" y2="20"/><line x1="128" y1="16" x2="124" y2="24"/>
+  </g>
+  <!-- storefront pin + gold check -->
+  <g>
+    <path d="M44 40 C44 28 54 20 67 20 C80 20 90 28 90 40 C90 58 67 86 67 86 C67 86 44 58 44 40 Z" fill="#204E8E"/>
+    <path d="M55 36 h24 v14 h-24 Z" fill="#F9ECD9"/>
+    <path d="M53 36 L67 27 L81 36 Z" fill="#F9ECD9"/>
+    <rect x="63" y="42" width="8" height="8" fill="#204E8E"/>
+    <circle cx="89" cy="30" r="10" fill="#E6A93C"/>
+    <path d="M84 30 l4 4 l6 -7" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- card -->
+  <rect x="26" y="58" width="162" height="168" rx="12" fill="#FFFFFF" stroke="#ECE3D0" stroke-width="1.5"/>
+  <text x="42" y="92" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="800" fill="#16335e">You now appear in</text>
+  <text x="42" y="110" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="800" fill="#16335e">AI itineraries</text>
+
+  <!-- list rows: navy icon tile + number badge + gray lines -->
+  <g font-family="Inter,sans-serif">
+    <!-- row 1: Fuji -->
+    <rect x="42" y="124" width="26" height="26" rx="6" fill="#204E8E"/>
+    <path d="M48 145 L55 131 L62 145 Z" fill="#F9ECD9"/><path d="M52.5 138 L55 134 L57.5 138 L55 140 Z" fill="#204E8E"/>
+    <circle cx="70" cy="124" r="8" fill="#204E8E" stroke="#fff" stroke-width="1.5"/><text x="70" y="127.5" font-size="9" font-weight="800" fill="#fff" text-anchor="middle">1</text>
+    <rect x="84" y="129" width="92" height="6" rx="3" fill="#E7EAF1"/><rect x="84" y="140" width="64" height="5" rx="2.5" fill="#EEF1F8"/>
+    <!-- row 2: temple/torii -->
+    <rect x="42" y="160" width="26" height="26" rx="6" fill="#204E8E"/>
+    <g fill="#F9ECD9"><rect x="49" y="167" width="18" height="3"/><rect x="51" y="172" width="14" height="2.5"/><rect x="52" y="170" width="2.6" height="12"/><rect x="61.4" y="170" width="2.6" height="12"/></g>
+    <circle cx="70" cy="160" r="8" fill="#204E8E" stroke="#fff" stroke-width="1.5"/><text x="70" y="163.5" font-size="9" font-weight="800" fill="#fff" text-anchor="middle">2</text>
+    <rect x="84" y="165" width="92" height="6" rx="3" fill="#E7EAF1"/><rect x="84" y="176" width="70" height="5" rx="2.5" fill="#EEF1F8"/>
+    <!-- row 3: onsen -->
+    <rect x="42" y="196" width="26" height="26" rx="6" fill="#204E8E"/>
+    <g fill="none" stroke="#F9ECD9" stroke-width="2" stroke-linecap="round"><path d="M51 211 q-2 -3 0 -6"/><path d="M55 211 q-2 -3 0 -6"/><path d="M59 211 q-2 -3 0 -6"/></g>
+    <path d="M48 213 h14" stroke="#F9ECD9" stroke-width="2.4" stroke-linecap="round"/>
+    <circle cx="70" cy="196" r="8" fill="#204E8E" stroke="#fff" stroke-width="1.5"/><text x="70" y="199.5" font-size="9" font-weight="800" fill="#fff" text-anchor="middle">3</text>
+    <rect x="84" y="201" width="92" height="6" rx="3" fill="#E7EAF1"/><rect x="84" y="212" width="58" height="5" rx="2.5" fill="#EEF1F8"/>
+  </g>
+
+  <!-- celebrating Shirube (right) -->
+  <g>
+    <path d="M242 116 q-10 -8 -12 -22" stroke="#204E8E" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M286 116 q10 -8 12 -22" stroke="#204E8E" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <rect x="244" y="84" width="40" height="118" rx="14" fill="#204E8E"/>
+    <rect x="253" y="200" width="10" height="9" rx="3.4" fill="#204E8E"/>
+    <rect x="265" y="200" width="10" height="9" rx="3.4" fill="#204E8E"/>
+    <path d="M253 109 q4 -5 8 0" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M267 109 q4 -5 8 0" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M251 120 Q264 132 277 121 Q264 123 251 120 Z" fill="#FFC94F"/>
+    <path d="M278 119 L284 121.6 L280 125 Z" fill="#FFC94F"/>
+    <text x="264" y="156" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="9" font-weight="700" fill="#F9ECD9" text-anchor="middle" writing-mode="tb" letter-spacing="1.5">シルベ</text>
+    <path d="M230 96 l-6 -5 M300 98 l6 -5 M224 124 l-7 0 M306 126 l7 1" stroke="#E0584A" stroke-width="2.6" stroke-linecap="round"/>
+  </g>
+</svg>

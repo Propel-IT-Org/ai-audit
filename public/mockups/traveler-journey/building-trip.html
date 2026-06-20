@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — Building your trip</title>
+  <!-- Auto-advances to the itinerary, like the real app would -->
+  <meta http-equiv="refresh" content="9;url=itinerary.html" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .bar { animation: grow 9s ease-out forwards; }
+    @keyframes grow { from { width: 8%; } to { width: 97%; } }
+    .step-3 .dot { animation: pulse-dot 1.2s ease-in-out infinite; }
+    @keyframes pulse-dot { 50% { opacity: 0.3; } }
+    .gem { opacity: 0; transform: translateY(6px); animation: gemin 500ms ease-out forwards; }
+    @keyframes gemin { to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-indigo-50 to-white text-gray-900 min-h-screen flex flex-col">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between">
+    <a href="discover.html" class="hover:text-white">← Discover</a>
+    <span class="tracking-widest uppercase">[Mockup v2 · Traveler 3/6 — AI building the trip · auto-advances]</span>
+    <a href="itinerary.html" class="text-white hover:text-indigo-300">Next: Itinerary →</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bg-white/80 border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-1">
+        <img src="icons/shirube.svg" alt="Shirube" class="w-7 h-7" />
+        <span class="text-xl font-bold text-gray-900">AIVIBLE</span>
+      </a>
+      <button data-lang-toggle class="text-sm border border-gray-200 px-3 py-1 rounded-full hover:bg-gray-50 font-medium">日本語</button>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-2xl mx-auto px-4 py-12">
+
+    <!-- PROGRESS HERO -->
+    <div class="text-center mb-8">
+      <div class="flex items-center justify-center gap-3 mb-2">
+        <div class="w-7 h-7 rounded-full border-[3px] border-indigo-100 border-t-indigo-500 spin"></div>
+        <h1 class="text-2xl font-extrabold text-gray-900"
+            data-en="Building your trip…"
+            data-jp="旅程を作成中…">Building your trip…</h1>
+      </div>
+      <p class="text-sm text-gray-500 max-w-md mx-auto"
+         data-en="Routing your stops into a day-by-day plan around <span class='font-mono text-gray-700'>private onsen + kaiseki near Gion</span>."
+         data-jp="<span class='font-mono text-gray-700'>祇園近くの貸切温泉＋懐石</span>を軸に、立ち寄り先を日程へ組み込んでいます。">
+        Routing your stops into a day-by-day plan around <span class="font-mono text-gray-700">private onsen + kaiseki near Gion</span>.</p>
+      <div class="h-2 bg-gray-200 rounded-full mt-5 overflow-hidden max-w-md mx-auto">
+        <div class="h-2 bg-indigo-500 rounded-full bar"></div>
+      </div>
+    </div>
+
+    <!-- BUILD STEPS -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50 text-left">
+      <div class="px-5 py-3.5 flex items-center gap-3">
+        <span class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs flex-shrink-0">✓</span>
+        <span class="text-sm text-gray-700" data-en="Searching Japanese + English sources" data-jp="日本語・英語のソースを検索">Searching Japanese + English sources</span>
+        <span class="ml-auto text-[10px] text-gray-300 font-mono">1.8s</span>
+      </div>
+      <div class="px-5 py-3.5 flex items-center gap-3">
+        <span class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs flex-shrink-0">✓</span>
+        <span class="text-sm text-gray-700" data-en="Finding verified local hidden gems" data-jp="認証済みの地元の名店を発見">Finding verified local hidden gems</span>
+        <span class="ml-auto text-[10px] text-gray-300 font-mono">4.2s</span>
+      </div>
+      <div class="px-5 py-3.5 flex items-center gap-3 step-3">
+        <span class="dot w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0">
+          <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
+        </span>
+        <span class="text-sm font-medium text-gray-900" data-en="Optimizing the route &amp; travel times" data-jp="ルートと移動時間を最適化中">Optimizing the route &amp; travel times</span>
+      </div>
+      <div class="px-5 py-3.5 flex items-center gap-3 opacity-40">
+        <span class="w-6 h-6 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs flex-shrink-0">4</span>
+        <span class="text-sm text-gray-500" data-en="Laying out your day-by-day plan" data-jp="日程表を組み立て中">Laying out your day-by-day plan</span>
+      </div>
+    </div>
+
+    <!-- gems being added (the verified-business payoff) -->
+    <div class="mt-6">
+      <div class="text-xs font-bold text-gray-500 mb-2" data-en="Verified gems added to your trip" data-jp="旅程に追加された認証済みの名店">Verified gems added to your trip</div>
+      <div class="space-y-2">
+        <div class="gem flex items-center gap-2 rounded-lg border border-gray-100 bg-white px-3 py-2 text-sm" style="animation-delay:1.0s;">
+          <span class="text-purple-500">💎</span><span class="font-semibold text-gray-800">Kamogawa-kan</span>
+          <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full ml-auto" style="background:#E8F5E9; color:#2E7D32;" data-en="✓ Verified 2d ago" data-jp="✓ 2日前に確認済み">✓ Verified 2d ago</span>
+        </div>
+        <div class="gem flex items-center gap-2 rounded-lg border border-gray-100 bg-white px-3 py-2 text-sm" style="animation-delay:2.4s;">
+          <span class="text-purple-500">💎</span><span class="font-semibold text-gray-800">Tonari Ramen</span>
+          <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-full ml-auto bg-purple-100 text-purple-700" data-en="JP-only find" data-jp="日本語のみ">JP-only find</span>
+        </div>
+        <div class="gem flex items-center gap-2 rounded-lg border border-gray-100 bg-white px-3 py-2 text-sm" style="animation-delay:3.8s;">
+          <span class="text-purple-500">💎</span><span class="font-semibold text-gray-800">Yamanaka Soba</span>
+          <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-full ml-auto bg-purple-100 text-purple-700" data-en="JP-only find" data-jp="日本語のみ">JP-only find</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-xs text-gray-400 text-center mt-6">
+      <a href="itinerary.html" class="text-indigo-500 hover:underline" data-en="(mockup: skip ahead →)" data-jp="（モック：スキップ →）">(mockup: skip ahead →)</a>
+    </p>
+
+  </main>
+
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

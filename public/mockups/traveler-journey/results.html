@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — Step 2: Score &amp; Offer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between">
+    <a href="index.html" class="hover:text-white">← Audit</a>
+    <span class="tracking-widest uppercase">[Mockup v2 — Flow 2/9: Score &amp; Offer]</span>
+    <a href="login.html" class="text-white hover:text-indigo-300">Next: Login →</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bg-white border-b border-gray-100 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-1">
+        <img src="icons/shirube.svg" alt="Shirube" class="w-7 h-7" />
+        <span class="text-xl font-bold text-gray-900">AIVIBLE</span>
+      </a>
+      <a href="index.html" class="text-sm text-gray-500 hover:text-gray-900" data-en="← Check another business" data-jp="← 別のビジネスを確認">← Check another business</a>
+      <button data-lang-toggle class="text-sm border border-gray-200 px-3 py-1 rounded-full hover:bg-gray-50 font-medium">日本語</button>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-10">
+
+    <!-- AUDITED URL BADGE -->
+    <div class="flex items-center gap-2 mb-6">
+      <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-mono">kamogawakan.com</span>
+      <span class="text-xs text-gray-400"><span data-en="Audit completed" data-jp="診断完了">Audit completed</span> · <span data-en="June 13, 2026" data-jp="2026年6月13日">June 13, 2026</span></span>
+    </div>
+
+    <!-- SCORE CARD -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6 flex flex-col sm:flex-row items-center gap-6">
+      <div class="score-ring flex-shrink-0" style="--pct:29;">
+        <div class="score-ring__face">
+          <span class="score-ring__grade">F</span>
+          <span class="score-ring__num">29 / 100</span>
+        </div>
+      </div>
+      <div>
+        <div class="av-eyebrow mb-1" data-en="AI Visibility Index" data-jp="AI可視化インデックス">AI Visibility Index</div>
+        <h1 class="text-xl font-bold text-gray-900 mb-2"
+            data-en="Right now, AI struggles to find your business — and that's fixable."
+            data-jp="いまのところ、AIはあなたのお店をうまく見つけられないようです。">Right now, AI struggles to find your business — and that's fixable.</h1>
+        <p class="text-sm text-gray-500"
+           data-en="Tools like ChatGPT and Perplexity can't yet read enough to describe or recommend you. The good news — this is quick to fix, and AIVIBLE does the heavy lifting."
+           data-jp="ChatGPTやPerplexityは、あなたのお店をまだうまく紹介できていないようです。ご安心ください — AIVIBLEが一緒に整えていきます。">
+          Tools like ChatGPT and Perplexity can't yet read enough to describe or recommend you. The good news — this is quick to fix, and AIVIBLE does the heavy lifting.</p>
+        <div class="flex gap-3 mt-3 text-xs font-medium">
+          <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full">4 <span data-en="passed" data-jp="合格">passed</span></span>
+          <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full">10 <span data-en="failed" data-jp="不合格">failed</span></span>
+          <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">4 <span data-en="partial" data-jp="一部">partial</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHAT AI SEES -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm mb-6 overflow-hidden">
+      <div class="border-b border-gray-100 px-4 py-3 flex items-center gap-2">
+        <div class="flex gap-1.5">
+          <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+          <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+          <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+        </div>
+        <div class="flex-1 bg-gray-100 rounded px-3 py-1 text-xs text-gray-400 font-mono text-center" data-en="what AI sees on kamogawakan.com" data-jp="AIが見ている kamogawakan.com">what AI sees on kamogawakan.com</div>
+      </div>
+      <div class="bg-gray-900 p-5 font-mono text-xs leading-relaxed">
+        <div class="text-green-400 mb-2">$ AI bot visiting kamogawakan.com ...</div>
+        <div class="text-gray-500 mb-1"><span class="text-gray-600">&lt;title&gt;</span><span class="text-gray-300">鴨川館 – 京都の旅館</span><span class="text-gray-600">&lt;/title&gt;</span></div>
+        <div class="text-gray-600 mb-1">&lt;!-- ⚠️ robots.txt blocks: GPTBot, ClaudeBot, PerplexityBot --&gt;</div>
+        <div class="text-gray-600 mb-1">&lt;!-- ⚠️ No schema markup · No meta description · Japanese only --&gt;</div>
+        <div class="text-gray-600 mb-1">&lt;!-- ⚠️ Content rendered by JavaScript — AI sees blank body --&gt;</div>
+        <div class="mt-3 text-red-400 border-t border-gray-700 pt-3"
+             data-en="Result: AI could read very little here — so right now it has nothing to recommend. This is exactly what we'll fix."
+             data-jp="結果：AIが読み取れる情報がまだ少なく、いまは紹介につなげにくい状態のようです。ここを一緒に整えていきます。">
+          Result: AI could read very little here — so right now it has nothing to recommend. This is exactly what we'll fix.</div>
+      </div>
+    </div>
+
+    <!-- ★ THE OFFER -->
+    <div class="rounded-2xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-indigo-50 shadow-md p-6 sm:p-8 mb-6 relative overflow-hidden">
+      <div class="absolute top-4 right-4 bg-indigo-500 text-white text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full" data-en="Free" data-jp="無料">Free</div>
+      <h2 class="text-2xl font-extrabold text-gray-900 mb-2 pr-16"
+          data-en="Want an AI-optimized version of your site?"
+          data-jp="AIに最適化されたサイト、作ってみませんか？">Want an AI-optimized version of your site?</h2>
+      <p class="text-sm text-gray-500 mb-5 max-w-lg"
+         data-en="In about 60 seconds, AIVIBLE reads your existing site and builds an English, AI-readable storefront that ChatGPT, Gemini &amp; Perplexity can find, understand, and recommend."
+         data-jp="約60秒で、AIVIBLEが既存サイトを読み取り、ChatGPT・Gemini・Perplexityが見つけて理解し、推薦できる英語のAI対応サイトを作成します。">
+        In about 60 seconds, AIVIBLE reads your existing site and builds an English, AI-readable storefront that ChatGPT, Gemini &amp; Perplexity can find, understand, and recommend.</p>
+
+      <!-- Before / After strip -->
+      <div class="grid grid-cols-2 gap-3 mb-6 max-w-lg">
+        <div class="bg-white border border-gray-200 rounded-xl p-3">
+          <div class="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-2" data-en="Your site today" data-jp="現在のサイト">Your site today</div>
+          <div class="space-y-1.5">
+            <div class="h-2 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-2 bg-gray-100 rounded w-1/2"></div>
+            <div class="h-8 bg-gray-100 rounded flex items-center justify-center text-[10px] text-gray-400" data-en="blocked · JP only · no schema" data-jp="ブロック中・日本語のみ・構造化なし">blocked · JP only · no schema</div>
+          </div>
+          <div class="mt-2 text-xs font-bold text-red-500" data-en="Score: F" data-jp="スコア：F">Score: F</div>
+        </div>
+        <div class="bg-white border-2 border-indigo-300 rounded-xl p-3 shadow-sm">
+          <div class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-2" data-en="AI-optimized version" data-jp="AI最適化バージョン">AI-optimized version</div>
+          <div class="space-y-1.5">
+            <div class="h-2 bg-indigo-300 rounded w-3/4"></div>
+            <div class="h-2 bg-indigo-200 rounded w-2/3"></div>
+            <div class="h-8 bg-indigo-50 rounded flex items-center justify-center text-[10px] text-indigo-500" data-en="EN + JP · schema · AI-welcome file" data-jp="英語＋日本語・構造化・AI案内ファイル">EN + JP · schema · AI-welcome file</div>
+          </div>
+          <div class="mt-2 text-xs font-bold text-green-600" data-en="Score: A" data-jp="スコア：A">Score: A</div>
+        </div>
+      </div>
+
+      <ul class="text-sm text-gray-600 space-y-2 mb-6">
+        <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5">✓</span> <span data-en="Built automatically from your current website — nothing to write" data-jp="今のサイトから自動生成 — 文章を書く必要なし">Built automatically from your current website — nothing to write</span></li>
+        <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5">✓</span> <span data-en="Refine it by chatting with your AI assistant (5 free edits)" data-jp="AIアシスタントとのチャットで改善（無料編集5回付き）">Refine it by chatting with your AI assistant (5 free edits)</span></li>
+        <li class="flex items-start gap-2"><span class="text-green-500 mt-0.5">✓</span> <span data-en="Live on the web instantly, with all 18 AI-visibility signals fixed" data-jp="すぐに公開 — 18のAI可視化シグナルをすべて修正済み">Live on the web instantly, with all 18 AI-visibility signals fixed</span></li>
+      </ul>
+
+      <a href="login.html" class="block sm:inline-block text-center bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-8 py-3.5 rounded-xl transition-colors shadow-lg shadow-indigo-200"
+         data-en="Generate My AI-Optimized Site →" data-jp="AI最適化サイトを生成する →">
+        Generate My AI-Optimized Site →
+      </a>
+      <p class="text-xs text-gray-400 mt-3"
+         data-en="Sign in with Google to save &amp; edit your site · Free · No credit card"
+         data-jp="Googleでログインして保存・編集 · 無料 · クレジットカード不要">Sign in with Google to save &amp; edit your site · Free · No credit card</p>
+    </div>
+
+    <!-- CONDENSED CHECK LIST -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm mb-6 overflow-hidden">
+      <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h2 class="font-bold text-gray-900" data-en="Top issues found" data-jp="主な問題点">Top issues found</h2>
+        <span class="text-xs text-gray-400" data-en="18 checks · showing worst 5" data-jp="全18項目中・重大な5件を表示">18 checks · showing worst 5</span>
+      </div>
+      <div class="divide-y divide-gray-50">
+        <div class="px-5 py-3 flex items-center gap-3">
+          <span class="text-lg">❌</span>
+          <div class="flex-1"><span class="text-sm font-medium text-gray-900" data-en="AI crawlers are blocked" data-jp="AIクローラーがブロックされています">AI crawlers are blocked</span><div class="text-xs text-gray-400" data-en="robots.txt blocks GPTBot, ClaudeBot, PerplexityBot" data-jp="robots.txt が GPTBot・ClaudeBot・PerplexityBot を拒否">robots.txt blocks GPTBot, ClaudeBot, PerplexityBot</div></div>
+          <span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium" data-en="High" data-jp="重大">High</span>
+        </div>
+        <div class="px-5 py-3 flex items-center gap-3">
+          <span class="text-lg">❌</span>
+          <div class="flex-1"><span class="text-sm font-medium text-gray-900" data-en="No English content" data-jp="英語コンテンツがありません">No English content</span><div class="text-xs text-gray-400" data-en="International travelers' AI assistants can't quote you" data-jp="海外旅行者のAIアシスタントが引用できません">International travelers' AI assistants can't quote you</div></div>
+          <span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium" data-en="High" data-jp="重大">High</span>
+        </div>
+        <div class="px-5 py-3 flex items-center gap-3">
+          <span class="text-lg">❌</span>
+          <div class="flex-1"><span class="text-sm font-medium text-gray-900" data-en="No structured business data" data-jp="構造化データがありません">No structured business data</span><div class="text-xs text-gray-400" data-en="AI can't read your hours, location, or business type" data-jp="営業時間・場所・業種をAIが読み取れません">AI can't read your hours, location, or business type</div></div>
+          <span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium" data-en="High" data-jp="重大">High</span>
+        </div>
+        <div class="px-5 py-3 flex items-center gap-3">
+          <span class="text-lg">⚠️</span>
+          <div class="flex-1"><span class="text-sm font-medium text-gray-900" data-en="Content hidden behind JavaScript" data-jp="コンテンツがJavaScriptに隠れています">Content hidden behind JavaScript</span><div class="text-xs text-gray-400" data-en="AI bots see a mostly empty page" data-jp="AIボットにはほぼ空のページに見えます">AI bots see a mostly empty page</div></div>
+          <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-medium" data-en="Medium" data-jp="中程度">Medium</span>
+        </div>
+        <div class="px-5 py-3 flex items-center gap-3">
+          <span class="text-lg">⚠️</span>
+          <div class="flex-1"><span class="text-sm font-medium text-gray-900" data-en="Missing page descriptions" data-jp="ページ説明文がありません">Missing page descriptions</span><div class="text-xs text-gray-400" data-en="The first thing AI reads is empty" data-jp="AIが最初に読む情報が空です">The first thing AI reads is empty</div></div>
+          <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-medium" data-en="Medium" data-jp="中程度">Medium</span>
+        </div>
+      </div>
+      <div class="px-5 py-3 bg-gray-50 text-center">
+        <span class="text-xs text-gray-400" data-en="All of these are fixed automatically in your generated site." data-jp="これらはすべて、生成されるサイトで自動的に修正されます。">All of these are fixed automatically in your generated site.</span>
+      </div>
+    </div>
+
+    <!-- HOW THE SCORE IS CALCULATED -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm mb-6 overflow-hidden">
+      <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-1">
+        <h2 class="font-bold text-gray-900" data-en="How your AI-Visibility score is calculated" data-jp="AI可視化スコアの算出方法">How your AI-Visibility score is calculated</h2>
+        <span class="text-xs text-gray-400" data-en="18 signals · 4 pillars · 100 pts" data-jp="18シグナル・4分野・100点満点">18 signals · 4 pillars · 100 pts</span>
+      </div>
+
+      <!-- legend row -->
+      <div class="px-5 py-2.5 bg-gray-50/70 border-b border-gray-100 flex items-center gap-4 text-[11px] text-gray-500">
+        <span class="flex items-center gap-1"><span class="text-green-500 font-bold">✓</span> <span data-en="passing" data-jp="合格">passing</span></span>
+        <span class="flex items-center gap-1"><span class="text-yellow-500 font-bold">△</span> <span data-en="partial" data-jp="一部">partial</span></span>
+        <span class="flex items-center gap-1"><span class="text-red-400 font-bold">✗</span> <span data-en="missing" data-jp="未対応">missing</span></span>
+        <span class="ml-auto font-mono" data-en="weight →" data-jp="配点 →">weight →</span>
+      </div>
+
+      <!-- PILLAR A -->
+      <div class="px-5 pt-3 pb-2 flex items-center justify-between bg-indigo-50/40">
+        <span class="text-xs font-bold uppercase tracking-wide text-gray-700" data-en="A · AI Access &amp; Discovery" data-jp="A・AIのアクセスと発見">A · AI Access &amp; Discovery</span>
+        <span class="text-xs font-bold text-red-500 font-mono">0 / 25</span>
+      </div>
+      <div class="divide-y divide-gray-50">
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-red-400 font-bold w-4 text-center">✗</span><span class="flex-1 text-sm text-gray-700" data-en="AI bot access — robots.txt + live fetch" data-jp="AIボットのアクセス（robots.txt＋実地取得）">AI bot access — robots.txt + live fetch</span><span class="text-[11px] text-gray-400 font-mono">12</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-red-400 font-bold w-4 text-center">✗</span><span class="flex-1 text-sm text-gray-700" data-en="llms.txt / llms-full.txt — AI welcome file" data-jp="llms.txt / llms-full.txt（AI向け案内ファイル）">llms.txt / llms-full.txt — AI welcome file</span><span class="text-[11px] text-gray-400 font-mono">8</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-red-400 font-bold w-4 text-center">✗</span><span class="flex-1 text-sm text-gray-700" data-en="Raw HTML vs JavaScript — what bots actually see" data-jp="素のHTML対JavaScript（ボットが実際に見る内容）">Raw HTML vs JavaScript — what bots actually see</span><span class="text-[11px] text-gray-400 font-mono">5</span></div>
+      </div>
+
+      <!-- PILLAR B -->
+      <div class="px-5 pt-3 pb-2 flex items-center justify-between bg-indigo-50/40 border-t border-gray-100">
+        <span class="text-xs font-bold uppercase tracking-wide text-gray-700" data-en="B · Structured Understanding" data-jp="B・構造の理解">B · Structured Understanding</span>
+        <span class="text-xs font-bold text-yellow-600 font-mono">8 / 25</span>
+      </div>
+      <div class="divide-y divide-gray-50">
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-red-400 font-bold w-4 text-center">✗</span><span class="flex-1 text-sm text-gray-700" data-en="Schema markup — JSON-LD business data" data-jp="構造化データ（業種別 JSON-LD）">Schema markup — JSON-LD business data</span><span class="text-[11px] text-gray-400 font-mono">12</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-yellow-500 font-bold w-4 text-center">△</span><span class="flex-1 text-sm text-gray-700" data-en="Meta tags — title, description, OG, canonical" data-jp="メタタグ（title・description・OG・canonical）">Meta tags — title, description, OG, canonical</span><span class="text-[11px] text-gray-400 font-mono">4 / 7</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-yellow-500 font-bold w-4 text-center">△</span><span class="flex-1 text-sm text-gray-700" data-en="Semantic HTML — main / article / section" data-jp="セマンティックHTML（main / article / section）">Semantic HTML — main / article / section</span><span class="text-[11px] text-gray-400 font-mono">1 / 3</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-green-500 font-bold w-4 text-center">✓</span><span class="flex-1 text-sm text-gray-700" data-en="Language declared — html[lang]" data-jp="言語指定（html[lang]）">Language declared — html[lang]</span><span class="text-[11px] text-gray-400 font-mono">3 / 3</span></div>
+      </div>
+
+      <!-- PILLAR C -->
+      <div class="px-5 pt-3 pb-2 flex items-center justify-between bg-indigo-50/40 border-t border-gray-100">
+        <span class="text-xs font-bold uppercase tracking-wide text-gray-700" data-en="C · Content Quality" data-jp="C・コンテンツの質">C · Content Quality</span>
+        <span class="text-xs font-bold text-yellow-600 font-mono">9 / 25</span>
+      </div>
+      <div class="divide-y divide-gray-50">
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-yellow-500 font-bold w-4 text-center">△</span><span class="flex-1 text-sm text-gray-700" data-en="Content structure — headings, lists, FAQ" data-jp="コンテンツ構造（見出し・リスト・FAQ）">Content structure — headings, lists, FAQ</span><span class="text-[11px] text-gray-400 font-mono">4 / 8</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-red-400 font-bold w-4 text-center">✗</span><span class="flex-1 text-sm text-gray-700" data-en="AI content patterns — answer-first, facts, named entities" data-jp="AI向け文章（要点先出し・事実・固有名詞）">AI content patterns — answer-first, facts, named entities</span><span class="text-[11px] text-gray-400 font-mono">6</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-green-500 font-bold w-4 text-center">✓</span><span class="flex-1 text-sm text-gray-700" data-en="Readability — sentence length, clarity" data-jp="読みやすさ（文の長さ・明快さ）">Readability — sentence length, clarity</span><span class="text-[11px] text-gray-400 font-mono">5 / 5</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-red-400 font-bold w-4 text-center">✗</span><span class="flex-1 text-sm text-gray-700" data-en="E-E-A-T — owner info, sources, trust signals" data-jp="E-E-A-T（運営者情報・出典・信頼性）">E-E-A-T — owner info, sources, trust signals</span><span class="text-[11px] text-gray-400 font-mono">4</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-red-400 font-bold w-4 text-center">✗</span><span class="flex-1 text-sm text-gray-700" data-en="Freshness — published / updated dates" data-jp="更新性（公開日・更新日）">Freshness — published / updated dates</span><span class="text-[11px] text-gray-400 font-mono">2</span></div>
+      </div>
+
+      <!-- PILLAR D -->
+      <div class="px-5 pt-3 pb-2 flex items-center justify-between bg-indigo-50/40 border-t border-gray-100">
+        <span class="text-xs font-bold uppercase tracking-wide text-gray-700" data-en="D · Technical Health &amp; Trust" data-jp="D・技術的な健全性と信頼">D · Technical Health &amp; Trust</span>
+        <span class="text-xs font-bold text-yellow-600 font-mono">12 / 25</span>
+      </div>
+      <div class="divide-y divide-gray-50">
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-green-500 font-bold w-4 text-center">✓</span><span class="flex-1 text-sm text-gray-700" data-en="HTTPS &amp; security — valid certificate" data-jp="HTTPS・セキュリティ（有効な証明書）">HTTPS &amp; security — valid certificate</span><span class="text-[11px] text-gray-400 font-mono">6 / 6</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-red-400 font-bold w-4 text-center">✗</span><span class="flex-1 text-sm text-gray-700" data-en="Performance — page weight, load speed" data-jp="パフォーマンス（ページ重量・表示速度）">Performance — page weight, load speed</span><span class="text-[11px] text-gray-400 font-mono">5</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-yellow-500 font-bold w-4 text-center">△</span><span class="flex-1 text-sm text-gray-700" data-en="Canonical domain — www / apex, HTTPS consistency" data-jp="正規ドメイン（www / apex・HTTPS統一）">Canonical domain — www / apex, HTTPS consistency</span><span class="text-[11px] text-gray-400 font-mono">2 / 4</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-green-500 font-bold w-4 text-center">✓</span><span class="flex-1 text-sm text-gray-700" data-en="Mobile viewport — responsive meta" data-jp="モバイル対応（viewport）">Mobile viewport — responsive meta</span><span class="text-[11px] text-gray-400 font-mono">4 / 4</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-red-400 font-bold w-4 text-center">✗</span><span class="flex-1 text-sm text-gray-700" data-en="Image alt text — descriptive captions" data-jp="画像の代替テキスト（説明的なalt）">Image alt text — descriptive captions</span><span class="text-[11px] text-gray-400 font-mono">4</span></div>
+        <div class="px-5 py-2.5 flex items-center gap-3"><span class="text-red-400 font-bold w-4 text-center">✗</span><span class="flex-1 text-sm text-gray-700" data-en="Internal linking — descriptive anchors" data-jp="内部リンク（説明的なアンカー）">Internal linking — descriptive anchors</span><span class="text-[11px] text-gray-400 font-mono">2</span></div>
+      </div>
+
+      <!-- TOTAL + GRADE SCALE -->
+      <div class="px-5 py-4 border-t border-gray-100 bg-gray-50">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-sm font-bold text-gray-700" data-en="Total score" data-jp="合計スコア">Total score</span>
+          <span class="text-sm font-bold text-red-500 font-mono">29 / 100 · F</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5 text-[11px] mb-2">
+          <span class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-mono">A+ 90+</span>
+          <span class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-mono">A 80–89</span>
+          <span class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-mono">B 65–79</span>
+          <span class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-mono">C 50–64</span>
+          <span class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-mono">D 35–49</span>
+          <span class="px-2 py-0.5 rounded-full bg-red-500 text-white font-bold font-mono" data-en="F 0–34 ← you" data-jp="F 0–34 ← 現在">F 0–34 ← you</span>
+        </div>
+        <p class="text-[11px] text-gray-400" data-en="Every signal above is fixed automatically in the AI-optimized site we generate for you." data-jp="上記のシグナルは、生成するAI最適化サイトですべて自動的に整えます。">Every signal above is fixed automatically in the AI-optimized site we generate for you.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- STICKY BOTTOM BAR -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg py-3 px-4 z-40">
+    <div class="max-w-3xl mx-auto flex items-center justify-between gap-4">
+      <div class="text-xs text-gray-500 hidden sm:block" data-en="Fix all 14 issues in one click — free" data-jp="14件の問題をワンクリックで修正 — 無料">Fix all 14 issues in one click — free</div>
+      <a href="login.html" class="ml-auto bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-6 py-2.5 rounded-xl transition-colors text-sm whitespace-nowrap"
+         data-en="Generate My AI-Optimized Site →" data-jp="AI最適化サイトを生成する →">
+        Generate My AI-Optimized Site →
+      </a>
+    </div>
+  </div>
+  <div class="h-16"></div>
+
+  <footer class="border-t border-gray-100 py-8 text-center text-sm text-gray-400 mt-4 mb-14">
+    © 2026 AIVIBLE · <span data-en="The AI Visibility Assistant" data-jp="AI可視化アシスタント">The AI Visibility Assistant</span>
+  </footer>
+
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

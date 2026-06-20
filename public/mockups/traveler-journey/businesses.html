@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — Explore verified places near you</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    /* you-are-here pulsing pin */
+    .pin-you { width:18px; height:18px; border-radius:9999px; background:#1F4788; border:3px solid #fff; box-shadow:0 0 0 2px #1F4788; position:relative; }
+    .pin-you::after { content:""; position:absolute; inset:-8px; border-radius:9999px; border:2px solid #1F4788; opacity:0; animation:ring 1.8s ease-out infinite; }
+    @keyframes ring { 0%{opacity:.7;transform:scale(.6);} 100%{opacity:0;transform:scale(1.7);} }
+    /* Wanderlog-style teardrop pin (navy verified / gold gem) */
+    .wl-pin { width:28px; height:28px; border-radius:50% 50% 50% 0; background:var(--kon-2); transform:rotate(-45deg);
+      border:2px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+    .wl-pin span { transform:rotate(45deg); font-size:12px; line-height:1; }
+    .wl-pin.wl-gem { background:var(--gold); }
+    .nearby-dot { width:12px; height:12px; border-radius:9999px; background:#223A70; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.3); opacity:.55; }
+    .leaflet-popup-content { margin:10px 12px; }
+    /* chat scrollbar tidy */
+    #chat-stream::-webkit-scrollbar, #pane-list::-webkit-scrollbar { width:8px; }
+    #chat-stream::-webkit-scrollbar-thumb, #pane-list::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:8px; }
+    /* mobile pane toggle (chat / list / map) */
+    #mobile-tabs { display:none; }
+    @media (max-width:767px) {
+      #mobile-tabs { display:flex; }
+      #pane-chat,#pane-list,#pane-map { width:100%; }
+      body[data-mobile-pane="chat"] #pane-list, body[data-mobile-pane="chat"] #pane-map  { display:none; }
+      body[data-mobile-pane="list"] #pane-chat, body[data-mobile-pane="list"] #pane-map  { display:none; }
+      body[data-mobile-pane="map"]  #pane-chat, body[data-mobile-pane="map"]  #pane-list { display:none; }
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900 h-screen flex flex-col overflow-hidden" data-mobile-pane="chat">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between flex-shrink-0">
+    <a href="itinerary-stop.html" class="hover:text-white">← Stop detail</a>
+    <span class="tracking-widest uppercase hidden sm:inline">[Mockup v2 · Traveler 6/6 — Explore · chat-first discovery near you]</span>
+    <a href="index.html" class="text-white hover:text-indigo-300">↺ Restart flow</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bg-white border-b border-gray-100 flex-shrink-0">
+    <div class="px-4 py-2.5 flex items-center justify-between gap-3">
+      <a href="index.html" class="flex items-center gap-1.5 flex-shrink-0">
+        <img src="icons/shirube.svg" alt="Shirube" class="w-7 h-7" />
+        <span class="text-lg font-bold text-gray-900">AIVIBLE</span>
+      </a>
+      <div class="hidden md:flex items-center gap-6 text-sm text-gray-500">
+        <a href="plan-start.html" class="hover:text-gray-900 transition-colors" data-en="Plan a trip" data-jp="旅程をつくる">Plan a trip</a>
+        <a href="businesses.html" class="text-gray-900 font-medium" data-en="Explore" data-jp="さがす">Explore</a>
+        <a href="discover.html" class="hover:text-gray-900 transition-colors" data-en="Add places" data-jp="スポットを追加">Add places</a>
+        <span class="text-gray-200">|</span>
+        <a href="index.html" class="hover:text-indigo-700 text-indigo-600 font-medium transition-colors" data-en="For your business" data-jp="事業者の方へ">For your business</a>
+      </div>
+      <button data-lang-toggle class="text-sm border border-gray-200 px-3 py-1 rounded-full hover:bg-gray-50 font-medium flex-shrink-0">日本語</button>
+    </div>
+    <!-- mobile pane toggle -->
+    <div id="mobile-tabs" class="px-3 pb-2 gap-1.5">
+      <button onclick="document.body.dataset.mobilePane='chat'" class="flex-1 text-xs font-semibold py-1.5 rounded-lg bg-[#223A70] text-white" data-en="💬 Shirube" data-jp="💬 シルベ">💬 Shirube</button>
+      <button onclick="document.body.dataset.mobilePane='list'" class="flex-1 text-xs font-semibold py-1.5 rounded-lg text-gray-500" data-en="📋 Places" data-jp="📋 一覧">📋 Places</button>
+      <button onclick="document.body.dataset.mobilePane='map';setTimeout(function(){window.__bizMap&&window.__bizMap.invalidateSize();},60)" class="flex-1 text-xs font-semibold py-1.5 rounded-lg text-gray-500" data-en="🗺 Map" data-jp="🗺 地図">🗺 Map</button>
+    </div>
+  </header>
+
+  <!-- MAIN 3-REGION LAYOUT: chat (primary) · list (updates) · map -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- LEFT: Shirube discovery chat — the primary interface, search happens here -->
+    <aside id="pane-chat" class="w-full md:w-[360px] md:flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
+      <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2.5 flex-shrink-0">
+        <span class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>
+        <div class="min-w-0">
+          <div class="text-sm font-bold text-gray-900 truncate" data-en="Shirube · Local guide" data-jp="シルベ · 地元ガイド">Shirube · Local guide</div>
+          <div class="text-[11px] text-green-500 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span><span data-en="Near Gion, Kyoto" data-jp="祇園・京都の近く">Near Gion, Kyoto</span></div>
+        </div>
+      </div>
+
+      <!-- message stream -->
+      <div id="chat-stream" class="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        <div class="flex gap-2.5">
+          <span class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>
+          <div class="bg-gray-50 border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 leading-relaxed" data-en="📍 You're near <b>Gion, Kyoto</b>. I found verified local places around you — the gold <span class='text-purple-600 font-semibold'>💎 gems</span> are JP-only finds most AI search misses. What are you after?" data-jp="📍 現在地は<b>祇園・京都</b>。周辺の認証済みスポットを見つけました。金色の<span class='text-purple-600 font-semibold'>💎名店</span>は日本語のみでAI検索が見落とす穴場です。何をお探しですか？">📍 You're near <b>Gion, Kyoto</b>. I found verified local places around you — the gold <span class="text-purple-600 font-semibold">💎 gems</span> are JP-only finds most AI search misses. What are you after?</div>
+        </div>
+        <!-- quick searches (chat-driven) -->
+        <div id="chat-chips" class="pl-9 flex flex-wrap gap-2"></div>
+      </div>
+
+      <!-- composer: search the directory by chatting -->
+      <div class="border-t border-gray-100 p-3 flex-shrink-0">
+        <form id="chat-form" class="flex items-end gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-indigo-400">
+          <textarea id="chat-input" rows="1" data-en-ph="Ask Shirube — “quiet ramen near Gion”…" data-jp-ph="シルベに質問 —「祇園の静かなラーメン」など…" placeholder="Ask Shirube — “quiet ramen near Gion”…" class="flex-1 bg-transparent text-sm resize-none focus:outline-none placeholder:text-gray-400"></textarea>
+          <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-white flex-shrink-0" style="background:var(--kon-2);" title="Search" aria-label="Search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </button>
+        </form>
+        <p class="text-[10px] text-gray-400 mt-2 px-1 text-center" data-en="Searching is a conversation — refine by just chatting." data-jp="検索は会話で。チャットで絞り込めます。">Searching is a conversation — refine by just chatting.</p>
+      </div>
+    </aside>
+
+    <!-- MIDDLE: nearby places list — updates as you chat -->
+    <aside id="pane-list" class="w-full md:w-96 border-r border-gray-100 overflow-y-auto flex-shrink-0 bg-white">
+      <div class="px-4 py-2.5 bg-gray-50 border-b border-gray-100 sticky top-0 z-10">
+        <div class="flex items-center justify-between gap-2">
+          <h3 class="font-bold text-sm text-gray-900" data-en="Verified places near you" data-jp="近くの認証済みスポット">Verified places near you</h3>
+          <span id="list-count" class="text-[11px] font-semibold text-gray-400"></span>
+        </div>
+        <p class="text-[11px] text-gray-400 mt-0.5" data-en="Sorted by distance from Gion · 💎 = hidden gem" data-jp="祇園からの距離順 · 💎＝隠れた名店">Sorted by distance from Gion · 💎 = hidden gem</p>
+      </div>
+      <div id="place-list"></div>
+      <div id="list-empty" class="hidden px-4 py-10 text-center text-sm text-gray-400" data-en="No matches — try a broader search." data-jp="該当なし — 条件を広げてみてください。">No matches — try a broader search.</div>
+    </aside>
+
+    <!-- RIGHT: live map -->
+    <div id="pane-map" class="flex-1 relative overflow-hidden">
+      <div id="biz-map" class="absolute inset-0 z-0"></div>
+      <div class="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-sm border border-gray-100 rounded-lg px-3 py-1.5 shadow-sm pointer-events-none">
+        <div class="text-[11px] font-bold text-gray-900 flex items-center gap-1"><span class="japan-red">●</span> <span data-en="Near Gion, Kyoto" data-jp="祇園・京都の近く">Near Gion, Kyoto</span></div>
+        <div id="map-sub" class="text-[10px] text-gray-400"></div>
+      </div>
+      <div class="absolute bottom-3 right-3 z-[1000] bg-white/95 backdrop-blur-sm border border-gray-100 rounded-lg px-3 py-2 text-[10px] text-gray-500 shadow-sm pointer-events-none">
+        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full" style="background:var(--gold);"></span> <span data-en="Hidden gem (JP-only)" data-jp="隠れた名店（日本語のみ）">Hidden gem (JP-only)</span></div>
+        <div class="flex items-center gap-1.5 mt-1"><span class="w-3 h-3 rounded-full" style="background:var(--kon-2);"></span> <span data-en="Verified business" data-jp="認証済み店舗">Verified business</span></div>
+        <div class="flex items-center gap-1.5 mt-1"><span class="w-3 h-3 rounded-full" style="background:#1F4788;opacity:.55"></span> <span data-en="Nearby attraction (OSM)" data-jp="周辺の観光地（OSM）">Nearby attraction (OSM)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PERSISTENT BOTTOM NAV ===== -->
+  <nav class="flex-shrink-0 bg-white border-t border-gray-100 shadow-[0_-1px_4px_rgba(0,0,0,0.05)]">
+    <div class="max-w-md mx-auto w-full flex items-end justify-around px-2 pt-1.5 pb-2">
+      <a href="indexmock.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/home.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Home" data-jp="ホーム">Home</span></a>
+      <a href="businesses.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-[#223A70]"><span class="text-lg leading-none"><img src="icons/compass.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-semibold" data-en="Explore" data-jp="さがす">Explore</span></a>
+      <a href="itinerary.html" class="flex flex-col items-center gap-1 flex-1 group"><span class="w-12 h-12 -mt-5 rounded-full flex items-center justify-center text-white text-xl shadow-lg ring-4 ring-white group-hover:brightness-110 transition" style="background:linear-gradient(135deg,#223A70,#18243F);"><img src="icons/itinerary-white.svg" width="26" height="26" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-bold text-[#223A70]" data-en="Itinerary" data-jp="旅程">Itinerary</span></a>
+      <a href="discover.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/gem.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Add" data-jp="追加">Add</span></a>
+      <a href="plan-start.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/brush.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Plan" data-jp="プラン">Plan</span></a>
+    </div>
+  </nav>
+
+  <!-- seed data + app logic (before lang.js so injected EN/JP nodes get the language pass) -->
+  <script src="hidden-gems-data.js"></script>
+  <script>
+  (function () {
+    var ALL = (window.HIDDEN_GEMS && window.HIDDEN_GEMS.businesses) || [];
+    var USER = { name: 'Gion, Kyoto', c: [35.0037, 135.7745] };
+    var GRAD = { Restaurant:'from-orange-300 to-amber-400', Cafe:'from-rose-200 to-pink-300', Stay:'from-indigo-200 to-sky-300', Experience:'from-emerald-200 to-teal-300' };
+
+    function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function jp(){ return document.documentElement.lang === 'ja'; }
+    // haversine km
+    function dist(a,b){ var R=6371,dLat=(b[0]-a[0])*Math.PI/180,dLon=(b[1]-a[1])*Math.PI/180,la1=a[0]*Math.PI/180,la2=b[0]*Math.PI/180;
+      var h=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.sin(dLon/2)*Math.sin(dLon/2)*Math.cos(la1)*Math.cos(la2); return 2*R*Math.asin(Math.sqrt(h)); }
+    function distLabel(km){ return km<1 ? Math.round(km*1000)+' m' : km.toFixed(km<10?1:0)+' km'; }
+
+    // prep: only those with coords, annotate distance + searchable text, sort nearest first
+    var DATA = ALL.filter(function(b){ return b.lat && b.lng; }).map(function(b){
+      b._c=[b.lat,b.lng]; b._km=dist(USER.c,b._c);
+      b._kw=((b.name_en||'')+' '+(b.name_jp||'')+' '+(b.subcategory||'')+' '+(b.category||'')+' '+(b.area||'')+' '+((b.tags||[]).join(' '))+' '+(b.short_en||'')).toLowerCase();
+      return b;
+    }).sort(function(x,y){ return x._km - y._km; });
+
+    /* ── chat log capture point ──────────────────────────────────────────────
+       In the LIVE app every turn is persisted (session, role, text, intent,
+       returned/added place ids, lang, ts) → Supabase `chat_logs` for our future
+       chatbot / RAG. Here it's a client-side stub so the mockup mirrors the shape. */
+    window.__shirubeChatLog = [];
+    function logChat(role, text, meta){
+      var turn = { t: Date.now(), role: role, text: text, lang: jp()?'ja':'en', meta: meta||{} };
+      window.__shirubeChatLog.push(turn);
+      if (window.console && console.debug) console.debug('[shirube chat_logs]', turn); // → POST /chat_logs in prod
+    }
+
+    // ---------- middle list ----------
+    var listEl = document.getElementById('place-list');
+    listEl.innerHTML = DATA.map(function (b) {
+      var gem=!!b.hidden_gem, grad=GRAD[b.category]||'from-slate-200 to-slate-300';
+      return ''+
+      '<div class="place-item px-3 py-3 border-b border-gray-50" data-id="'+esc(b.id)+'" data-cat="'+esc(b.category)+'" data-gem="'+(gem?'1':'0')+'" data-kw="'+esc(b._kw)+'">'+
+        '<div class="flex gap-2.5">'+
+          '<a href="storefront.html" class="w-20 h-16 rounded-lg bg-gradient-to-br '+grad+' relative overflow-hidden flex-shrink-0 flex items-center justify-center text-lg'+(gem?' ring-2 ring-[#C8A859]':'')+'">'+
+            '<span aria-hidden="true">'+(b.image_emoji||'📍')+'</span>'+
+            '<img src="'+esc(b.image_url)+'" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()">'+
+          '</a>'+
+          '<div class="flex-1 min-w-0">'+
+            '<div class="flex items-start gap-1.5">'+
+              '<a href="storefront.html" class="font-bold text-sm text-gray-900 hover:text-indigo-600 leading-snug">'+esc(b.name_en)+'</a>'+
+              (gem?'<span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 flex-shrink-0">💎</span>':'')+
+            '</div>'+
+            '<div class="text-[11px] text-gray-400 mt-0.5">'+esc(b.subcategory||b.category)+' · '+esc(b.area||b.prefecture)+' <span class="text-gray-300">·</span> <span class="text-indigo-500 font-medium">'+distLabel(b._km)+'</span></div>'+
+            '<p class="text-[11px] text-gray-500 mt-1 line-clamp-2" data-en="'+esc(b.short_en)+'" data-jp="'+esc(b.short_jp)+'">'+esc(b.short_en)+'</p>'+
+            '<div class="flex items-center gap-3 mt-2 text-[11px]">'+
+              '<button class="add-btn font-semibold text-indigo-600 inline-flex items-center gap-1" data-name="'+esc(b.name_en)+'"><span>＋</span> <span data-en="Add to trip" data-jp="旅程に追加">Add to trip</span></button>'+
+              '<a href="storefront.html" class="text-gray-400 hover:text-gray-700 inline-flex items-center gap-1">🏪 <span data-en="View" data-jp="見る">View</span></a>'+
+              '<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full ml-auto" style="background:#E8F5E9;color:#2E7D32;" data-en="✓ Verified" data-jp="✓ 認証済み">✓ Verified</span>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+
+    // list image fallback
+    listEl.querySelectorAll('img').forEach(function(img){
+      var t=setTimeout(function(){ if(!(img.complete&&img.naturalWidth>0)) img.remove(); },5000);
+      img.addEventListener('load',function(){clearTimeout(t);}); img.addEventListener('error',function(){clearTimeout(t);img.remove();});
+    });
+
+    // ---------- map ----------
+    var markers = {}; // id -> leaflet marker
+    var map = null;
+    if (window.L && document.getElementById('biz-map')) {
+      map = L.map('biz-map', { zoomControl:true, scrollWheelZoom:false }).setView(USER.c, 13);
+      window.__bizMap = map;
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom:19, subdomains:'abcd', attribution:'&copy; OpenStreetMap &copy; CARTO' }).addTo(map);
+      // you-are-here
+      L.marker(USER.c, { icon:L.divIcon({ className:'', html:'<div class="pin-you"></div>', iconSize:[18,18], iconAnchor:[9,9] }), zIndexOffset:1000 })
+        .addTo(map).bindTooltip(jp()?'現在地':'You are here',{direction:'top',offset:[0,-8]});
+      // business pins
+      DATA.forEach(function (b) {
+        var gem=!!b.hidden_gem;
+        var icon=L.divIcon({ className:'', html:'<div class="wl-pin'+(gem?' wl-gem':'')+'"><span>'+(b.image_emoji||'📍')+'</span></div>', iconSize:[28,28], iconAnchor:[14,28], popupAnchor:[0,-28] });
+        var m=L.marker(b._c,{icon:icon}).addTo(map);
+        var badge=gem?' &middot; <b style="color:#9a7b27">&#128142; '+(jp()?'名店':'Hidden gem')+'</b>':'';
+        m.bindTooltip(esc(b.name_en),{direction:'top',offset:[0,-28]});
+        m.bindPopup('<b>'+esc(b.name_en)+'</b> <span style="font-size:11px;color:#888">'+esc(b.name_jp||'')+'</span><br><span style="font-size:11px;color:#888">'+esc(b.subcategory||b.category)+' · '+distLabel(b._km)+badge+'</span><br><a href="storefront.html" style="color:#223A70;font-weight:700;font-size:12px">Open storefront &rarr;</a>');
+        markers[b.id]=m;
+      });
+      // nearby OSM attractions (real Kyoto coords) — context layer, not our product
+      [{en:'Yasaka Shrine',jp:'八坂神社',c:[35.0036,135.7785]},{en:'Kiyomizu-dera',jp:'清水寺',c:[34.9949,135.7850]},{en:'Nishiki Market',jp:'錦市場',c:[35.0050,135.7649]},{en:'Kamo River',jp:'鴨川',c:[35.0094,135.7716]}].forEach(function(a){
+        L.marker(a.c,{icon:L.divIcon({className:'',html:'<div class="nearby-dot"></div>',iconSize:[12,12],iconAnchor:[6,6]})}).addTo(map)
+          .bindTooltip(jp()?a.jp:a.en,{direction:'top',offset:[0,-6]})
+          .bindPopup('<b>'+(jp()?a.jp:a.en)+'</b><br><span style="font-size:11px;color:#888">'+(jp()?'周辺の観光地 · OpenStreetMap':'Nearby attraction · OpenStreetMap')+'</span><br><a href="discover.html" style="color:#223A70;font-weight:700;font-size:12px">+ Add to trip</a>');
+      });
+      setTimeout(function(){ map.invalidateSize(); },150);
+      window.addEventListener('resize', function(){ map.invalidateSize(); });
+    }
+
+    // ---------- shared filter (chat ↔ list ↔ map) ----------
+    var items = Array.prototype.slice.call(listEl.children);
+    var countEl=document.getElementById('list-count'), emptyEl=document.getElementById('list-empty'), mapSub=document.getElementById('map-sub');
+    function match(b, q) {
+      if (q.type==='all') return true;
+      if (q.type==='gem') return b.dataset.gem==='1';
+      if (q.type==='cat') return b.dataset.cat===q.value;
+      if (q.type==='kw')  return b.dataset.kw.indexOf(q.value)>-1;
+      return true;
+    }
+    function apply(q) {
+      var shown=0, gems=0, pts=[];
+      items.forEach(function(b){
+        var ok=match(b,q); b.style.display=ok?'':'none';
+        var mk=map&&markers[b.dataset.id];
+        if(mk){ ok?markers[b.dataset.id].addTo(map):map.removeLayer(markers[b.dataset.id]); }
+        if(ok){ shown++; if(b.dataset.gem==='1') gems++; if(mk) pts.push(markers[b.dataset.id].getLatLng()); }
+      });
+      emptyEl.classList.toggle('hidden', shown>0);
+      countEl.textContent = jp()? (shown+'件') : (shown+' places');
+      if(mapSub) mapSub.textContent = jp()? (shown+'件 · 💎'+gems) : (shown+' places · '+gems+' gems');
+      // keep the map on point: default = framed on you; a search = fit to the results
+      if(map){
+        if(q.type==='all'){ map.setView(USER.c, 13); }
+        else if(pts.length){ map.fitBounds(L.latLngBounds(pts.concat([L.latLng(USER.c)])).pad(0.25), {maxZoom:14}); }
+        setTimeout(function(){ map.invalidateSize(); }, 60);
+      }
+      return { shown:shown, gems:gems };
+    }
+
+    // ---------- chat ----------
+    var stream=document.getElementById('chat-stream'), chipWrap=document.getElementById('chat-chips');
+    function bubbleUser(text){
+      var d=document.createElement('div'); d.className='flex justify-end';
+      d.innerHTML='<div class="bg-indigo-500 text-white text-sm rounded-2xl rounded-tr-sm px-3.5 py-2 max-w-[85%]">'+esc(text)+'</div>';
+      stream.appendChild(d); stream.scrollTop=stream.scrollHeight;
+    }
+    function bubbleShirube(html){
+      var d=document.createElement('div'); d.className='flex gap-2.5';
+      d.innerHTML='<span class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>'+
+        '<div class="bg-gray-50 border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 leading-relaxed">'+html+'</div>';
+      stream.appendChild(d); stream.scrollTop=stream.scrollHeight;
+    }
+    function reply(res, labelEn){
+      var html = jp()
+        ? ('「'+labelEn+'」で<b>'+res.shown+'件</b>見つけました（うち<span class="text-purple-600 font-semibold">💎'+res.gems+'件</span>）。右の一覧と地図を更新しました →')
+        : ('Found <b>'+res.shown+'</b> for “'+esc(labelEn)+'” — <span class="text-purple-600 font-semibold">'+res.gems+' 💎 gems</span>. Updated the list & map →');
+      bubbleShirube(html);
+    }
+    function runQuery(q, userText, labelEn) {
+      bubbleUser(userText); logChat('user', userText, { intent:q });
+      var res = apply(q);
+      reply(res, labelEn);
+      logChat('assistant', 'returned '+res.shown+' places ('+res.gems+' gems)', { type:q.type, value:q.value, shown:res.shown });
+      if (window.innerWidth < 768) { document.body.dataset.mobilePane='list'; }
+    }
+
+    // quick-search chips (rendered into the chat)
+    var CHIPS=[
+      { en:'📍 Nearest', jp:'📍 最寄り',   q:{type:'all'},                  u_en:"What's closest to me?",        u_jp:'一番近いのは？',        l:'nearest' },
+      { en:'💎 Gems only', jp:'💎 名店のみ', q:{type:'gem'},                 u_en:'Just the hidden gems',         u_jp:'隠れた名店だけ',        l:'hidden gems' },
+      { en:'🍜 Ramen', jp:'🍜 ラーメン',   q:{type:'kw',value:'ramen'},     u_en:'Any good ramen nearby?',       u_jp:'近くに良いラーメンは？', l:'ramen' },
+      { en:'♨️ Onsen stay', jp:'♨️ 温泉宿', q:{type:'kw',value:'onsen'},     u_en:'Where can I stay with an onsen?', u_jp:'温泉付きの宿は？',     l:'onsen' },
+      { en:'☕ Cafés', jp:'☕ カフェ',      q:{type:'cat',value:'Cafe'},     u_en:'Show me cafés',                u_jp:'カフェを見せて',        l:'cafés' },
+      { en:'🎋 Experiences', jp:'🎋 体験',  q:{type:'cat',value:'Experience'},u_en:'Any local experiences?',      u_jp:'地元の体験は？',        l:'experiences' }
+    ];
+    chipWrap.innerHTML = CHIPS.map(function(c,i){
+      return '<button class="qchip text-xs border border-gray-200 bg-white text-gray-600 px-3 py-1.5 rounded-full hover:border-indigo-200 hover:text-indigo-600 transition-colors" data-i="'+i+'" data-en="'+esc(c.en)+'" data-jp="'+esc(c.jp)+'">'+c.en+'</button>';
+    }).join('');
+    chipWrap.querySelectorAll('.qchip').forEach(function(btn){
+      btn.addEventListener('click', function(){ var c=CHIPS[+btn.dataset.i]; runQuery(c.q, jp()?c.u_jp:c.u_en, c.l); });
+    });
+
+    // free-text search = chatting
+    document.getElementById('chat-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      var inp=document.getElementById('chat-input'); var v=(inp.value||'').trim(); if(!v) return; inp.value='';
+      runQuery({type:'kw', value:v.toLowerCase()}, v, v);
+    });
+
+    // "Add to trip" → confirm in chat (and log it)
+    listEl.addEventListener('click', function(e){
+      var btn=e.target.closest('.add-btn'); if(!btn) return;
+      e.preventDefault();
+      var name=btn.dataset.name;
+      btn.innerHTML='<span>✓</span> <span data-en="Added" data-jp="追加済み">'+(jp()?'追加済み':'Added')+'</span>';
+      btn.classList.remove('text-indigo-600'); btn.classList.add('text-green-600');
+      bubbleShirube(jp()? ('<b>'+esc(name)+'</b> を旅程に追加しました。続けて探しますか？') : ('Added <b>'+esc(name)+'</b> to your trip. Want more like it?'));
+      logChat('user', 'add '+name, { action:'add_to_trip', name:name });
+    });
+
+    // re-run language-specific counts on toggle
+    document.addEventListener('click', function(e){ if(e.target.closest('[data-lang-toggle]')) setTimeout(function(){ apply(current); },0); });
+
+    // initial state
+    var current={type:'all'};
+    apply(current);
+  })();
+  </script>
+
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

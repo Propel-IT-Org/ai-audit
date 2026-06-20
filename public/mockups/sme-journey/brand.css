@@ -1,0 +1,45 @@
+/* ===========================================================================
+   AIVIBLE — Japan Blue Index brand system
+   Refinement of branding vote winner: concept #2 (Japan Blue Index)
+   + concept #5 Ukiyo-e wave as the logo mark
+   + concept #3 "Shirube" mascot as the in-product assistant
+   Loaded after the Tailwind CDN on every v2 screen; brand.js injects the
+   logo mark + mascot SVGs so all 9 screens stay in sync.
+   =========================================================================== */
+:root{
+  --kon:    #18243F;  /* 紺 — dark navy, primary */
+  --kon-2:  #223A70;  /* mid navy — buttons */
+  --wave:   #1F4788;  /* Prussian "Japan Blue" wave (concept #5) */
+  --gold:   #C8A859;  /* 金 — gold accent / the score arc */
+  --sun:    #D6452C;  /* red sun + hanko (concept #5) */
+  --paper:  #F5EEDC;  /* washi cream */
+  --shirube-1: #6E80E0;  /* mascot indigo, light */
+  --shirube-2: #4A5DC4;  /* mascot indigo, deep */
+}
+
+/* repurpose the old vermilion accent to the Ukiyo-e sun red */
+.japan-red{ color: var(--sun); }
+
+/* ---- Logo lockup (wave mark + wordmark) ---- */
+.av-logo__mark{ display:inline-block; flex:none; line-height:0; vertical-align:middle; }
+
+/* ---- Score-as-brand gauge (concept #2) ---- */
+.score-ring{
+  position:relative; width:7rem; height:7rem; border-radius:9999px; padding:.5rem;
+  background: conic-gradient(var(--gold) calc(var(--pct,0) * 1%), rgba(255,255,255,.14) 0);
+  box-shadow: 0 10px 26px rgba(24,36,63,.35);
+}
+.score-ring__face{
+  width:100%; height:100%; border-radius:9999px; background:var(--kon);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff;
+}
+.score-ring__grade{ font-size:2.6rem; font-weight:800; line-height:1; }
+.score-ring__num{ font-size:.72rem; font-weight:600; color:var(--gold); margin-top:.2rem; letter-spacing:.06em; }
+
+/* gold eyebrow used to reinforce the "index" identity */
+.av-eyebrow{
+  font-size:.62rem; font-weight:800; letter-spacing:.28em; text-transform:uppercase; color:var(--gold);
+}
+
+/* ---- Shirube mascot ---- */
+.shirube{ display:inline-block; flex:none; line-height:0; }

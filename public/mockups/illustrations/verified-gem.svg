@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" fill="none">
+  <!-- ===== AIVIBLE · "Verified gem" — hand-vectorized from verified-gem-e.comp.png (pass 2) ===== -->
+  <!-- palette sampled from the comp -->
+  <!-- navy #204E8E · navy-dk #1A3F73 · navy-lt #3C6CB0 · gold #E6A93C · gold-br #FFC94F · gold-dk #C68A2E
+       cream #F9ECD9 · paper #F6E6CC · paper-sh #F0DFC0 · road #FCF7EC · red #C5432F -->
+
+  <rect width="320" height="320" fill="#F9ECD9"/>
+
+  <!-- ===================== FOLDED MAP (flat, subtle creases) ===================== -->
+  <g>
+    <polygon points="114,112 161,104 161,225 114,219" fill="#F6E6CC"/>
+    <polygon points="161,104 208,115 208,233 161,225" fill="#EFDDBD"/>
+    <polygon points="208,115 255,104 255,225 208,233" fill="#F6E6CC"/>
+    <polygon points="255,104 303,112 303,219 255,225" fill="#EFDDBD"/>
+    <line x1="161" y1="104" x2="161" y2="225" stroke="#E5D3B1" stroke-width="1"/>
+    <line x1="208" y1="115" x2="208" y2="233" stroke="#F4E8D0" stroke-width="1"/>
+    <line x1="255" y1="104" x2="255" y2="225" stroke="#E5D3B1" stroke-width="1"/>
+  </g>
+
+  <!-- winding road -->
+  <path d="M150 230 C174 208 156 188 184 174 C206 163 200 148 222 138" stroke="#FCF7EC" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+  <!-- mountains (small, scattered low across the map; navy + lighter facet) -->
+  <g>
+    <path d="M124 212 L139 183 L154 212 Z" fill="#204E8E"/><path d="M139 183 L146 197 L139 212 Z" fill="#3C6CB0"/>
+    <path d="M150 216 L161 197 L172 216 Z" fill="#204E8E"/>
+    <path d="M184 218 L195 200 L206 218 Z" fill="#204E8E"/>
+    <path d="M250 213 L266 183 L282 213 Z" fill="#204E8E"/><path d="M266 183 L273 198 L266 213 Z" fill="#3C6CB0"/>
+    <path d="M278 218 L290 197 L302 218 Z" fill="#204E8E"/>
+  </g>
+
+  <!-- trees -->
+  <g fill="#204E8E">
+    <circle cx="216" cy="210" r="4.5"/><circle cx="221" cy="206" r="4"/><rect x="217.5" y="211" width="2" height="5"/>
+    <circle cx="238" cy="212" r="4.5"/><circle cx="243" cy="208" r="4"/>
+  </g>
+
+  <!-- location pins (teardrop + hole) -->
+  <g>
+    <path d="M150 154 C150 148 155 144 161 144 C167 144 172 148 172 154 C172 162 161 174 161 174 C161 174 150 162 150 154 Z" fill="#204E8E"/>
+    <circle cx="161" cy="153.5" r="3.4" fill="#F9ECD9"/>
+    <path d="M272 152 C272 146 277 142 283 142 C289 142 294 146 294 152 C294 160 283 172 283 172 C283 172 272 160 272 152 Z" fill="#204E8E"/>
+    <circle cx="283" cy="151.5" r="3.4" fill="#F9ECD9"/>
+  </g>
+
+  <!-- ===================== VERIFIED GEM (hero) ===================== -->
+  <!-- 3 short radiating rays -->
+  <g stroke="#E6A93C" stroke-width="3" stroke-linecap="round">
+    <line x1="224" y1="40" x2="224" y2="52"/>
+    <line x1="212" y1="44" x2="218" y2="54"/>
+    <line x1="236" y1="44" x2="230" y2="54"/>
+  </g>
+  <!-- FLAT hexagonal gem with honeycomb facets (top-down cut) -->
+  <g>
+    <polygon points="212,58 236,58 247,75 236,92 212,92 201,75" fill="#E6B445"/>
+    <polygon points="218,66.5 230,66.5 236,58 212,58" fill="#D7A038"/>
+    <polygon points="235.5,75 230,83.5 236,92 247,75" fill="#D7A038"/>
+    <polygon points="218,83.5 212.5,75 201,75 212,92" fill="#D7A038"/>
+    <polygon points="218,66.5 230,66.5 235.5,75 230,83.5 218,83.5 212.5,75" fill="#FFD980"/>
+    <g stroke="#F8E3B0" stroke-width="1.3" fill="none" stroke-linejoin="round">
+      <polygon points="212,58 236,58 247,75 236,92 212,92 201,75"/>
+      <polygon points="218,66.5 230,66.5 235.5,75 230,83.5 218,83.5 212.5,75"/>
+      <line x1="218" y1="66.5" x2="212" y2="58"/><line x1="230" y1="66.5" x2="236" y2="58"/>
+      <line x1="235.5" y1="75" x2="247" y2="75"/>
+      <line x1="230" y1="83.5" x2="236" y2="92"/><line x1="218" y1="83.5" x2="212" y2="92"/>
+      <line x1="212.5" y1="75" x2="201" y2="75"/>
+    </g>
+  </g>
+
+  <!-- soft gold spotlight + onsen building -->
+  <ellipse cx="224" cy="150" rx="22" ry="26" fill="#FBE6B0" opacity=".35"/>
+  <path d="M207 141 C207 131.5 214.5 126 224 126 C233.5 126 241 131.5 241 141 C241 154 224 174 224 174 C224 174 207 154 207 141 Z" fill="#E6A93C"/>
+  <g>
+    <rect x="217" y="143" width="14" height="11" rx="1.2" fill="#204E8E"/>
+    <path d="M214.5 143 L224 135 L233.5 143 Z" fill="#1A3F73"/>
+    <path d="M220 132.5 q-1.4 -2.3 0 -4.4" stroke="#F9ECD9" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <path d="M224 132.5 q-1.4 -2.3 0 -4.4" stroke="#F9ECD9" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <path d="M228 132.5 q-1.4 -2.3 0 -4.4" stroke="#F9ECD9" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- ===================== SHIRUBE (the guide, pointing) — updated smile-arrow ===================== -->
+  <g>
+    <!-- left arm holding the AI-verified hanko stamp -->
+    <path d="M44 152 q-11 6 -13 15" stroke="#204E8E" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <rect x="28" y="156" width="4.5" height="12" rx="2.2" fill="#204E8E"/>
+    <rect x="23" y="168" width="14" height="7" rx="2" fill="#C5432F"/>
+    <text x="30" y="173.6" font-family="serif" font-size="5.6" font-weight="700" fill="#F4ECDD" text-anchor="middle">藍</text>
+    <circle cx="31" cy="166" r="5" fill="#204E8E"/>
+    <!-- right arm → fist + short index finger (off the top of the hand) pointing at the map -->
+    <path d="M90 150 q10 0 16 -6" stroke="#204E8E" stroke-width="8.5" fill="none" stroke-linecap="round"/>
+    <circle cx="108" cy="143" r="5.4" fill="#204E8E"/>
+    <path d="M110 139.5 L116 136.5" stroke="#204E8E" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <!-- body: rectangular guidepost, wider (matches comp) -->
+    <rect x="42" y="90" width="50" height="120" rx="14" fill="#204E8E"/>
+    <!-- feet -->
+    <rect x="54" y="208" width="11" height="9" rx="3.5" fill="#204E8E"/>
+    <rect x="69" y="208" width="11" height="9" rx="3.5" fill="#204E8E"/>
+    <!-- eyes -->
+    <circle cx="58" cy="114" r="4" fill="#fff"/><circle cx="76" cy="114" r="4" fill="#fff"/>
+    <!-- UPDATED yellow smile-arrow (the gold arrow IS the smile; replaces old smile + body arrow) -->
+    <path d="M54 125 Q67 136 79 126.5 Q67 128 54 125 Z" fill="#FFC94F"/>
+    <path d="M80 124 L85.5 126.6 L81.5 130 Z" fill="#FFC94F"/>
+    <!-- vertical シルベ (the mascot's name) — extra gap below the smile-arrow -->
+    <text x="67" y="161" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="10" font-weight="700" fill="#F9ECD9" text-anchor="middle" writing-mode="tb" letter-spacing="2">シルベ</text>
+    <!-- (藍 hanko now held in Shirube's left hand) -->
+  </g>
+</svg>

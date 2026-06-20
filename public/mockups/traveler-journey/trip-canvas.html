@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — 2 Days in Kyoto (new trip)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    .map-grid {
+      background-color: #EEF2F0;
+      background-image:
+        linear-gradient(rgba(31,71,136,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31,71,136,.07) 1px, transparent 1px);
+      background-size: 26px 26px;
+    }
+    .dropzone { border: 2px dashed #D9E0F1; }
+    /* Wanderlog-style numbered teardrop pin */
+    .wl-pin {
+      width: 28px; height: 28px; border-radius: 50% 50% 50% 0;
+      background: #e5351a; transform: rotate(-45deg);
+      border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,.4);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .wl-pin span { transform: rotate(45deg); color: #fff; font-weight: 800; font-size: 12px; line-height: 1; }
+    .wl-pin.wl-gem { background: var(--gold); }
+    .wl-pin.wl-gem span { color: var(--kon); }
+    .leaflet-popup-content { margin: 10px 12px; }
+    /* numbered chip in the itinerary list (matches the map pins) */
+    .wl-num { width: 20px; height: 20px; border-radius: 9999px; background: #e5351a; color: #fff;
+      font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .wl-num.wl-num-gem { background: var(--gold); color: var(--kon); }
+    .nearby-dot { width:12px; height:12px; border-radius:9999px; background:#223A70; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.3); opacity:.6; }
+    #mobile-tabs { display: none; }
+    @media (max-width: 767px) {
+      #mobile-tabs { display: flex; }
+      #pane-stops, #pane-map { width: 100%; }
+      body[data-mobile-pane="stops"] #pane-map { display: none; }
+      body[data-mobile-pane="map"] #pane-stops { display: none; }
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900 h-screen flex flex-col overflow-hidden" data-mobile-pane="stops">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between flex-shrink-0">
+    <a href="plan-start.html" class="hover:text-white">← New trip</a>
+    <span class="tracking-widest uppercase hidden sm:inline">[Mockup v2 · Traveler 2/6 — AI draft ready · refine with Shirube or add places]</span>
+    <a href="trip-canvas-instagram.html" class="text-white hover:text-indigo-300">Next: Paste a link →</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="border-b border-gray-100 bg-white flex-shrink-0">
+    <div class="px-4 py-2.5 flex items-center justify-between gap-3">
+      <a href="plan-start.html" class="flex items-center gap-1 flex-shrink-0">
+        <span class="japan-red text-lg leading-none">●</span>
+        <span class="text-lg font-bold text-gray-900">AIVIBLE</span>
+      </a>
+      <div class="min-w-0 text-center flex-1">
+        <div class="text-sm font-semibold text-gray-900 truncate" data-en="2 Days in Kyoto" data-jp="京都2日間">2 Days in Kyoto</div>
+        <div class="text-[10px] text-gray-400" data-en="AI draft · 6 stops" data-jp="AIドラフト · 6スポット">AI draft · 6 stops</div>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button class="hidden sm:inline-flex text-xs font-semibold text-gray-600 border border-gray-200 hover:bg-gray-50 px-3 py-1.5 rounded-lg" data-en="+ Invite" data-jp="+ 招待">+ Invite</button>
+        <button data-lang-toggle class="text-xs border border-gray-200 px-2.5 py-1 rounded-full hover:bg-gray-50 font-medium">日本語</button>
+      </div>
+    </div>
+    <!-- mobile pane toggle -->
+    <div id="mobile-tabs" class="border-t border-gray-100 p-1.5 gap-1.5">
+      <button onclick="document.body.dataset.mobilePane='stops'" class="flex-1 text-xs font-semibold py-1.5 rounded-lg bg-[#223A70] text-white" data-en="📋 Plan" data-jp="📋 プラン">📋 Plan</button>
+      <button onclick="document.body.dataset.mobilePane='map'" class="flex-1 text-xs font-semibold py-1.5 rounded-lg text-gray-500" data-en="🗺 Map" data-jp="🗺 地図">🗺 Map</button>
+    </div>
+  </header>
+
+  <!-- MAIN 2-REGION LAYOUT -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- LEFT: Shirube trip-planner chat (primary UI — mirrors the SME editor) -->
+    <aside id="pane-stops" class="w-full md:w-[400px] md:flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
+
+      <!-- Shirube header -->
+      <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between gap-2.5 flex-shrink-0">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-8 h-8 rounded-full flex items-center justify-center text-white text-base flex-shrink-0" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>
+          <div class="min-w-0">
+            <div class="text-sm font-bold text-gray-900 truncate" data-en="Shirube · Trip Planner" data-jp="シルベ · 旅程プランナー">Shirube · Trip Planner</div>
+            <div class="text-[11px] text-green-500 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span><span data-en="Planning 2 days in Kyoto" data-jp="京都2日間を計画中">Planning 2 days in Kyoto</span></div>
+          </div>
+        </div>
+        <!-- daily chat credits -->
+        <a href="plan-cap.html" class="flex-shrink-0 flex items-center gap-1 bg-indigo-50 border border-indigo-100 rounded-full px-2.5 py-1 hover:bg-indigo-100 transition-colors" title="Free planning chats reset daily">
+          <span class="text-xs font-bold text-indigo-600">💬 5</span>
+          <span class="text-[10px] text-indigo-400 hidden sm:inline" data-en="today" data-jp="本日">today</span>
+        </a>
+      </div>
+
+      <!-- Messages -->
+      <div class="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-4">
+
+        <!-- Shirube welcome + draft itinerary -->
+        <div class="flex gap-2.5">
+          <span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs flex-shrink-0 mt-0.5" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>
+          <div class="bg-gray-50 border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 leading-relaxed"
+               data-en="<p class='mb-2'>👋 I'm Shirube. Tell me your travel style and I'll plan your <b>2 days in Kyoto</b> — weaving in <span class='text-purple-600 font-semibold'>verified local gems</span> most guides miss.</p><p class='mb-2'>Here's a starter draft — the numbered pins are on the map →</p>"
+               data-jp="<p class='mb-2'>👋 シルベです。旅のスタイルを教えてください。<b>京都2日間</b>を計画し、ガイドが見落とす<span class='text-purple-600 font-semibold'>認証済みの名店</span>も加えます。</p><p class='mb-2'>たたき台を用意しました — 番号付きピンは地図に表示中 →</p>">
+            <p class="mb-2">👋 I'm Shirube. Tell me your travel style and I'll plan your <b>2 days in Kyoto</b> — weaving in <span class="text-purple-600 font-semibold">verified local gems</span> most guides miss.</p>
+            <p class="mb-2">Here's a starter draft — the numbered pins are on the map →</p>
+          </div>
+        </div>
+
+        <!-- draft itinerary card -->
+        <div class="ml-9 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden text-[13px]">
+          <div class="px-3 py-2 bg-gray-50 border-b border-gray-100 font-bold text-xs uppercase tracking-wide text-gray-900">Day 1 · <span data-en="Southern Higashiyama" data-jp="東山南部">Southern Higashiyama</span></div>
+          <div class="divide-y divide-gray-50">
+            <div class="flex items-center gap-2.5 px-3 py-2"><span class="wl-num">1</span><span class="flex-1">Fushimi Inari Shrine</span></div>
+            <div class="flex items-center gap-2.5 px-3 py-2"><span class="wl-num">2</span><span class="flex-1">Nishiki Market</span></div>
+            <div class="flex items-center gap-2.5 px-3 py-2"><span class="wl-num wl-num-gem">3</span><span class="flex-1">Tonari Ramen</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style="background:var(--gold);color:var(--kon);">💎 Gem</span></div>
+            <div class="flex items-center gap-2.5 px-3 py-2"><span class="wl-num wl-num-gem">4</span><span class="flex-1">Kamogawa-kan</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style="background:var(--gold);color:var(--kon);">💎 Score A</span></div>
+          </div>
+          <div class="px-3 py-2 bg-gray-50 border-y border-gray-100 font-bold text-xs uppercase tracking-wide text-gray-900">Day 2 · <span data-en="Arashiyama &amp; Uji" data-jp="嵐山・宇治">Arashiyama &amp; Uji</span></div>
+          <div class="divide-y divide-gray-50">
+            <div class="flex items-center gap-2.5 px-3 py-2"><span class="wl-num">5</span><span class="flex-1">Arashiyama Bamboo Grove</span></div>
+            <div class="flex items-center gap-2.5 px-3 py-2"><span class="wl-num wl-num-gem">6</span><span class="flex-1">Tsuen Tea House (Uji)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style="background:var(--gold);color:var(--kon);">💎 Score B</span></div>
+          </div>
+          <a href="itinerary.html" class="block text-center text-xs font-bold text-white py-2.5" style="background:var(--kon-2);" data-en="Open full itinerary →" data-jp="完全な旅程を開く →">Open full itinerary →</a>
+        </div>
+
+        <!-- Shirube follow-up -->
+        <div class="flex gap-2.5">
+          <span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs flex-shrink-0 mt-0.5" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>
+          <div class="bg-gray-50 border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700" data-en="Want it more relaxed, foodie, or temple-focused? Just tell me 👇" data-jp="もっとゆったり・グルメ・寺院中心にしますか？教えてください 👇">Want it more relaxed, foodie, or temple-focused? Just tell me 👇</div>
+        </div>
+
+        <!-- suggestion chips -->
+        <div class="pl-9 flex flex-wrap gap-2">
+          <a href="itinerary.html" class="text-xs border border-indigo-200 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors" data-en="🍜 More food &amp; hidden gems" data-jp="🍜 グルメと名店を増やす">🍜 More food &amp; hidden gems</a>
+          <a href="itinerary.html" class="text-xs border border-gray-200 bg-white text-gray-600 px-3 py-1.5 rounded-full hover:border-indigo-200 hover:text-indigo-600 transition-colors" data-en="♨️ Add an onsen night" data-jp="♨️ 温泉泊を追加">♨️ Add an onsen night</a>
+          <a href="itinerary.html" class="text-xs border border-gray-200 bg-white text-gray-600 px-3 py-1.5 rounded-full hover:border-indigo-200 hover:text-indigo-600 transition-colors" data-en="🛕 Temple-focused" data-jp="🛕 寺院中心に">🛕 Temple-focused</a>
+          <a href="itinerary.html" class="text-xs border border-gray-200 bg-white text-gray-600 px-3 py-1.5 rounded-full hover:border-indigo-200 hover:text-indigo-600 transition-colors" data-en="😌 Make it more relaxed" data-jp="😌 もっとゆったり">😌 Make it more relaxed</a>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="border-t border-gray-100 p-3 flex-shrink-0">
+        <!-- Quick-action chips above the input -->
+        <div class="flex flex-wrap gap-1.5 mb-2">
+          <a href="trip-canvas-instagram.html" class="flex items-center gap-1 text-[11px] border border-pink-200 bg-pink-50 text-pink-600 px-2.5 py-1 rounded-full hover:bg-pink-100 transition-colors font-medium">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Paste a link
+          </a>
+          <span class="text-[11px] text-gray-300 self-center">·</span>
+          <span class="text-[11px] text-gray-400 self-center">or tell Shirube what you want</span>
+        </div>
+        <div class="flex items-end gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-indigo-400">
+          <textarea rows="1"
+            placeholder="foodie trip, love temples — or paste an Instagram / TikTok link"
+            class="flex-1 bg-transparent text-sm resize-none focus:outline-none placeholder:text-gray-400"></textarea>
+          <a href="itinerary.html" class="w-8 h-8 rounded-lg flex items-center justify-center text-white flex-shrink-0 transition-colors" style="background:var(--kon-2);" title="Send">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </a>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-2 px-1 flex items-center justify-between">
+          <span data-en="Shirube plans your days and adds verified local gems" data-jp="シルベが日程を組み、認証済みの名店を追加">Shirube plans your days and adds verified local gems</span>
+          <a href="plan-cap.html" class="font-semibold text-indigo-500 hover:underline whitespace-nowrap" data-en="💬 5 free chats left today" data-jp="💬 本日の無料チャット残り5回">💬 5 free chats left today</a>
+        </p>
+      </div>
+    </aside>
+
+    <!-- CENTER: real Leaflet map centered on Kyoto -->
+    <div id="pane-map" class="flex-1 relative overflow-hidden">
+      <div id="kyoto-map" class="absolute inset-0 z-0"></div>
+
+      <!-- area label -->
+      <div class="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-sm border border-gray-100 rounded-lg px-3 py-1.5 shadow-sm pointer-events-none">
+        <div class="text-[11px] font-bold text-gray-900 flex items-center gap-1"><span class="japan-red">●</span> <span data-en="Kyoto, Japan" data-jp="京都, 日本">Kyoto, Japan</span></div>
+        <div class="text-[10px] text-gray-400" data-en="Verified gems near your trip" data-jp="旅程周辺の認証済みの名店">Verified gems near your trip</div>
+      </div>
+
+      <!-- gem teaser chip -->
+      <div class="absolute bottom-3 left-3 z-[1000] bg-white/95 backdrop-blur-sm border border-gray-100 rounded-lg px-3 py-2 text-[11px] text-gray-600 shadow-sm flex items-center gap-1.5 pointer-events-none">
+        <span class="text-purple-500">💎</span>
+        <span id="gem-chip" data-en="Verified gems near Kyoto, waiting to be added" data-jp="京都周辺の認証済みの名店、追加待ち">Verified gems near Kyoto, waiting to be added</span>
+      </div>
+
+      <!-- CTA -->
+      <a href="discover.html" class="absolute bottom-3 right-3 z-[1000] inline-flex items-center gap-2 text-sm font-bold text-white px-4 py-2.5 rounded-lg shadow-lg transition-colors" style="background:var(--kon-2);" onmouseover="this.style.background='var(--kon)'" onmouseout="this.style.background='var(--kon-2)'"
+         data-en="🔍 Find places to add" data-jp="🔍 追加するスポットを探す">🔍 Find places to add</a>
+    </div>
+  </div>
+
+  <!-- seed data MUST be before lang.js so the initial EN/JP pass catches the cards -->
+  <script src="hidden-gems-data.js"></script>
+  <script>
+  (function () {
+    if (!window.L || !document.getElementById('kyoto-map')) return;
+
+    // Draft Kyoto itinerary — numbered stops (Wanderlog-style), gems flagged
+    var STOPS = [
+      { n: 1, name: 'Fushimi Inari Shrine',     day: 1, c: [34.9671, 135.7727], gem: false },
+      { n: 2, name: 'Nishiki Market',           day: 1, c: [35.0050, 135.7649], gem: false },
+      { n: 3, name: 'Tonari Ramen',             day: 1, c: [35.0042, 135.7710], gem: true,  grade: null },
+      { n: 4, name: 'Kamogawa-kan',             day: 1, c: [35.0125, 135.7725], gem: true,  grade: 'A' },
+      { n: 5, name: 'Arashiyama Bamboo Grove',  day: 2, c: [35.0094, 135.6722], gem: false },
+      { n: 6, name: 'Tsuen Tea House (Uji)',    day: 2, c: [34.8912, 135.8074], gem: true,  grade: 'B' }
+    ];
+
+    var map = L.map('kyoto-map', { zoomControl: true, scrollWheelZoom: false }).setView([35.0, 135.76], 11);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19, subdomains: 'abcd', attribution: '&copy; OpenStreetMap &copy; CARTO'
+    }).addTo(map);
+
+    function pin(s) {
+      return L.divIcon({
+        className: '',
+        html: '<div class="wl-pin' + (s.gem ? ' wl-gem' : '') + '"><span>' + s.n + '</span></div>',
+        iconSize: [28, 28], iconAnchor: [14, 28], popupAnchor: [0, -30]
+      });
+    }
+
+    // soft dashed route line per day
+    // continuous route across all stops in order — connects every consecutive stop, incl. the overnight 4→5 day boundary
+    var routePts = STOPS.map(function (s) { return s.c; });
+    if (routePts.length > 1) L.polyline(routePts, { color: '#223A70', weight: 2, opacity: 0.4, dashArray: '4 5' }).addTo(map);
+
+    var markers = [];
+    STOPS.forEach(function (s) {
+      var m = L.marker(s.c, { icon: pin(s) }).addTo(map);
+      var badge = s.gem ? (' &middot; <b style="color:#9a7b27">&#128142; ' + (s.grade ? ('Score ' + s.grade) : 'Verified') + '</b>') : '';
+      m.bindTooltip(s.n + '. ' + s.name, { direction: 'top', offset: [0, -30] });
+      m.bindPopup('<b>' + s.n + '. ' + s.name + '</b><br><span style="font-size:11px;color:#888">Day ' + s.day + badge + '</span><br><a href="itinerary.html" style="color:#223A70;font-weight:700;font-size:12px">Open itinerary &rarr;</a>');
+      markers.push(m);
+    });
+    // nearby attractions from Overpass / OpenStreetMap (real coords)
+    var NEARBY = [
+      { name: 'Golden Pavilion (Kinkaku-ji)', c: [35.0395, 135.7285] },
+      { name: 'Kyoto National Museum',        c: [34.9900, 135.7729] },
+      { name: 'Two-year Slope (Ninenzaka)',   c: [34.9981, 135.7808] },
+      { name: 'Shinkyogoku Street',           c: [35.0062, 135.7673] }
+    ];
+    NEARBY.forEach(function (a) {
+      var m = L.marker(a.c, { icon: L.divIcon({ className:'', html:'<div class="nearby-dot"></div>', iconSize:[12,12], iconAnchor:[6,6] }) }).addTo(map);
+      m.bindTooltip(a.name, { direction:'top', offset:[0,-6] });
+      m.bindPopup('<b>' + a.name + '</b><br><span style="font-size:11px;color:#888">Nearby attraction · OpenStreetMap</span><br><a href="discover.html" style="color:#223A70;font-weight:700;font-size:12px">+ Add to trip</a>');
+      markers.push(m);
+    });
+    if (markers.length) map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
+    setTimeout(function () { map.invalidateSize(); }, 150);
+
+    var chip = document.getElementById('gem-chip');
+    if (chip) {
+      chip.dataset.en = '3 verified gems woven into your trip';
+      chip.dataset.jp = '認証済みの名店3件を旅程に追加';
+      chip.textContent = (document.documentElement.lang === 'ja') ? chip.dataset.jp : chip.dataset.en;
+    }
+
+    var mt = document.getElementById('mobile-tabs');
+    if (mt) mt.addEventListener('click', function () {
+      setTimeout(function () { map.invalidateSize(); if (markers.length) map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2)); }, 60);
+    });
+  })();
+  </script>
+
+  <!-- ===== PERSISTENT BOTTOM NAV · Itinerary is the anchor, always reachable ===== -->
+  <nav class="flex-shrink-0 bg-white border-t border-gray-100 shadow-[0_-1px_4px_rgba(0,0,0,0.05)]">
+    <div class="max-w-md mx-auto w-full flex items-end justify-around px-2 pt-1.5 pb-2">
+      <a href="indexmock.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/home.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Home" data-jp="ホーム">Home</span></a>
+      <a href="businesses.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/compass.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Explore" data-jp="さがす">Explore</span></a>
+      <a href="itinerary.html" class="flex flex-col items-center gap-1 flex-1 group"><span class="w-12 h-12 -mt-5 rounded-full flex items-center justify-center text-white text-xl shadow-lg ring-4 ring-white group-hover:brightness-110 transition" style="background:linear-gradient(135deg,#223A70,#18243F);"><img src="icons/itinerary-white.svg" width="26" height="26" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-bold text-[#223A70]" data-en="Itinerary" data-jp="旅程">Itinerary</span></a>
+      <a href="discover.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/gem.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Add" data-jp="追加">Add</span></a>
+      <a href="plan-start.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-[#223A70]"><span class="text-lg leading-none"><img src="icons/brush.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-semibold" data-en="Plan" data-jp="プラン">Plan</span></a>
+    </div>
+  </nav>
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script>
+    document.getElementById('mobile-tabs').addEventListener('click', function () {
+      var btns = this.querySelectorAll('button');
+      btns.forEach(function (b) { b.className = b.className.replace('bg-[#223A70] text-white', 'text-gray-500'); });
+      var idx = document.body.dataset.mobilePane === 'map' ? 1 : 0;
+      btns[idx].className = btns[idx].className.replace('text-gray-500', 'bg-[#223A70] text-white');
+    });
+  </script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

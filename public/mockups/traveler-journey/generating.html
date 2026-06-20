@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — Step 4: Generating</title>
+  <!-- Auto-advances to the editor, like the real app would (longer here so the itinerary upsell is readable) -->
+  <meta http-equiv="refresh" content="14;url=editor.html" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .bar { animation: grow 14s ease-out forwards; }
+    @keyframes grow { from { width: 8%; } to { width: 97%; } }
+    .step-3 .dot { animation: pulse-dot 1.2s ease-in-out infinite; }
+    @keyframes pulse-dot { 50% { opacity: 0.3; } }
+
+    /* ---- Itinerary map ---- */
+    .map-grid {
+      background-color: #EEF2F0;
+      background-image:
+        linear-gradient(rgba(31,71,136,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31,71,136,.07) 1px, transparent 1px);
+      background-size: 26px 26px;
+    }
+    .pin {
+      position: absolute; transform: translate(-50%, -50%);
+      width: 28px; height: 28px; border-radius: 9999px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; color: #fff; background: var(--kon-2);
+      box-shadow: 0 3px 8px rgba(24,36,63,.35); border: 2px solid #fff;
+    }
+    /* the business pin — drops in, then keeps a gentle pulse ring */
+    .pin-you {
+      background: var(--gold); color: var(--kon);
+      animation: drop 600ms cubic-bezier(.2,1.3,.5,1) 1.6s both;
+    }
+    .pin-you::after {
+      content: ""; position: absolute; inset: -6px; border-radius: 9999px;
+      border: 2px solid var(--gold); opacity: 0;
+      animation: ring 1.8s ease-out 2.3s infinite;
+    }
+    @keyframes drop { from { opacity: 0; transform: translate(-50%, -160%) scale(.4); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+    @keyframes ring { 0% { opacity: .7; transform: scale(.7); } 100% { opacity: 0; transform: scale(1.6); } }
+    .reveal { animation: reveal 600ms ease-out 1.9s both; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .route-you { stroke-dasharray: 3 3; animation: draw 700ms ease-out 1.7s both; }
+    @keyframes draw { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-indigo-50 to-white text-gray-900 min-h-screen flex flex-col">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between">
+    <a href="login.html" class="hover:text-white">← Login</a>
+    <span class="tracking-widest uppercase">[Mockup v2 — Flow 4/9: Generating + itinerary upsell · auto-advances]</span>
+    <a href="editor.html" class="text-white hover:text-indigo-300">Next: Editor →</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bg-white/80 border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-1">
+        <img src="icons/shirube.svg" alt="Shirube" class="w-7 h-7" />
+        <span class="text-xl font-bold text-gray-900">AIVIBLE</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+          <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 font-bold text-xs flex items-center justify-center">YT</span>
+          yamada.taro@gmail.com
+        </div>
+        <button data-lang-toggle class="text-sm border border-gray-200 px-3 py-1 rounded-full hover:bg-gray-50 font-medium">日本語</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-5xl mx-auto px-4 py-10">
+
+    <!-- PROGRESS HERO -->
+    <div class="text-center mb-8">
+      <div class="flex items-center justify-center gap-3 mb-2">
+        <div class="w-7 h-7 rounded-full border-[3px] border-indigo-100 border-t-indigo-500 spin"></div>
+        <h1 class="text-2xl font-extrabold text-gray-900"
+            data-en="Building your AI-optimized site…"
+            data-jp="AI最適化サイトを作成中…">Building your AI-optimized site…</h1>
+      </div>
+      <p class="text-sm text-gray-500"
+         data-en="This usually takes about a minute. While you wait — here's what being visible to AI actually unlocks."
+         data-jp="通常1分ほどで完了します。お待ちいただく間に — AIに「見える」ようになると何が変わるのか、ご覧ください。">
+        This usually takes about a minute. While you wait — here's what being visible to AI actually unlocks.</p>
+      <div class="h-2 bg-gray-200 rounded-full mt-5 overflow-hidden max-w-md mx-auto">
+        <div class="h-2 bg-indigo-500 rounded-full bar"></div>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-5 gap-6 items-start">
+
+      <!-- LEFT: build steps -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50 text-left">
+          <div class="px-5 py-3.5 flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs flex-shrink-0">✓</span>
+            <span class="text-sm text-gray-700" data-en="Reading your website" data-jp="サイトを読み取り中">Reading your website</span>
+            <span class="ml-auto text-[10px] text-gray-300 font-mono">2.1s</span>
+          </div>
+          <div class="px-5 py-3.5 flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs flex-shrink-0">✓</span>
+            <span class="text-sm text-gray-700" data-en="Translating to natural English" data-jp="自然な英語に翻訳中">Translating to natural English</span>
+            <span class="ml-auto text-[10px] text-gray-300 font-mono">8.4s</span>
+          </div>
+          <div class="px-5 py-3.5 flex items-center gap-3 step-3">
+            <span class="dot w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0">
+              <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
+            </span>
+            <span class="text-sm font-medium text-gray-900" data-en="Building your storefront &amp; fixing 14 AI-visibility issues" data-jp="サイトを構築し、14件のAI可視化問題を修正中">Building your storefront &amp; fixing 14 AI-visibility issues</span>
+          </div>
+          <div class="px-5 py-3.5 flex items-center gap-3 opacity-40">
+            <span class="w-6 h-6 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs flex-shrink-0">4</span>
+            <span class="text-sm text-gray-500" data-en="Opening your editor" data-jp="エディタを準備中">Opening your editor</span>
+          </div>
+        </div>
+        <p class="text-xs text-gray-400 text-center">
+          <a href="editor.html" class="text-indigo-500 hover:underline" data-en="(mockup: skip ahead →)" data-jp="（モック：スキップ →）">(mockup: skip ahead →)</a>
+        </p>
+      </div>
+
+      <!-- RIGHT: itinerary upsell -->
+      <div class="lg:col-span-3">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
+
+          <!-- header -->
+          <div class="px-5 py-4 border-b border-gray-100">
+            <div class="av-eyebrow mb-1" data-en="Why this matters" data-jp="なぜ重要か">Why this matters</div>
+            <h2 class="text-lg font-extrabold text-gray-900 leading-snug"
+                data-en="Travelers now let AI plan their trips. Visible businesses get put on the map."
+                data-jp="旅行者は、旅程づくりをAIに任せはじめています。AIに見えるお店は、地図に載ります。">
+              Travelers now let AI plan their trips. Visible businesses get put on the map.</h2>
+          </div>
+
+          <!-- the sample AI-built itinerary -->
+          <div class="px-5 pt-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-gray-700" data-en="Sample · a traveler's AI-built plan" data-jp="サンプル · AIが作った旅行者の旅程">Sample · a traveler's AI-built plan</span>
+              <span class="text-[11px] text-gray-400 flex items-center gap-1">
+                <span class="w-4 h-4 rounded-full bg-gray-900 text-white flex items-center justify-center text-[8px]">AI</span>
+                <span data-en="2 days in Kyoto" data-jp="京都2日間">2 days in Kyoto</span>
+              </span>
+            </div>
+
+            <!-- MAP -->
+            <div class="map-grid relative rounded-xl border border-gray-100 overflow-hidden" style="height:230px;">
+              <!-- route -->
+              <svg class="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <polyline points="20,80 44,58" fill="none" stroke="#223A70" stroke-width="0.6" stroke-dasharray="2 2" opacity="0.55" />
+                <polyline class="route-you" points="44,58 64,40 80,64" fill="none" stroke="#C8A859" stroke-width="0.9" />
+              </svg>
+
+              <!-- pins -->
+              <span class="pin" style="left:20%; top:80%;">1</span>
+              <span class="pin" style="left:44%; top:58%;">2</span>
+              <span class="pin pin-you" style="left:64%; top:40%;" title="Kamogawa-kan">★</span>
+              <span class="pin" style="left:80%; top:64%;">3</span>
+
+              <!-- floating "recommended" callout on the business pin -->
+              <div class="reveal absolute" style="left:64%; top:40%; transform:translate(-50%,-160%);">
+                <div class="bg-gray-900 text-white text-[10px] font-semibold px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg flex items-center gap-1">
+                  <span>✨</span>
+                  <span data-en="“…stay at Kamogawa-kan”" data-jp="「…鴨川館に泊まろう」">“…stay at Kamogawa-kan”</span>
+                </div>
+                <div class="w-2 h-2 bg-gray-900 rotate-45 mx-auto -mt-1"></div>
+              </div>
+
+              <!-- labels -->
+              <span class="absolute text-[9px] font-semibold text-gray-500" style="left:20%; top:80%; transform:translate(-50%,18px);">Fushimi Inari</span>
+              <span class="absolute text-[9px] font-semibold text-gray-500" style="left:44%; top:58%; transform:translate(-50%,18px);">Nishiki Market</span>
+              <span class="absolute text-[9px] font-semibold text-gray-500" style="left:80%; top:64%; transform:translate(-50%,18px);">Gion</span>
+            </div>
+
+            <!-- stop list (live page's signature: numbered + verified + hidden-gem) -->
+            <div class="mt-4 space-y-2 pb-1">
+              <div class="flex items-center gap-3 text-sm text-gray-400">
+                <span class="w-5 h-5 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-[11px] font-bold flex-shrink-0">2</span>
+                <span data-en="Lunch at Nishiki Market" data-jp="錦市場でランチ">Lunch at Nishiki Market</span>
+              </div>
+
+              <!-- YOUR business, freshly dropped into the plan -->
+              <div class="reveal flex items-start gap-3 rounded-xl border-2 p-2.5" style="border-color:var(--gold); background:rgba(200,168,89,.08);">
+                <span class="w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0" style="background:var(--gold); color:var(--kon);">★</span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-sm font-bold text-gray-900">Kamogawa-kan</span>
+                    <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style="background:#E8F5E9; color:#2E7D32;" data-en="✓ Verified today" data-jp="✓ 本日確認済み">✓ Verified today</span>
+                    <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700" data-en="💎 Hidden Gem" data-jp="💎 隠れた名店">💎 Hidden Gem</span>
+                  </div>
+                  <div class="text-[11px] text-gray-500 mt-0.5" data-en="Riverside ryokan · private onsen · 5 min from Gion" data-jp="鴨川沿いの旅館 · 貸切温泉 · 祇園から5分">Riverside ryokan · private onsen · 5 min from Gion</div>
+                </div>
+                <span class="text-[9px] font-bold uppercase tracking-wide self-center px-1.5 py-0.5 rounded" style="background:var(--kon); color:#fff;" data-en="New" data-jp="新規">New</span>
+              </div>
+
+              <div class="flex items-center gap-3 text-sm text-gray-400">
+                <span class="w-5 h-5 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-[11px] font-bold flex-shrink-0">3</span>
+                <span data-en="Evening stroll in Gion" data-jp="夜は祇園を散策">Evening stroll in Gion</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- value + soft upsell -->
+          <div class="px-5 py-4 mt-2 border-t border-gray-100 bg-gray-50">
+            <p class="text-[13px] text-gray-600 leading-relaxed mb-3"
+               data-en="Right now AI can't read your site, so you're left off plans like this. Once we make you AI-readable, you start appearing as a verified stop — recommended automatically to travelers planning Japan."
+               data-jp="いまはAIがサイトを読めないため、こうした旅程からは外れてしまいます。AIに読めるかたちに整えると、確認済みの立ち寄り先として現れ、日本を計画する旅行者へ自動で推薦されるようになります。">
+              Right now AI can't read your site, so you're left off plans like this. Once we make you AI-readable, you start appearing as a verified stop — recommended automatically to travelers planning Japan.</p>
+            <a href="sov.html" class="inline-flex items-center gap-2 text-xs font-bold text-indigo-600 hover:text-indigo-800">
+              <span>📈</span>
+              <span data-en="See how often AI puts you on the map — your Share-of-Voice report" data-jp="AIがどれだけあなたを地図に載せているか — シェア・オブ・ボイスを見る">See how often AI puts you on the map — your Share-of-Voice report</span>
+              <span>→</span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

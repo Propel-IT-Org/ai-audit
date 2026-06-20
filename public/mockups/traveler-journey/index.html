@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — Step 1: Audit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    .hp-cursor { display:inline-block; width:2px; background:#10A37F; margin-left:1px; animation:hpblink 1s step-end infinite; }
+    @keyframes hpblink { 50% { opacity:0; } }
+    .hp-hide { opacity:0; transform:translateY(6px); }
+    .hp-show { opacity:1; transform:translateY(0); transition:all .45s ease; }
+  </style>
+</head>
+<body class="bg-white text-gray-900">
+
+  <!-- MOCKUP FLOW BAR (reviewer chrome — EN only) -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between">
+    <span class="tracking-widest uppercase">[Mockup v2 — Flow 1/9: Audit]</span>
+    <a href="analyzing.html" class="text-white hover:text-indigo-300">Next: Analyzing →</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bg-white border-b border-gray-100 sticky top-0 z-50 backdrop-blur-sm bg-white/90">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-1.5">
+        <img src="icons/shirube.svg" alt="Shirube" class="w-7 h-7" />
+        <span class="text-xl font-bold text-gray-900">AIVIBLE</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-5 text-sm text-gray-500">
+        <a href="plan-start.html" class="hover:text-gray-900 transition-colors" data-en="Plan a trip" data-jp="旅程をつくる">Plan a trip</a>
+        <a href="businesses.html" class="hover:text-gray-900 transition-colors" data-en="Explore" data-jp="さがす">Explore</a>
+        <a href="discover.html" class="hover:text-gray-900 transition-colors" data-en="Add places" data-jp="スポットを追加">Add places</a>
+        <span class="text-gray-200">|</span>
+        <a href="index.html" class="text-indigo-600 font-semibold" data-en="For your business" data-jp="事業者の方へ">For your business</a>
+      </nav>
+      <button data-lang-toggle class="text-sm border border-gray-200 px-3 py-1 rounded-full hover:bg-gray-50 transition-colors font-medium">日本語</button>
+    </div>
+  </header>
+
+  <!-- HERO + CHATGPT DEMO (side by side on desktop, stacked on mobile) -->
+  <section class="bg-gradient-to-b from-indigo-50 to-white py-16 md:py-20 px-4">
+    <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+
+      <!-- LEFT: headline + audit form -->
+      <div class="text-center lg:text-left">
+        <div class="inline-flex items-center gap-2 bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full mb-6">
+          <span class="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></span>
+          <span data-en="Free audit · No signup required · Results in 30 seconds" data-jp="無料診断・登録不要・30秒で結果表示">Free audit · No signup required · Results in 30 seconds</span>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-5"
+            data-en="Is your business invisible to AI travelers?"
+            data-jp="外国人観光客は、AI経由であなたを見つけられますか？">
+          Is your business invisible to AI travelers?
+        </h1>
+        <p class="text-lg text-gray-500 mb-8 max-w-xl mx-auto lg:mx-0"
+           data-en="Check how ChatGPT, Gemini &amp; Perplexity see your business — then let AI build you a site they can actually recommend."
+           data-jp="ChatGPT・Gemini・Perplexityがあなたのビジネスをどう見ているかを確認し、「推薦されるサイト」をAIに作らせましょう。">
+          Check how ChatGPT, Gemini &amp; Perplexity see your business — then let AI build you a site they can actually recommend.
+        </p>
+
+        <!-- URL INPUT FORM -->
+        <div class="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto lg:mx-0 mb-6">
+          <input
+            type="url"
+            value="kamogawakan.com"
+            class="flex-1 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          />
+          <a href="analyzing.html" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors whitespace-nowrap text-sm text-center"
+             data-en="Check My Business" data-jp="ビジネスをチェック">
+            Check My Business
+          </a>
+        </div>
+
+        <div class="flex flex-wrap justify-center lg:justify-start gap-4 text-xs text-gray-400">
+          <span data-en="✓ Free audit, forever" data-jp="✓ 診断はずっと無料">✓ Free audit, forever</span>
+          <span data-en="✓ No signup to check" data-jp="✓ 診断に登録不要">✓ No signup to check</span>
+          <span data-en="✓ Results in 30 seconds" data-jp="✓ 30秒で結果表示">✓ Results in 30 seconds</span>
+          <span data-en="✓ No credit card" data-jp="✓ クレジットカード不要">✓ No credit card</span>
+        </div>
+      </div>
+
+      <!-- RIGHT: the pain in 5 seconds — ChatGPT demo -->
+      <div>
+        <div class="av-eyebrow text-center lg:text-left mb-3"
+             data-en="When a traveler asks AI about places like yours…"
+             data-jp="旅行者がAIにあなたのような店を尋ねたら…">When a traveler asks AI about places like yours…</div>
+
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
+          <div class="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100">
+            <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-[11px] font-bold" style="background:#10A37F;">✺</span>
+            <span class="text-sm font-semibold text-gray-700">ChatGPT</span>
+          </div>
+          <div class="px-4 py-5 space-y-4 min-h-[150px]">
+            <div id="hp-user" class="hp-hide flex justify-end">
+              <div class="bg-gray-100 text-gray-800 text-sm rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[82%]"
+                   data-en="Any good ryokan near Gion with a private onsen and kaiseki dinner?"
+                   data-jp="祇園の近くで、貸切温泉と懐石のあるおすすめの旅館はある？">Any good ryokan near Gion with a private onsen and kaiseki dinner?</div>
+            </div>
+            <div id="hp-reply" class="hp-hide flex items-start gap-2.5">
+              <span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs flex-shrink-0 mt-0.5" style="background:#10A37F;">✺</span>
+              <div class="bg-gray-50 border border-gray-100 text-sm text-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[88%] leading-relaxed"
+                   data-en="I can only suggest places with clear, AI-readable info online. Many wonderful local ryokan don't show up here — so travelers never see them."
+                   data-jp="ご紹介できるのは、AIが読み取れる情報が整ったお店だけです。多くの素敵な旅館はここに出てこないため、旅行者の目に触れません。">
+                I can only suggest places with clear, AI-readable info online. Many wonderful local ryokan don't show up here — so travelers never see them.</div>
+            </div>
+          </div>
+        </div>
+
+        <p id="hp-kicker" class="hp-hide text-center lg:text-left text-sm font-semibold text-gray-900 mt-4"
+           data-en="Is <span class='japan-red font-bold'>your</span> business in that answer? Run the free check."
+           data-jp="その答えに<span class='japan-red font-bold'>あなた</span>のお店は入っていますか？無料で診断しましょう。">
+          Is <span class="japan-red font-bold">your</span> business in that answer? Run the free check.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- AUDIT COUNT STRIP -->
+  <div class="bg-gray-50 border-y border-gray-100 py-3 text-center text-sm text-gray-500">
+    <span class="font-bold japan-red">1,247</span>
+    <span data-en=" businesses audited so far" data-jp="社のビジネスを診断済み"> businesses audited so far</span>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works" class="py-20 px-4 bg-white">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-3"
+            data-en="From invisible to recommended — in minutes"
+            data-jp="「見えない」から「推薦される」へ — 数分で">From invisible to recommended — in minutes</h2>
+        <p class="text-gray-500 max-w-xl mx-auto"
+           data-en="Audit, generate, refine with AI guidance, and get found by AI travel planners."
+           data-jp="診断 → 生成 → AIと一緒に改善 → AI旅行プランナーに見つけてもらう。">
+          Audit, generate, refine with AI guidance, and get found by AI travel planners.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="border border-gray-100 rounded-2xl p-6 hover:border-indigo-200 hover:shadow-sm transition-all">
+          <div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-600 font-bold flex items-center justify-center mb-4">1</div>
+          <div class="text-2xl mb-2">🔍</div>
+          <div class="font-semibold text-gray-900 mb-1" data-en="Check your AI score" data-jp="AIスコアをチェック">Check your AI score</div>
+          <p class="text-xs text-gray-400"
+             data-en="Enter your URL. We scan your site the way AI bots do and grade what they can see."
+             data-jp="URLを入力するだけ。AIボットと同じ方法でサイトをスキャンし、見え方を採点します。">
+            Enter your URL. We scan your site the way AI bots do and grade what they can see.</p>
+        </div>
+        <div class="border border-gray-100 rounded-2xl p-6 hover:border-indigo-200 hover:shadow-sm transition-all">
+          <div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-600 font-bold flex items-center justify-center mb-4">2</div>
+          <div class="text-2xl mb-2">✨</div>
+          <div class="font-semibold text-gray-900 mb-1" data-en="Generate your AI-ready site" data-jp="AI対応サイトを生成">Generate your AI-ready site</div>
+          <p class="text-xs text-gray-400"
+             data-en="One click builds an English, AI-optimized version of your site from your existing content."
+             data-jp="ワンクリックで、既存サイトの内容から英語のAI最適化サイトを自動生成します。">
+            One click builds an English, AI-optimized version of your site from your existing content.</p>
+        </div>
+        <div class="border border-gray-100 rounded-2xl p-6 hover:border-indigo-200 hover:shadow-sm transition-all">
+          <div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-600 font-bold flex items-center justify-center mb-4">3</div>
+          <div class="text-2xl mb-2">💬</div>
+          <div class="font-semibold text-gray-900 mb-1" data-en="Refine it by chatting" data-jp="チャットで改善">Refine it by chatting</div>
+          <p class="text-xs text-gray-400"
+             data-en="Tell the AI assistant what to change — it edits your site live and coaches you on what AI travelers look for."
+             data-jp="変えたいことをAIアシスタントに伝えるだけ。サイトをその場で編集し、AI旅行者に響くポイントも教えてくれます。">
+            Tell the AI assistant what to change — it edits your site live and coaches you on what AI travelers look for.</p>
+        </div>
+        <div class="border border-gray-100 rounded-2xl p-6 hover:border-indigo-200 hover:shadow-sm transition-all">
+          <div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-600 font-bold flex items-center justify-center mb-4">4</div>
+          <div class="text-2xl mb-2">📈</div>
+          <div class="font-semibold text-gray-900 mb-1" data-en="Track your AI visibility" data-jp="AIでの露出を計測">Track your AI visibility</div>
+          <p class="text-xs text-gray-400"
+             data-en="See how often AI assistants mention you vs. competitors with a Share-of-Voice report."
+             data-jp="シェア・オブ・ボイス（SoV）レポートで、競合と比べてAIにどれだけ言及されているかを確認できます。">
+            See how often AI assistants mention you vs. competitors with a Share-of-Voice report.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="py-16 px-4 bg-gradient-to-b from-white to-indigo-50">
+    <div class="max-w-xl mx-auto text-center">
+      <h2 class="text-2xl font-bold text-gray-900 mb-3"
+          data-en="36.9M tourists came to Japan last year."
+          data-jp="昨年、3,690万人の旅行者が日本を訪れました。">36.9M tourists came to Japan last year.</h2>
+      <p class="text-gray-500 mb-6 text-sm"
+         data-en="Over 60% of Gen Z travelers plan trips with AI. If AI can't read your site, they'll never find you."
+         data-jp="Z世代の6割以上がAIで旅行を計画しています。AIがあなたのサイトを読めなければ、見つけてもらえません。">
+        Over 60% of Gen Z travelers plan trips with AI. If AI can't read your site, they'll never find you.</p>
+      <a href="analyzing.html" class="inline-block bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-8 py-3.5 rounded-xl transition-colors shadow-lg shadow-indigo-100"
+         data-en="Check My Business — Free" data-jp="無料でビジネスをチェック">
+        Check My Business — Free
+      </a>
+    </div>
+  </section>
+
+  <footer class="border-t border-gray-100 py-8 text-center text-sm text-gray-400">
+    © 2026 AIVIBLE · <span data-en="The AI Visibility Assistant" data-jp="AI可視化アシスタント">The AI Visibility Assistant</span>
+  </footer>
+
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script>
+    // Home "pain hook": type the traveler's question, then reveal AI's answer.
+    // Runs after lang.js so the bubble text matches the current language.
+    (function () {
+      var u = document.getElementById("hp-user");
+      if (!u) return;
+      var bubble = u.querySelector("div");
+      var full = bubble.textContent;
+      function showEl(id) { var e = document.getElementById(id); if (e) { e.classList.remove("hp-hide"); e.classList.add("hp-show"); } }
+
+      bubble.textContent = "";
+      var cur = document.createElement("span"); cur.className = "hp-cursor"; cur.style.height = "1em";
+      bubble.appendChild(document.createTextNode("")); bubble.appendChild(cur);
+      u.classList.remove("hp-hide"); u.classList.add("hp-show");
+
+      var i = 0;
+      function type() {
+        if (i <= full.length) { bubble.firstChild.textContent = full.slice(0, i); i++; setTimeout(type, 32); }
+        else { cur.remove(); setTimeout(function () { showEl("hp-reply"); }, 700); setTimeout(function () { showEl("hp-kicker"); }, 1600); }
+      }
+      setTimeout(type, 600);
+    })();
+  </script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

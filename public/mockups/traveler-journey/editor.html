@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE Editor — Step 5: AI Editor (fresh)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    /* Mobile: show one pane at a time (chat or preview). Desktop keeps both. */
+    @media (max-width: 767px) {
+      body[data-mobile-pane="chat"] #pane-preview { display: none; }
+      body[data-mobile-pane="preview"] #pane-chat { display: none; }
+    }
+  </style>
+</head>
+<body data-mobile-pane="chat" class="bg-gray-100 text-gray-900 h-screen flex flex-col overflow-hidden">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between flex-shrink-0">
+    <a href="generating.html" class="hover:text-white">← Generating</a>
+    <span class="tracking-widest uppercase">[Mockup v2 — Flow 5/9: Editor, just generated · 5 credits]</span>
+    <a href="editor-2.html" class="text-white hover:text-indigo-300">Next: After an edit →</a>
+  </div>
+
+  <!-- EDITOR TOPBAR -->
+  <header class="bg-white border-b border-gray-200 flex-shrink-0">
+    <div class="px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2 sm:gap-3">
+      <div id="tt-site" class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <a href="index.html" class="flex items-center gap-1 flex-shrink-0">
+          <img src="icons/shirube.svg" alt="Shirube" class="w-6 h-6" />
+          <span class="text-lg font-bold text-gray-900">AIVIBLE</span>
+        </a>
+        <span class="text-gray-300 hidden sm:inline">/</span>
+        <span class="text-sm font-medium text-gray-700 hidden sm:inline truncate">Kamogawa-kan</span>
+        <span class="text-[10px] bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full uppercase tracking-wide hidden sm:inline" data-en="Live" data-jp="公開中">Live</span>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+        <div id="tt-credits" class="flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 rounded-full px-2.5 sm:px-3 py-1">
+          <span class="text-xs font-bold text-indigo-600">⚡ 5</span>
+          <span class="text-[11px] text-indigo-400 hidden sm:inline" data-en="free edits left" data-jp="回の無料編集が可能">free edits left</span>
+        </div>
+        <a id="tt-viewlive" href="storefront.html" class="text-xs font-semibold text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 hidden md:inline-block" data-en="View live site ↗" data-jp="公開サイトを見る ↗">View live site ↗</a>
+        <button id="tt-help" class="text-xs border border-indigo-200 text-indigo-600 px-2.5 py-1.5 rounded-lg hover:bg-indigo-50 font-semibold flex items-center gap-1"><span>❓</span><span class="hidden sm:inline" data-en="Guide" data-jp="ガイド">Guide</span></button>
+        <button data-lang-toggle class="text-xs border border-gray-200 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 font-medium">日本語</button>
+        <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 font-bold text-xs flex items-center justify-center flex-shrink-0" title="yamada.taro@gmail.com">YT</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE PANE TOGGLE (Chat / Preview) — Lovable-style; desktop shows both side by side -->
+  <div class="md:hidden flex-shrink-0 border-b border-gray-200 bg-white px-3 py-2 flex gap-1">
+    <button id="mp-chat" class="flex-1 text-xs font-semibold py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors">💬 <span data-en="Chat" data-jp="チャット">Chat</span></button>
+    <button id="mp-preview" class="flex-1 text-xs font-semibold py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors">👁 <span data-en="Preview" data-jp="プレビュー">Preview</span></button>
+  </div>
+
+  <!-- SPLIT LAYOUT -->
+  <div class="flex-1 flex overflow-hidden">
+
+    <!-- ◀ CHAT PANEL -->
+    <aside id="pane-chat" class="w-full md:w-[400px] md:flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
+
+      <div id="tt-shirube" class="px-4 py-3 border-b border-gray-100 flex items-center gap-2.5 flex-shrink-0">
+        <span class="w-8 h-8 rounded-full bg-[#F5EEDC] flex items-center justify-center text-white text-sm"><img src="icons/shirube.svg" alt="Shirube" style="width:60%;height:60%" /></span>
+        <div>
+          <div class="text-sm font-bold text-gray-900" data-en="Shirube · AI Visibility Assistant" data-jp="シルベ · AI可視化アシスタント">Shirube · AI Visibility Assistant</div>
+          <div class="text-[11px] text-green-500 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span><span data-en="Ready to improve your site" data-jp="サイト改善の準備ができました">Ready to improve your site</span></div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+
+        <!-- Assistant welcome -->
+        <div class="flex gap-2.5">
+          <span class="w-7 h-7 rounded-full bg-[#F5EEDC] flex items-center justify-center text-white text-xs flex-shrink-0 mt-0.5"><img src="icons/shirube.svg" alt="Shirube" style="width:60%;height:60%" /></span>
+          <div class="bg-gray-50 border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 leading-relaxed"
+               data-en="<p class='mb-2'>🎉 Your AI-optimized site is live! I rebuilt <span class='font-mono text-xs bg-gray-100 px-1 rounded'>kamogawakan.com</span> and fixed all 14 issues from your audit — your new site scores an <span class='font-bold text-green-600'>A</span>.</p><p class='mb-2'>I'm your editor: just tell me what to change, in plain words, and you'll see it update on the right.</p><p>While translating your site I noticed <span class='font-semibold'>3 things that would make AI recommend you more often:</span></p><ol class='list-decimal ml-4 mt-2 space-y-1 text-[13px]'><li>Your description doesn't mention your <b>private onsen baths</b> — the #1 thing travelers ask AI about ryokans.</li><li>You have no <b>prices</b> listed. AI skips businesses it can't quote prices for.</li><li>Adding your <b>distance from Kyoto Station</b> helps AI plan itineraries around you.</li></ol>"
+               data-jp="<p class='mb-2'>🎉 AI最適化サイトが公開されました！<span class='font-mono text-xs bg-gray-100 px-1 rounded'>kamogawakan.com</span> を再構築し、診断で見つかった14件の問題をすべて修正しました。新しいサイトのスコアは <span class='font-bold text-green-600'>A</span> です。</p><p class='mb-2'>私があなたの編集担当です。変えたいことを普通の言葉で伝えるだけで、右側のサイトがその場で更新されます。</p><p>翻訳しながら、<span class='font-semibold'>AIに推薦されやすくなるポイントを3つ</span>見つけました：</p><ol class='list-decimal ml-4 mt-2 space-y-1 text-[13px]'><li>説明文に<b>貸切露天風呂</b>の記載がありません — 旅行者がAIに最もよく聞く条件です。</li><li><b>料金</b>が掲載されていません。AIは料金を引用できないお店を推薦から外します。</li><li><b>京都駅からのアクセス</b>を追加すると、AIが旅程に組み込みやすくなります。</li></ol>">
+            <p class="mb-2">🎉 Your AI-optimized site is live! I rebuilt <span class="font-mono text-xs bg-gray-100 px-1 rounded">kamogawakan.com</span> and fixed all 14 issues from your audit — your new site scores an <span class="font-bold text-green-600">A</span>.</p>
+            <p class="mb-2">I'm your editor: just tell me what to change, in plain words, and you'll see it update on the right.</p>
+            <p>While translating your site I noticed <span class="font-semibold">3 things that would make AI recommend you more often:</span></p>
+            <ol class="list-decimal ml-4 mt-2 space-y-1 text-[13px]">
+              <li>Your description doesn't mention your <b>private onsen baths</b> — the #1 thing travelers ask AI about ryokans.</li>
+              <li>You have no <b>prices</b> listed. AI skips businesses it can't quote prices for.</li>
+              <li>Adding your <b>distance from Kyoto Station</b> helps AI plan itineraries around you.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Suggestion chips -->
+        <div id="tt-suggest" class="pl-9 flex flex-wrap gap-2">
+          <a href="editor-2.html" class="text-xs border border-indigo-200 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors" data-en="✨ Mention our onsen in the tagline" data-jp="✨ キャッチコピーに温泉を入れる">✨ Mention our onsen in the tagline</a>
+          <a href="editor-2.html" class="text-xs border border-gray-200 bg-white text-gray-600 px-3 py-1.5 rounded-full hover:border-indigo-200 hover:text-indigo-600 transition-colors" data-en="💴 Add room prices" data-jp="💴 料金を追加する">💴 Add room prices</a>
+          <a href="editor-2.html" class="text-xs border border-gray-200 bg-white text-gray-600 px-3 py-1.5 rounded-full hover:border-indigo-200 hover:text-indigo-600 transition-colors" data-en="📍 Add access from Kyoto Station" data-jp="📍 京都駅からのアクセスを追加">📍 Add access from Kyoto Station</a>
+        </div>
+
+      </div>
+
+      <!-- Input -->
+      <div class="border-t border-gray-100 p-3 flex-shrink-0">
+        <div id="tt-input" class="flex items-end gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-indigo-400">
+          <textarea rows="1"
+            data-en-ph="Tell me what to change… e.g. “make the tagline mention our onsen”"
+            data-jp-ph="変えたいことを入力… 例：「キャッチコピーに温泉を入れて」"
+            placeholder="Tell me what to change… e.g. “make the tagline mention our onsen”"
+            class="flex-1 bg-transparent text-sm resize-none focus:outline-none placeholder:text-gray-400"></textarea>
+          <a href="editor-2.html" class="w-8 h-8 bg-indigo-500 hover:bg-indigo-600 rounded-lg flex items-center justify-center text-white flex-shrink-0 transition-colors" title="Send">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </a>
+        </div>
+        <div class="flex items-center justify-between mt-2 px-1">
+          <span class="text-[10px] text-gray-400" data-en="Each applied change uses 1 credit · questions are free" data-jp="適用された変更ごとに1クレジット・質問は無料">Each applied change uses 1 credit · questions are free</span>
+          <span class="text-[10px] font-semibold text-indigo-500" data-en="⚡ 5 left" data-jp="⚡ 残り5回">⚡ 5 left</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ▶ LIVE PREVIEW -->
+    <main id="pane-preview" class="flex-1 w-full overflow-y-auto bg-gray-100 p-4 sm:p-5">
+      <div class="max-w-3xl mx-auto">
+
+        <div id="tt-preview" class="bg-white rounded-t-xl border border-gray-200 px-4 py-2.5 flex items-center gap-2 sticky top-0 z-10">
+          <div class="flex gap-1.5">
+            <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+            <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+            <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+          </div>
+          <div class="flex-1 bg-gray-100 rounded px-3 py-1 text-xs text-gray-500 font-mono text-center">🔒 aivible.tokyo/s/kamogawa-kan</div>
+          <span class="text-[10px] font-bold text-green-600 bg-green-50 border border-green-100 px-2 py-0.5 rounded-full" data-en="Score A" data-jp="スコア A">Score A</span>
+        </div>
+
+        <!-- STOREFRONT PREVIEW (the generated site itself stays EN — that's the product) -->
+        <div class="bg-white border-x border-b border-gray-200 rounded-b-xl overflow-hidden shadow-sm">
+
+          <div class="relative h-64 bg-gradient-to-br from-stone-700 via-stone-500 to-amber-200 flex items-end">
+            <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 70% 20%, rgba(255,255,255,0.4) 0, transparent 40%);"></div>
+            <div class="relative p-8 text-white">
+              <div class="text-[10px] uppercase tracking-[0.2em] opacity-80 mb-2">Ryokan · Kyoto</div>
+              <h1 class="text-3xl font-extrabold mb-1.5">Kamogawa-kan 鴨川館</h1>
+              <p class="text-sm opacity-90">A traditional ryokan in Kyoto.</p>
+            </div>
+          </div>
+
+          <div class="px-8 py-6 border-b border-gray-50">
+            <h2 class="font-bold text-gray-900 mb-2 text-sm uppercase tracking-widest text-indigo-500">About</h2>
+            <p class="text-sm text-gray-600 leading-relaxed">Family-run since 1932, Kamogawa-kan offers tatami rooms overlooking the Kamo River in central Kyoto. Guests enjoy seasonal kaiseki dinners and traditional hospitality, a short walk from Gion and Pontocho Alley.</p>
+          </div>
+
+          <div class="px-8 py-5 border-b border-gray-50 flex flex-wrap gap-2">
+            <span class="text-xs bg-stone-100 text-stone-600 px-3 py-1 rounded-full">Traditional Architecture</span>
+            <span class="text-xs bg-stone-100 text-stone-600 px-3 py-1 rounded-full">Kaiseki Cuisine</span>
+            <span class="text-xs bg-stone-100 text-stone-600 px-3 py-1 rounded-full">River View</span>
+            <span class="text-xs bg-stone-100 text-stone-600 px-3 py-1 rounded-full">Multilingual Staff</span>
+          </div>
+
+          <div class="px-8 py-6 border-b border-gray-50">
+            <h2 class="font-bold text-gray-900 mb-4 text-sm uppercase tracking-widest text-indigo-500">Rooms &amp; Plans</h2>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="border border-gray-100 rounded-xl overflow-hidden">
+                <div class="h-24 bg-gradient-to-br from-stone-200 to-stone-300 flex items-center justify-center text-2xl">🛏️</div>
+                <div class="p-3">
+                  <div class="text-sm font-semibold text-gray-900">River-view Tatami Room</div>
+                  <div class="text-xs text-gray-400 mt-0.5">Breakfast included · up to 3 guests</div>
+                </div>
+              </div>
+              <div class="border border-gray-100 rounded-xl overflow-hidden">
+                <div class="h-24 bg-gradient-to-br from-amber-100 to-stone-200 flex items-center justify-center text-2xl">🍱</div>
+                <div class="p-3">
+                  <div class="text-sm font-semibold text-gray-900">Kaiseki Dinner Plan</div>
+                  <div class="text-xs text-gray-400 mt-0.5">Seasonal 9-course dinner</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="px-8 py-6 border-b border-gray-50">
+            <h2 class="font-bold text-gray-900 mb-4 text-sm uppercase tracking-widest text-indigo-500">Gallery</h2>
+            <div class="grid grid-cols-4 gap-2">
+              <div class="h-16 rounded-lg bg-gradient-to-br from-stone-300 to-stone-400"></div>
+              <div class="h-16 rounded-lg bg-gradient-to-br from-amber-200 to-amber-300"></div>
+              <div class="h-16 rounded-lg bg-gradient-to-br from-emerald-200 to-emerald-300"></div>
+              <div class="h-16 rounded-lg bg-gradient-to-br from-rose-200 to-rose-300"></div>
+            </div>
+          </div>
+
+          <div class="px-8 py-6">
+            <h2 class="font-bold text-gray-900 mb-3 text-sm uppercase tracking-widest text-indigo-500">Access &amp; Contact</h2>
+            <div class="text-sm text-gray-600 space-y-1.5">
+              <div>📍 Oike-dori, Nakagyo-ku, Kyoto</div>
+              <div>📞 +81-75-000-0000</div>
+              <div>✉️ stay@kamogawakan.com</div>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 border-t border-gray-100 py-3 text-center text-[11px] text-gray-400">
+            <span class="japan-red">●</span> Powered by <b>AIVIBLE</b> — AI-optimized &amp; verified
+          </div>
+        </div>
+
+        <div class="h-6"></div>
+      </div>
+    </main>
+
+  </div>
+
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+
+  <!-- MOBILE PANE TOGGLE -->
+  <script>
+  (function () {
+    var body = document.body,
+        chat = document.getElementById("mp-chat"),
+        prev = document.getElementById("mp-preview");
+    if (!chat || !prev) return;
+    function set(pane) {
+      body.setAttribute("data-mobile-pane", pane);
+      var on = chat, off = prev;
+      if (pane === "preview") { on = prev; off = chat; }
+      on.className = on.className.replace(/\s*(bg-\[#223A70\]|text-white|text-gray-500)/g, "") + " bg-[#223A70] text-white";
+      off.className = off.className.replace(/\s*(bg-\[#223A70\]|text-white|text-gray-500)/g, "") + " text-gray-500";
+    }
+    chat.addEventListener("click", function () { set("chat"); });
+    prev.addEventListener("click", function () { set("preview"); });
+    set("chat");
+  })();
+  </script>
+
+  <!-- ONBOARDING TOUR — stepped on desktop, single intro card on mobile; ❓ Guide re-opens it -->
+  <script>
+  (function () {
+    if (window.self !== window.top) return;                 // hide inside iframes
+    if (/(^|[?&])clean=1/.test(location.search)) return;     // hide for screenshots
+
+    var SEEN_KEY = "aivible-tour-editor-seen";
+    var lang = function () { return localStorage.getItem("aivible-mock-lang") || "en"; };
+    var isMobile = function () { return window.matchMedia("(max-width: 767px)").matches; };
+
+    // One step per editor region: anchor selector, preferred label side, EN/JP copy.
+    var STEPS = [
+      { sel: "#tt-shirube", pos: "right",
+        en: { t: "Meet Shirube", d: "Your AI visibility assistant. Tell it what to change in plain words — no code." },
+        jp: { t: "シルベです", d: "あなたのAI可視化アシスタント。変えたいことを普通の言葉で伝えるだけ。コード不要です。" } },
+      { sel: "#tt-suggest", pos: "right",
+        en: { t: "Smart suggestions", d: "Tap a suggestion to apply a high-impact fix instantly." },
+        jp: { t: "おすすめの改善", d: "提案をタップすると、効果の高い修正をその場で適用できます。" } },
+      { sel: "#tt-input", pos: "top",
+        en: { t: "Just type what to change", d: "e.g. “make the tagline mention our onsen.” The preview updates on the right." },
+        jp: { t: "変えたいことを入力", d: "例：「キャッチコピーに温泉を入れて」。右側のプレビューが更新されます。" } },
+      { sel: "#tt-preview", pos: "below-left",
+        en: { t: "Live preview", d: "Every change appears here instantly — before it goes live to the public." },
+        jp: { t: "ライブプレビュー", d: "変更は公開前にここで即座に反映されます。" } },
+      { sel: "#tt-credits", pos: "bottom",
+        en: { t: "Free edits", d: "You start with 5 free AI edits. Each applied change uses one — questions are free." },
+        jp: { t: "無料の編集回数", d: "最初は5回の無料編集。変更を適用するごとに1回消費します（質問は無料）。" } },
+      { sel: "#tt-viewlive", pos: "bottom",
+        en: { t: "View live site", d: "Open the public page exactly as travelers and AI assistants see it." },
+        jp: { t: "公開サイトを見る", d: "旅行者やAIアシスタントが見るのと同じ公開ページを開きます。" } }
+    ];
+
+    var L = function () {
+      return lang() === "jp"
+        ? { intro: "シルベ・エディターの使い方", back: "戻る", next: "次へ", done: "完了", got: "はじめる",
+            mobileLead: "編集はチャットで行います。主なエリアは：",
+            mobile: ["🔀 上部で「チャット / プレビュー」を切替", "💬 シルベ — 変えたいことを伝える", "✨ おすすめ — ワンタップで改善",
+                     "⌨️ 入力欄 — 普通の言葉で指示", "👁 プレビュー — 変更を即確認", "⚡ 無料編集 — 最初は5回"],
+            mobileNote: "※ 大きな画面ではチャットとプレビューが左右に並びます。" }
+        : { intro: "Welcome to your Shirube editor", back: "Back", next: "Next", done: "Done", got: "Got it",
+            mobileLead: "You edit by chatting. The main areas are:",
+            mobile: ["🔀 Toggle Chat / Preview at the top", "💬 Shirube — tell it what to change", "✨ Suggestions — one-tap fixes",
+                     "⌨️ Input — plain-language commands", "👁 Preview — see changes instantly", "⚡ Free edits — 5 to start"],
+            mobileNote: "On a larger screen, chat and preview sit side by side." };
+    };
+
+    // ---- scaffolding ----
+    var root = document.createElement("div");
+    root.id = "tt-overlay";
+    root.style.cssText = "position:fixed;inset:0;z-index:9998;display:none;";
+    var backdrop = document.createElement("div");
+    backdrop.style.cssText = "position:absolute;inset:0;background:rgba(12,19,32,.72);";
+    root.appendChild(backdrop);
+
+    var closeBtn = document.createElement("button");
+    closeBtn.setAttribute("aria-label", "Close");
+    closeBtn.innerHTML = "&times;";
+    closeBtn.style.cssText =
+      "position:absolute;top:14px;right:16px;z-index:10000;width:38px;height:38px;border-radius:9999px;" +
+      "background:#fff;color:#18243F;font-size:24px;line-height:1;border:none;cursor:pointer;" +
+      "box-shadow:0 4px 14px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;";
+    root.appendChild(closeBtn);
+
+    var layer = document.createElement("div");   // holds ring + card (or mobile card)
+    layer.style.cssText = "position:absolute;inset:0;";
+    root.appendChild(layer);
+
+    document.body.appendChild(root);
+
+    var idx = 0;
+    function clearLayer() { layer.innerHTML = ""; }
+
+    // ---- desktop: one ring + one card at a time ----
+    function renderStep() {
+      clearLayer();
+      var step = STEPS[idx];
+      var el = document.querySelector(step.sel);
+      if (!el) return;
+      if (el.scrollIntoView) el.scrollIntoView({ block: "nearest", inline: "nearest" });
+      var r = el.getBoundingClientRect();
+      var pad = 6, vw = window.innerWidth, vh = window.innerHeight;
+
+      var ring = document.createElement("div");
+      ring.style.cssText =
+        "position:absolute;pointer-events:none;border:2px solid #C8A859;border-radius:12px;" +
+        "box-shadow:0 0 0 3px rgba(200,168,89,.3);background:rgba(255,255,255,.10);" +
+        "transition:all .2s ease;" +
+        "left:" + (r.left - pad) + "px;top:" + (r.top - pad) + "px;" +
+        "width:" + (r.width + pad * 2) + "px;height:" + (r.height + pad * 2) + "px;";
+      layer.appendChild(ring);
+
+      var c = step[lang()] || step.en, t = L();
+      var last = idx === STEPS.length - 1, first = idx === 0;
+      var card = document.createElement("div");
+      card.style.cssText =
+        "position:absolute;width:250px;background:#fff;border-radius:14px;padding:14px 16px;" +
+        "box-shadow:0 12px 32px rgba(0,0,0,.35);";
+      card.innerHTML =
+        "<div style='font-size:11px;font-weight:800;letter-spacing:.04em;color:#C8A859;margin-bottom:5px'>" +
+          (idx + 1) + " / " + STEPS.length + "</div>" +
+        "<div style='font-size:14px;font-weight:700;color:#18243F;margin-bottom:4px'>" + c.t + "</div>" +
+        "<div style='font-size:12.5px;line-height:1.5;color:#475569;margin-bottom:12px'>" + c.d + "</div>" +
+        "<div style='display:flex;justify-content:space-between;align-items:center;gap:8px'>" +
+          "<button id='tt-back' style='font-size:12px;color:#94a3b8;background:none;border:none;cursor:pointer;" +
+            "padding:6px 4px;" + (first ? "visibility:hidden;" : "") + "'>" + t.back + "</button>" +
+          "<button id='tt-next' style='font-size:12.5px;font-weight:700;color:#fff;background:#223A70;border:none;" +
+            "border-radius:8px;padding:7px 16px;cursor:pointer'>" + (last ? t.done : t.next + " →") + "</button>" +
+        "</div>";
+      layer.appendChild(card);
+
+      var cw = card.offsetWidth, ch = card.offsetHeight, gap = 14, x, y;
+      switch (step.pos) {
+        case "bottom":     x = r.left;            y = r.bottom + gap; break;
+        case "top":        x = r.left;            y = r.top - ch - gap; break;
+        case "right":      x = r.right + gap;     y = r.top; break;
+        case "left":       x = r.left - cw - gap; y = r.top; break;
+        case "below-left": x = r.left + 14;       y = r.bottom + gap; break;
+        default:           x = r.left;            y = r.bottom + gap;
+      }
+      x = Math.max(12, Math.min(x, vw - cw - 12));
+      y = Math.max(12, Math.min(y, vh - ch - 12));
+      card.style.left = x + "px"; card.style.top = y + "px";
+
+      card.querySelector("#tt-next").addEventListener("click", function () {
+        if (last) { close(); } else { idx++; renderStep(); }
+      });
+      var back = card.querySelector("#tt-back");
+      if (!first) back.addEventListener("click", function () { idx--; renderStep(); });
+    }
+
+    // ---- mobile: a single centered intro card (no element coachmarks) ----
+    function renderMobile() {
+      clearLayer();
+      var t = L();
+      var card = document.createElement("div");
+      card.style.cssText =
+        "position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:88%;max-width:340px;" +
+        "background:#fff;border-radius:16px;padding:20px 20px 18px;box-shadow:0 18px 40px rgba(0,0,0,.4);";
+      var items = t.mobile.map(function (m) {
+        return "<li style='font-size:13px;color:#334155;margin:7px 0;list-style:none'>" + m + "</li>";
+      }).join("");
+      card.innerHTML =
+        "<div style='font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#C8A859;font-weight:700;margin-bottom:4px'>AIVIBLE</div>" +
+        "<div style='font-size:18px;font-weight:800;color:#18243F;margin-bottom:8px'>" + t.intro + "</div>" +
+        "<div style='font-size:13px;color:#475569;margin-bottom:6px'>" + t.mobileLead + "</div>" +
+        "<ul style='margin:0 0 12px;padding:0'>" + items + "</ul>" +
+        "<div style='font-size:11.5px;color:#94a3b8;margin-bottom:14px'>" + t.mobileNote + "</div>" +
+        "<button id='tt-got' style='width:100%;font-size:13.5px;font-weight:700;color:#fff;background:#223A70;" +
+          "border:none;border-radius:10px;padding:11px;cursor:pointer'>" + t.got + "</button>";
+      layer.appendChild(card);
+      card.querySelector("#tt-got").addEventListener("click", close);
+    }
+
+    function render() { if (isMobile()) renderMobile(); else renderStep(); }
+
+    function open() { idx = 0; root.style.display = "block"; render(); }
+    function close() {
+      root.style.display = "none";
+      try { localStorage.setItem(SEEN_KEY, "1"); } catch (e) {}
+    }
+
+    closeBtn.addEventListener("click", close);
+    backdrop.addEventListener("click", close);
+    document.addEventListener("keydown", function (e) {
+      if (root.style.display !== "block") return;
+      if (e.key === "Escape") close();
+      else if (!isMobile() && e.key === "ArrowRight") { if (idx < STEPS.length - 1) { idx++; renderStep(); } else close(); }
+      else if (!isMobile() && e.key === "ArrowLeft" && idx > 0) { idx--; renderStep(); }
+    });
+    window.addEventListener("resize", function () { if (root.style.display === "block") render(); });
+    var lt = document.querySelector("[data-lang-toggle]");
+    if (lt) lt.addEventListener("click", function () { if (root.style.display === "block") setTimeout(render, 0); });
+
+    var help = document.getElementById("tt-help");
+    if (help) help.addEventListener("click", open);
+
+    var seen;
+    try { seen = localStorage.getItem(SEEN_KEY); } catch (e) {}
+    if (!seen) setTimeout(open, 350);
+  })();
+  </script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/>
+<style>
+  *{margin:0;box-sizing:border-box}
+  body{font-family:Inter,system-ui,sans-serif;background:#F4F5F7;color:#18243F;padding:24px}
+  h1{font-size:18px;margin-bottom:4px}.sub{font-size:12px;color:#6b7280;margin-bottom:16px;max-width:820px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:740px}
+  .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden}
+  .card.win{border-color:#C8A859;box-shadow:0 0 0 2px #C8A85944}
+  .name{font-size:12px;font-weight:800;padding:9px 11px;border-bottom:1px solid #f0f0f0}
+  .name span{font-weight:500;color:#9ca3af;font-size:11px}
+  .big{display:flex;align-items:center;justify-content:center;height:140px}.big svg{width:118px;height:118px}
+  .tiny{display:flex;align-items:flex-end;justify-content:center;gap:14px;padding:12px 8px;border-top:1px solid #f0f0f0}
+  .tiny.dark{background:#18243F}
+  .navbar{display:flex;align-items:center;gap:7px;padding:9px 11px;border-top:1px solid #f0f0f0}
+  .navbar .wm{font-size:14px;font-weight:800}
+  .s16{width:16px;height:16px}.s20{width:20px;height:20px}.s24{width:24px;height:24px}.s28{width:28px;height:28px}
+  .col{display:flex;flex-direction:column;align-items:center;gap:4px}.lab{font-size:9px;color:#9ca3af}
+</style></head>
+<body>
+<h1>Shirube smile-arrow — corrected: arrow at the tip + dimple</h1>
+<div class="sub">Deep smile, thin pointed ends, arrowhead now sits at the smile’s right tip pointing rightward with a slight lift and a ~1px dimple gap (Amazon-style) — not floating above.</div>
+
+<script>
+const NAVY="#1F4788", GOLD="#C8A859", WHT="#fff";
+function face(){return `<rect x="10" y="6" width="28" height="36" rx="13" fill="${NAVY}"/><circle cx="19" cy="18" r="2.2" fill="${WHT}"/><circle cx="29" cy="18" r="2.2" fill="${WHT}"/>`;}
+const smile=`<path d="M15.8 24.2 Q22.8 32.4 29.8 25.8 Q22.8 27.0 15.8 24.2 Z" fill="${GOLD}"/>`;
+const SETS={
+  // arrowhead: back-upper, tip, back-lower  (back edge ~1px right of smile tip = dimple)
+  a1:smile+`<path d="M30.7 23.6 L34.6 24.9 L31.5 27.9 Z" fill="${GOLD}"/>`,   // points right, slight lift
+  a2:smile+`<path d="M30.7 23.2 L35.1 23.9 L31.6 27.6 Z" fill="${GOLD}"/>`,   // lifts more (more wink)
+  a3:smile+`<path d="M30.6 24.0 L34.2 25.6 L31.7 28.2 Z" fill="${GOLD}"/>`,   // flatter, points right
+};
+const C=[
+  {name:'A1 · slight lift', tag:'arrow points right, lifts a touch', a:'a1', win:true},
+  {name:'A2 · more lift', tag:'tip winks up (most Amazon)', a:'a2', win:false},
+  {name:'A3 · flatter', tag:'arrow points straight on', a:'a3', win:false},
+];
+function svgEl(c,cls){return `<svg class="${cls||''}" viewBox="0 0 48 48" fill="none">${face()}${SETS[c.a]}</svg>`;}
+document.write('<div class="grid">'+C.map(c=>`
+  <div class="card ${c.win?'win':''}">
+    <div class="name">${c.name}${c.win?' ⭐':''}<br><span>${c.tag}</span></div>
+    <div class="big">${svgEl(c)}</div>
+    <div class="tiny"><div class="col">${svgEl(c,'s16')}<div class="lab">16</div></div><div class="col">${svgEl(c,'s20')}<div class="lab">20</div></div><div class="col">${svgEl(c,'s24')}<div class="lab">24</div></div></div>
+    <div class="tiny dark"><div class="col">${svgEl(c,'s20')}</div><div class="col">${svgEl(c,'s24')}</div></div>
+    <div class="navbar">${svgEl(c,'s28')}<span class="wm">AIVIBLE</span></div>
+  </div>`).join('')+'</div>');
+</script>
+</body></html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — Kamogawa-kan · trip stop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    .wl-pin { width:28px; height:28px; border-radius:50% 50% 50% 0; background:#e5351a; transform:rotate(-45deg);
+      border:2px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+    .wl-pin span { transform:rotate(45deg); color:#fff; font-weight:800; font-size:12px; line-height:1; }
+    .wl-pin.wl-gem { background:var(--gold); } .wl-pin.wl-gem span { color:var(--kon); }
+    .nearby-dot { width:12px; height:12px; border-radius:9999px; background:#223A70; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.3); opacity:.6; }
+    .leaflet-popup-content { margin:10px 12px; }
+    /* Wanderlog detail tabs + chips */
+    .wtab { padding:10px 2px; font-size:13px; font-weight:600; color:#9CA3AF; border-bottom:2px solid transparent; white-space:nowrap; }
+    .wtab.active { color:#e5351a; border-bottom-color:#e5351a; }
+    .achip { display:inline-flex; align-items:center; gap:5px; white-space:nowrap; font-size:12px; font-weight:600; padding:6px 11px; border-radius:9999px; border:1px solid #E5E7EB; background:#fff; color:#374151; }
+    .achip:hover { border-color:#c7c9cd; }
+    .achip.ai { color:#e5351a; border-color:#f6c9c1; background:#fff7f5; }
+    .ttag { font-size:11px; font-weight:600; color:#4B5563; background:#F3F4F6; padding:3px 9px; border-radius:9999px; }
+    .no-scrollbar::-webkit-scrollbar { display:none; } .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+    #mobile-tabs { display: none; }
+    @media (max-width: 767px) {
+      #mobile-tabs { display: flex; }
+      #pane-stops, #pane-map { width: 100%; }
+      body[data-mobile-pane="stops"] #pane-map { display: none; }
+      body[data-mobile-pane="map"] #pane-stops { display: none; }
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900 h-screen flex flex-col overflow-hidden" data-mobile-pane="stops">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between flex-shrink-0">
+    <a href="itinerary.html" class="hover:text-white">← Itinerary</a>
+    <span class="tracking-widest uppercase hidden sm:inline">[Mockup v2 · Traveler 5/6 — Stop detail · Wanderlog-style place panel]</span>
+    <a href="businesses.html" class="text-white hover:text-indigo-300">Next: Browse all →</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="border-b border-gray-100 bg-white flex-shrink-0">
+    <div class="px-4 py-2.5 flex items-center justify-between gap-3">
+      <a href="itinerary.html" class="flex items-center gap-1.5 flex-shrink-0 text-gray-500 hover:text-gray-900">
+        <span>‹</span><span class="text-sm font-medium" data-en="2 Days in Kyoto" data-jp="京都2日間">2 Days in Kyoto</span>
+      </a>
+      <div class="min-w-0 text-center flex-1">
+        <div class="text-sm font-semibold text-gray-900 truncate">Kamogawa-kan 鴨川館</div>
+        <div class="text-[10px] text-gray-400" data-en="Day 1 · Stop 4 · Overnight" data-jp="1日目 · スポット4 · 宿泊">Day 1 · Stop 4 · Overnight</div>
+      </div>
+      <button data-lang-toggle class="text-xs border border-gray-200 px-2.5 py-1 rounded-full hover:bg-gray-50 font-medium flex-shrink-0">日本語</button>
+    </div>
+    <div id="mobile-tabs" class="border-t border-gray-100 p-1.5 gap-1.5">
+      <button data-pane="stops" onclick="document.body.dataset.mobilePane='stops'" class="flex-1 text-xs font-semibold py-1.5 rounded-lg bg-[#223A70] text-white" data-en="📋 Detail" data-jp="📋 詳細">📋 Detail</button>
+      <button data-pane="map" onclick="document.body.dataset.mobilePane='map'" class="flex-1 text-xs font-semibold py-1.5 rounded-lg text-gray-500" data-en="🗺 Map" data-jp="🗺 地図">🗺 Map</button>
+    </div>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- LEFT: Wanderlog-style place panel -->
+    <aside id="pane-stops" class="w-full md:w-[460px] md:flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto">
+
+      <!-- hero image -->
+      <div class="relative h-40 bg-gradient-to-br from-amber-800 via-orange-600 to-amber-300 overflow-hidden">
+        <img src="https://loremflickr.com/720/360/japan,ryokan,onsen/all?lock=201" alt="" loading="eager" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()" id="stop-hero-img">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="absolute top-3 right-3 z-10 flex gap-1.5">
+          <span class="text-[10px] font-semibold px-2 py-1 rounded-full" style="background:#E8F5E9; color:#2E7D32;" data-en="✓ Verified 2d ago" data-jp="✓ 2日前に確認済み">✓ Verified 2d ago</span>
+          <span class="text-[10px] font-semibold px-2 py-1 rounded-full bg-purple-100 text-purple-700" data-en="💎 Hidden Gem" data-jp="💎 隠れた名店">💎 Hidden Gem</span>
+        </div>
+      </div>
+
+      <!-- title + rating + thumb -->
+      <div class="px-5 pt-4">
+        <div class="flex items-start gap-3">
+          <span class="wl-pin wl-gem mt-1" style="position:relative; transform:rotate(-45deg);"><span>★</span></span>
+          <div class="flex-1 min-w-0">
+            <h1 class="text-xl font-extrabold text-gray-900 leading-tight">Kamogawa-kan 鴨川館</h1>
+            <div class="mt-1 flex items-center gap-1.5 text-[12px] text-gray-500 flex-wrap">
+              <span class="text-amber-500">★★★★<span class="text-gray-300">★</span></span>
+              <span class="font-semibold text-gray-700">4.7</span>
+              <span class="text-gray-400">(128)</span>
+              <span class="text-gray-300">·</span>
+              <span data-en="Ryokan · Kyoto" data-jp="旅館 · 京都">Ryokan · Kyoto</span>
+            </div>
+          </div>
+          <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-amber-700 to-orange-400 relative overflow-hidden flex-shrink-0 flex items-center justify-center text-xl">♨️
+            <img src="https://loremflickr.com/120/120/japan,onsen,bath/all?lock=210" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()"></div>
+        </div>
+      </div>
+
+      <!-- tabs -->
+      <div class="px-5 mt-3 border-b border-gray-100 flex gap-5 overflow-x-auto no-scrollbar sticky top-0 bg-white z-20" id="wtabs">
+        <button class="wtab active" data-tab="about" data-en="About" data-jp="概要">About</button>
+        <button class="wtab" data-tab="book" data-en="Book" data-jp="予約">Book</button>
+        <button class="wtab" data-tab="reviews" data-en="Reviews" data-jp="レビュー">Reviews</button>
+        <button class="wtab" data-tab="photos" data-en="Photos" data-jp="写真">Photos</button>
+        <button class="wtab" data-tab="mentions" data-en="Mentions" data-jp="言及">Mentions</button>
+      </div>
+
+      <!-- ABOUT tab -->
+      <div data-pane-tab="about" class="px-5 py-4">
+        <!-- lists + mark visited -->
+        <div class="flex flex-wrap gap-2">
+          <button class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-700 border border-gray-200 hover:bg-gray-50 px-3 py-1.5 rounded-lg"><span>🔖</span> <span data-en="Added to 2 lists" data-jp="2つのリストに追加">Added to 2 lists</span> <span class="text-gray-400">▾</span></button>
+          <button class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 px-2 py-1.5"><span>✓</span> <span data-en="Mark as visited" data-jp="訪問済みにする">Mark as visited</span></button>
+        </div>
+
+        <!-- AI action chips -->
+        <div class="flex gap-2 mt-3 overflow-x-auto no-scrollbar pb-1">
+          <button class="achip ai">✨ <span data-en="Ask Shirube" data-jp="シルベに聞く">Ask Shirube</span></button>
+          <button class="achip">🗺 <span data-en="Local tips" data-jp="地元のヒント">Local tips</span></button>
+          <button class="achip"><span data-en="What should I know before visiting?" data-jp="行く前に知っておくべきこと">What should I know before visiting?</span></button>
+          <button class="achip"><span data-en="How do I get there?" data-jp="アクセス方法は？">How do I get there?</span></button>
+        </div>
+
+        <!-- description -->
+        <p class="mt-4 text-sm text-gray-600 leading-relaxed"
+           data-en="Family-run since 1932, Kamogawa-kan offers tatami rooms overlooking the Kamo River. Private onsen baths, a seasonal kaiseki dinner, and a 5-minute walk to Gion make it an easy, relaxed base for your first night."
+           data-jp="1932年創業の家族経営。鴨川を望む畳のお部屋に、貸切温泉と季節の懐石料理。祇園まで徒歩5分で、初日のゆったりとした拠点に最適です。">
+          Family-run since 1932, Kamogawa-kan offers tatami rooms overlooking the Kamo River. Private onsen baths, a seasonal kaiseki dinner, and a 5-minute walk to Gion make it an easy, relaxed base for your first night.</p>
+
+        <!-- category tags -->
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="ttag" data-en="Ryokan" data-jp="旅館">Ryokan</span>
+          <span class="ttag" data-en="Private onsen" data-jp="貸切温泉">Private onsen</span>
+          <span class="ttag" data-en="Kaiseki" data-jp="懐石">Kaiseki</span>
+          <span class="ttag text-indigo-600" data-en="Show 2 more" data-jp="他2件を表示">Show 2 more</span>
+        </div>
+
+        <!-- quick stats -->
+        <div class="grid grid-cols-3 gap-3 mt-4 text-center">
+          <div class="rounded-xl bg-gray-50 py-3"><div class="text-base font-extrabold text-amber-700">¥28,000~</div><div class="text-[10px] text-gray-400" data-en="per night" data-jp="1泊">per night</div></div>
+          <div class="rounded-xl bg-gray-50 py-3"><div class="text-base font-extrabold text-amber-700">5 min</div><div class="text-[10px] text-gray-400" data-en="walk to Gion" data-jp="祇園まで徒歩">walk to Gion</div></div>
+          <div class="rounded-xl bg-gray-50 py-3"><div class="text-base font-extrabold text-amber-700">♨️ + 🍱</div><div class="text-[10px] text-gray-400" data-en="onsen + kaiseki" data-jp="温泉＋懐石">onsen + kaiseki</div></div>
+        </div>
+
+        <!-- why verified (our differentiator) -->
+        <div class="mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50 p-3.5">
+          <div class="flex items-start gap-2.5">
+            <span class="text-base">✓</span>
+            <div>
+              <div class="text-sm font-bold text-gray-900" data-en="Why “Verified 2 days ago”?" data-jp="「2日前に確認済み」とは？">Why “Verified 2 days ago”?</div>
+              <p class="text-xs text-gray-500 mt-1 leading-relaxed"
+                 data-en="Kept AI-readable through AIVIBLE and re-checked regularly — prices, hours, access. Last confirmed accurate 2 days ago, so AI can quote it with confidence."
+                 data-jp="AIVIBLEで情報をAIに読めるかたちに保ち、料金・営業時間・アクセスを定期的に再確認。直近の確認は2日前で、AIが安心して引用できます。">
+                Kept AI-readable through AIVIBLE and re-checked regularly — prices, hours, access. Last confirmed accurate 2 days ago, so AI can quote it with confidence.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- full business page -->
+        <a href="storefront.html" class="mt-4 w-full inline-flex items-center justify-center gap-1.5 text-sm font-bold text-white px-4 py-2.5 rounded-lg" style="background:var(--kon-2);" data-en="View full business page →" data-jp="店舗ページを見る →">View full business page →</a>
+
+        <!-- nearby gems -->
+        <div class="mt-5">
+          <div class="text-xs font-bold text-gray-500 mb-2" data-en="Other verified gems nearby" data-jp="近くの認証済みの名店">Other verified gems nearby</div>
+          <div class="space-y-2">
+            <a href="storefront.html" class="flex items-center gap-3 rounded-xl border border-gray-100 hover:bg-gray-50 px-3 py-2 transition-colors">
+              <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-200 to-amber-300 flex items-center justify-center">🍜</div>
+              <div class="flex-1 min-w-0"><div class="text-sm font-semibold text-gray-900">Tonari Ramen</div><div class="text-[11px] text-gray-400" data-en="6 min walk · in your trip" data-jp="徒歩6分 · 旅程に含む">6 min walk · in your trip</div></div>
+              <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700">💎</span>
+            </a>
+            <a href="storefront.html" class="flex items-center gap-3 rounded-xl border border-gray-100 hover:bg-gray-50 px-3 py-2 transition-colors">
+              <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-stone-300 to-emerald-200 flex items-center justify-center">🍲</div>
+              <div class="flex-1 min-w-0"><div class="text-sm font-semibold text-gray-900">Yamanaka Soba</div><div class="text-[11px] text-gray-400" data-en="Pontocho · add to Day 2" data-jp="先斗町 · 2日目に追加">Pontocho · add to Day 2</div></div>
+              <button class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800" data-en="+ Add" data-jp="+ 追加">+ Add</button>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOOK tab -->
+      <div data-pane-tab="book" class="px-5 py-4 hidden">
+        <div class="rounded-xl border border-gray-100 p-4">
+          <div class="flex items-baseline justify-between"><span class="text-sm font-semibold text-gray-900" data-en="River-view Tatami Room" data-jp="川側の和室">River-view Tatami Room</span><span class="text-base font-extrabold text-amber-700">¥28,000~</span></div>
+          <p class="text-xs text-gray-500 mt-1" data-en="2 guests · private onsen · breakfast + kaiseki dinner" data-jp="2名 · 貸切温泉 · 朝食＋懐石夕食">2 guests · private onsen · breakfast + kaiseki dinner</p>
+          <button class="mt-3 w-full text-sm font-bold text-white px-4 py-2.5 rounded-lg" style="background:var(--kon-2);" data-en="Check availability" data-jp="空室を確認">Check availability</button>
+        </div>
+        <p class="text-[11px] text-gray-400 mt-3 text-center" data-en="Booking handled on the business's own page · no commission" data-jp="予約は店舗ページで · 手数料なし">Booking handled on the business's own page · no commission</p>
+      </div>
+
+      <!-- REVIEWS tab -->
+      <div data-pane-tab="reviews" class="px-5 py-4 hidden space-y-3">
+        <div class="rounded-xl border border-gray-100 p-3">
+          <div class="flex items-center gap-2 text-xs"><span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">A</span><span class="font-semibold text-gray-800">Aiko</span><span class="text-amber-500">★★★★★</span></div>
+          <p class="text-xs text-gray-600 mt-1.5">The private onsen overlooking the river was unforgettable. Kaiseki dinner was the highlight of our Kyoto trip.</p>
+        </div>
+        <div class="rounded-xl border border-gray-100 p-3">
+          <div class="flex items-center gap-2 text-xs"><span class="w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold">M</span><span class="font-semibold text-gray-800">Marco</span><span class="text-amber-500">★★★★<span class="text-gray-300">★</span></span></div>
+          <p class="text-xs text-gray-600 mt-1.5">Tiny family-run ryokan, 5 min to Gion. Booked it after ChatGPT recommended it — glad I did.</p>
+        </div>
+      </div>
+
+      <!-- PHOTOS tab -->
+      <div data-pane-tab="photos" class="px-5 py-4 hidden">
+        <div class="grid grid-cols-3 gap-2">
+          <div class="aspect-square rounded-lg bg-amber-100 overflow-hidden"><img src="https://loremflickr.com/200/200/japan,ryokan,tatami/all?lock=211" class="w-full h-full object-cover" onerror="this.remove()"></div>
+          <div class="aspect-square rounded-lg bg-sky-100 overflow-hidden"><img src="https://loremflickr.com/200/200/japan,onsen,bath/all?lock=212" class="w-full h-full object-cover" onerror="this.remove()"></div>
+          <div class="aspect-square rounded-lg bg-rose-100 overflow-hidden"><img src="https://loremflickr.com/200/200/japan,kaiseki,food/all?lock=213" class="w-full h-full object-cover" onerror="this.remove()"></div>
+          <div class="aspect-square rounded-lg bg-emerald-100 overflow-hidden"><img src="https://loremflickr.com/200/200/kyoto,river/all?lock=214" class="w-full h-full object-cover" onerror="this.remove()"></div>
+          <div class="aspect-square rounded-lg bg-stone-100 overflow-hidden"><img src="https://loremflickr.com/200/200/japan,garden/all?lock=215" class="w-full h-full object-cover" onerror="this.remove()"></div>
+          <div class="aspect-square rounded-lg bg-indigo-100 overflow-hidden"><img src="https://loremflickr.com/200/200/gion,kyoto,street/all?lock=216" class="w-full h-full object-cover" onerror="this.remove()"></div>
+        </div>
+      </div>
+
+      <!-- MENTIONS tab (our edge) -->
+      <div data-pane-tab="mentions" class="px-5 py-4 hidden space-y-2">
+        <p class="text-xs text-gray-500" data-en="Where AI is recommending this place:" data-jp="AIがこの店を推薦している場面:">Where AI is recommending this place:</p>
+        <div class="rounded-xl border border-gray-100 p-3 text-xs"><span class="font-semibold text-gray-800">ChatGPT</span> <span class="text-gray-400">· 3 days ago</span><p class="text-gray-600 mt-1">"…for a riverside ryokan near Gion with a private onsen, try Kamogawa-kan."</p></div>
+        <div class="rounded-xl border border-gray-100 p-3 text-xs"><span class="font-semibold text-gray-800">Perplexity</span> <span class="text-gray-400">· 1 week ago</span><p class="text-gray-600 mt-1">"Kamogawa-kan offers kaiseki dinners and is 5 minutes from Gion."</p></div>
+        <div class="text-[11px] text-emerald-600 font-medium" data-en="✓ Appearing in 3 AI itineraries this month" data-jp="✓ 今月3件のAI旅程に登場">✓ Appearing in 3 AI itineraries this month</div>
+      </div>
+    </aside>
+
+    <!-- RIGHT: real map centered on this stop -->
+    <div id="pane-map" class="flex-1 relative overflow-hidden">
+      <div id="kyoto-map" class="absolute inset-0 z-0"></div>
+      <div class="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-sm border border-gray-100 rounded-lg px-3 py-1.5 shadow-sm pointer-events-none">
+        <div class="text-[11px] font-bold text-gray-900 flex items-center gap-1"><span style="color:var(--gold);">★</span> <span>Kamogawa-kan</span></div>
+        <div class="text-[10px] text-gray-400" data-en="Day 1 stay · near Gion" data-jp="1日目の宿 · 祇園近く">Day 1 stay · near Gion</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    // tabs
+    var tabs = document.querySelectorAll('#wtabs .wtab');
+    var panes = document.querySelectorAll('[data-pane-tab]');
+    tabs.forEach(function (t) {
+      t.addEventListener('click', function () {
+        tabs.forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+        panes.forEach(function (p) { p.classList.toggle('hidden', p.getAttribute('data-pane-tab') !== t.dataset.tab); });
+      });
+    });
+    // hero img fallback
+    var img = document.getElementById('stop-hero-img');
+    if (img) { var to = setTimeout(function () { if (!(img.complete && img.naturalWidth > 0)) img.remove(); }, 5000); img.addEventListener('load', function () { clearTimeout(to); }); img.addEventListener('error', function () { clearTimeout(to); img.remove(); }); }
+    // map
+    if (!window.L || !document.getElementById('kyoto-map')) return;
+    var STOP = [35.0125, 135.7725];
+    var map = L.map('kyoto-map', { zoomControl: true, scrollWheelZoom: false }).setView(STOP, 15);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, subdomains: 'abcd', attribution: '&copy; OpenStreetMap &copy; CARTO' }).addTo(map);
+    function gem(label){ return L.divIcon({ className:'', html:'<div class="wl-pin wl-gem"><span>'+label+'</span></div>', iconSize:[28,28], iconAnchor:[14,28], popupAnchor:[0,-30] }); }
+    L.marker(STOP, { icon: gem('★') }).addTo(map).bindPopup('<b>Kamogawa-kan 鴨川館</b><br><span style="font-size:11px;color:#888">💎 Your Day 1 stay · Score A</span>').bindTooltip('Kamogawa-kan', { direction:'top', offset:[0,-28] });
+    [{n:'Tonari Ramen',c:[35.0095,135.7710]},{n:'Yamanaka Soba',c:[35.0048,135.7705]}].forEach(function(g){ L.marker(g.c,{icon:gem('💎')}).addTo(map).bindTooltip(g.n,{direction:'top',offset:[0,-28]}); });
+    [{n:'Two-year Slope (Ninenzaka)',c:[34.9981,135.7808]},{n:'Shinkyogoku Street',c:[35.0062,135.7673]}].forEach(function(a){ L.marker(a.c,{icon:L.divIcon({className:'',html:'<div class="nearby-dot"></div>',iconSize:[12,12],iconAnchor:[6,6]})}).addTo(map).bindTooltip(a.n,{direction:'top',offset:[0,-6]}); });
+    setTimeout(function(){ map.invalidateSize(); }, 150);
+    var mt = document.getElementById('mobile-tabs');
+    if (mt) mt.addEventListener('click', function () {
+      var active = document.body.dataset.mobilePane;
+      this.querySelectorAll('button').forEach(function (b) { b.className = b.className.replace('bg-[#223A70] text-white', 'text-gray-500'); if (b.dataset.pane === active) b.className = b.className.replace('text-gray-500', 'bg-[#223A70] text-white'); });
+      setTimeout(function () { map.invalidateSize(); }, 60);
+    });
+  })();
+  </script>
+  <!-- ===== PERSISTENT BOTTOM NAV · Itinerary is the anchor, always reachable ===== -->
+  <nav class="flex-shrink-0 bg-white border-t border-gray-100 shadow-[0_-1px_4px_rgba(0,0,0,0.05)]">
+    <div class="max-w-md mx-auto w-full flex items-end justify-around px-2 pt-1.5 pb-2">
+      <a href="indexmock.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/home.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Home" data-jp="ホーム">Home</span></a>
+      <a href="businesses.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/compass.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Explore" data-jp="さがす">Explore</span></a>
+      <a href="itinerary.html" class="flex flex-col items-center gap-1 flex-1 group"><span class="w-12 h-12 -mt-5 rounded-full flex items-center justify-center text-white text-xl shadow-lg ring-4 ring-[#C8A859] group-hover:brightness-110 transition" style="background:linear-gradient(135deg,#223A70,#18243F);"><img src="icons/itinerary-white.svg" width="26" height="26" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-bold text-[#223A70]" data-en="Itinerary" data-jp="旅程">Itinerary</span></a>
+      <a href="discover.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/gem.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Add" data-jp="追加">Add</span></a>
+      <a href="plan-start.html" class="flex flex-col items-center justify-end gap-0.5 flex-1 py-1 text-gray-400 hover:text-gray-700 transition-colors"><span class="text-lg leading-none"><img src="icons/brush.svg" width="22" height="22" alt="" style="display:inline-block;vertical-align:middle" /></span><span class="text-[10px] font-medium" data-en="Plan" data-jp="プラン">Plan</span></a>
+    </div>
+  </nav>
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

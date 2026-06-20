@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE Editor — Refer a friend, get 50 edits</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    #copied { display: none; }
+    #copied:target { display: inline-flex; }
+    #copied:target ~ #copy-btn { display: none; }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between flex-shrink-0">
+    <a href="editor-paywall.html" class="hover:text-white">← Out of credits</a>
+    <span class="tracking-widest uppercase">[Mockup v2 — Flow 7b/9: Refer a friend → +50 edits]</span>
+    <a href="editor-referred.html" class="text-white hover:text-indigo-300">Next: Back to editor (55 ⚡) →</a>
+  </div>
+
+  <!-- TOPBAR -->
+  <header class="bg-white border-b border-gray-200 flex-shrink-0">
+    <div class="px-4 py-2.5 flex items-center justify-between gap-3 max-w-6xl mx-auto w-full">
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="flex items-center gap-1"><span class="japan-red text-lg leading-none">●</span><span class="text-lg font-bold text-gray-900">AIVIBLE</span></a>
+        <span class="text-gray-300 hidden sm:inline">/</span>
+        <span class="text-sm font-medium text-gray-700 hidden sm:inline">Kamogawa-kan</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1.5 bg-orange-50 border border-orange-200 rounded-full px-3 py-1">
+          <span class="text-xs font-bold text-orange-600">⚡ 0</span>
+          <span class="text-[11px] text-orange-400 hidden sm:inline" data-en="edits left" data-jp="編集が残っていません">edits left</span>
+        </div>
+        <button data-lang-toggle class="text-xs border border-gray-200 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 font-medium">日本語</button>
+        <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 font-bold text-xs flex items-center justify-center">YT</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN — two-column, home-page width -->
+  <main class="flex-1 px-4 py-6">
+    <div class="max-w-6xl mx-auto grid gap-6 lg:grid-cols-2 items-start">
+
+      <!-- LEFT: invite (top) + how it works + referrals -->
+      <div class="space-y-4 order-2 lg:order-1">
+
+        <!-- Invite -->
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3" data-en="Invite via" data-jp="招待方法">Invite via</div>
+          <div class="grid grid-cols-4 gap-2 mb-3">
+            <a href="#copied" class="flex flex-col items-center gap-1 py-2.5 rounded-xl border border-gray-100 hover:border-green-300 hover:bg-green-50 transition-colors">
+              <span class="w-8 h-8 rounded-full bg-[#06C755] text-white flex items-center justify-center text-sm font-bold">L</span><span class="text-[10px] text-gray-500">LINE</span>
+            </a>
+            <a href="#copied" class="flex flex-col items-center gap-1 py-2.5 rounded-xl border border-gray-100 hover:border-green-300 hover:bg-green-50 transition-colors">
+              <span class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center text-sm">✆</span><span class="text-[10px] text-gray-500">WhatsApp</span>
+            </a>
+            <a href="#copied" class="flex flex-col items-center gap-1 py-2.5 rounded-xl border border-gray-100 hover:border-indigo-300 hover:bg-indigo-50 transition-colors">
+              <span class="w-8 h-8 rounded-full bg-gray-700 text-white flex items-center justify-center text-sm">✉</span><span class="text-[10px] text-gray-500" data-en="Email" data-jp="メール">Email</span>
+            </a>
+            <a href="#copied" class="flex flex-col items-center gap-1 py-2.5 rounded-xl border border-gray-100 hover:border-gray-400 hover:bg-gray-50 transition-colors">
+              <span class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm font-bold">𝕏</span><span class="text-[10px] text-gray-500" data-en="Post" data-jp="投稿">Post</span>
+            </a>
+          </div>
+          <input readonly value="aivible.tokyo/r/kamogawa-yt"
+                 class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm font-mono text-gray-700 focus:outline-none" />
+        </div>
+
+        <!-- How it works -->
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3" data-en="How it works" data-jp="仕組み">How it works</div>
+          <ol class="space-y-3">
+            <li class="flex gap-3">
+              <span class="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold flex items-center justify-center">1</span>
+              <span class="text-sm text-gray-600" data-en="Share your link with another tourism business." data-jp="観光事業を営む知り合いにリンクを送ります。">Share your link with another tourism business.</span>
+            </li>
+            <li class="flex gap-3">
+              <span class="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold flex items-center justify-center">2</span>
+              <span class="text-sm text-gray-600" data-en="They sign up and <b>generate their first storefront</b> (they start with 10 free edits)." data-jp="相手が登録し、<b>最初のストアフロントを作成</b>します（相手は無料編集10回からスタート）。">They sign up and <b>generate their first storefront</b> (they start with 10 free edits).</span>
+            </li>
+            <li class="flex gap-3">
+              <span class="flex-shrink-0 w-6 h-6 rounded-full bg-gold-500/20 text-gold-500 text-xs font-bold flex items-center justify-center">3</span>
+              <span class="text-sm text-gray-600" data-en="You instantly get <b class='text-gold-500'>+50 free edits</b>. 🎉" data-jp="あなたに即座に<b class='text-gold-500'>50回の無料編集</b>が付与されます。🎉">You instantly get <b class="text-gold-500">+50 free edits</b>. 🎉</span>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Referral progress -->
+        <div class="bg-gradient-to-br from-indigo-50 to-white rounded-2xl border border-indigo-100 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-[11px] font-bold text-indigo-600 uppercase tracking-widest" data-en="Your referrals" data-jp="あなたの紹介状況">Your referrals</span>
+            <span class="text-xs font-bold text-gold-500" data-en="+50 ⚡ unlocked" data-jp="+50 ⚡ 獲得済み">+50 ⚡ unlocked</span>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center gap-3 bg-white rounded-lg px-3 py-2 border border-gray-100">
+              <span class="w-7 h-7 rounded-full bg-green-100 text-green-700 text-xs font-bold flex items-center justify-center">MS</span>
+              <span class="flex-1 text-sm text-gray-700">Maruyama Soba</span>
+              <span class="text-[11px] font-semibold text-green-600" data-en="✓ Built site · +50" data-jp="✓ サイト作成済み・+50">✓ Built site · +50</span>
+            </div>
+            <div class="flex items-center gap-3 bg-white rounded-lg px-3 py-2 border border-gray-100">
+              <span class="w-7 h-7 rounded-full bg-gray-100 text-gray-400 text-xs font-bold flex items-center justify-center">?</span>
+              <span class="flex-1 text-sm text-gray-500" data-en="Invited · not signed up yet" data-jp="招待済み・未登録">Invited · not signed up yet</span>
+              <span class="text-[11px] text-gray-400" data-en="Pending" data-jp="保留中">Pending</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: pitch + CTA (sticky → CTA stays above the fold) -->
+      <div class="order-1 lg:order-2 lg:sticky lg:top-6">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 text-center">
+          <img src="illustrations/refer-business.webp" alt="Refer a fellow business owner" class="w-full max-w-[320px] mx-auto mb-4" />
+          <h1 class="text-2xl font-extrabold text-gray-900 mb-2" data-en="Invite a fellow business owner" data-jp="他の事業者を招待しましょう">Invite a fellow business owner</h1>
+          <p class="text-sm text-gray-500 mb-4 max-w-sm mx-auto" data-en="Get <b class='text-gold-500'>50 free edits</b> when they build their first storefront. They get <b>10</b> to start. No limit on invites." data-jp="相手が最初のストアフロントを作ると<b class='text-gold-500'>50回の無料編集</b>。相手にも<b>10回</b>。招待数に上限なし。">Get <b class="text-gold-500">50 free edits</b> when they build their first storefront. They get <b>10</b> to start. No limit on invites.</p>
+
+          <!-- Primary CTA (above the fold) -->
+          <span id="copied" class="w-full justify-center items-center gap-1 bg-green-50 border border-green-200 text-green-700 text-sm font-bold px-4 py-3 rounded-xl" data-en="✓ Invite link copied" data-jp="✓ 招待リンクをコピーしました">✓ Invite link copied</span>
+          <a id="copy-btn" href="#copied" class="block w-full bg-indigo-500 hover:bg-indigo-600 text-white text-base font-bold px-4 py-3 rounded-xl transition-colors" data-en="Copy invite link &amp; earn +50 ⚡" data-jp="招待リンクをコピーして +50 ⚡">Copy invite link &amp; earn +50 ⚡</a>
+
+          <a href="editor-referred.html" class="mt-3 inline-block text-xs font-semibold text-indigo-500 hover:underline" data-en="← Back to editing (55 ⚡ available)" data-jp="← 編集に戻る（⚡55回 利用可能）">← Back to editing (55 ⚡ available)</a>
+        </div>
+        <p class="text-center text-[11px] text-gray-400 mt-2 px-4" data-en="Prefer not to wait? You can also upgrade for unlimited edits." data-jp="待ちたくない場合は、無制限プランへのアップグレードも可能です。">
+          Prefer not to wait? <a href="editor-paywall.html" class="text-indigo-500 underline">You can also upgrade</a> for unlimited edits.
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

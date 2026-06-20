@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — A traveler asks AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    .hp-cursor { display:inline-block; width:2px; background:#10A37F; margin-left:1px; animation:hpblink 1s step-end infinite; }
+    @keyframes hpblink { 50% { opacity:0; } }
+    .hp-hide { opacity:0; transform:translateY(6px); }
+    .hp-show { opacity:1; transform:translateY(0); transition:all .5s ease; }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-indigo-50 to-white text-gray-900 min-h-screen flex flex-col">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between">
+    <a href="index.html" class="hover:text-white">← Home (business side)</a>
+    <span class="tracking-widest uppercase">[Mockup v2 · Traveler 1/6 — A traveler asks AI · the payoff for a visible business]</span>
+    <a href="storefront.html" class="text-white hover:text-indigo-300">Next: The business page →</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bg-white/80 border-b border-gray-100 sticky top-0 z-50 backdrop-blur-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-1">
+        <img src="icons/shirube.svg" alt="Shirube" class="w-7 h-7" />
+        <span class="text-xl font-bold text-gray-900">AIVIBLE</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6 text-sm text-gray-500">
+        <a href="discover.html" class="hover:text-gray-900 transition-colors" data-en="Discover" data-jp="さがす">Discover</a>
+        <a href="businesses.html" class="hover:text-gray-900 transition-colors" data-en="Businesses" data-jp="店舗一覧">Businesses</a>
+        <a href="itinerary.html" class="hover:text-gray-900 transition-colors" data-en="Plan a trip" data-jp="旅程をつくる">Plan a trip</a>
+      </nav>
+      <button data-lang-toggle class="text-sm border border-gray-200 px-3 py-1 rounded-full hover:bg-gray-50 font-medium">日本語</button>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-2xl mx-auto px-4 py-10">
+
+    <div class="text-center mb-7">
+      <div class="av-eyebrow mb-2" data-en="The traveler's side" data-jp="旅行者の側から">The traveler's side</div>
+      <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 leading-snug"
+          data-en="A traveler plans their Japan trip with AI."
+          data-jp="旅行者は、日本の旅をAIで計画します。">
+        A traveler plans their Japan trip with AI.</h1>
+      <p class="text-sm text-gray-500 mt-2 max-w-lg mx-auto"
+         data-en="This is the same question from the audit — but now the business is AI-readable. Watch what changes."
+         data-jp="診断と同じ質問です。ただし今回は、ビジネスがAIに読めるようになっています。何が変わるかご覧ください。">
+        This is the same question from the audit — but now the business is AI-readable. Watch what changes.</p>
+    </div>
+
+    <!-- CHATGPT WINDOW -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
+      <div class="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100">
+        <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-[11px] font-bold" style="background:#10A37F;">✺</span>
+        <span class="text-sm font-semibold text-gray-700">ChatGPT</span>
+        <span class="ml-auto text-[11px] text-gray-400" data-en="traveler planning Japan" data-jp="日本を計画中の旅行者">traveler planning Japan</span>
+      </div>
+
+      <div class="px-4 py-5 space-y-4 min-h-[280px]">
+
+        <!-- user -->
+        <div id="r-user" class="hp-hide flex justify-end">
+          <div class="bg-gray-100 text-gray-800 text-sm rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[82%]"
+               data-en="Any good ryokan near Gion with a private onsen and kaiseki dinner?"
+               data-jp="祇園の近くで、貸切温泉と懐石のあるおすすめの旅館はある？">Any good ryokan near Gion with a private onsen and kaiseki dinner?</div>
+        </div>
+
+        <!-- assistant -->
+        <div id="r-reply" class="hp-hide flex items-start gap-2.5">
+          <span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs flex-shrink-0 mt-0.5" style="background:#10A37F;">✺</span>
+          <div class="flex-1 max-w-[90%]">
+            <div class="bg-gray-50 border border-gray-100 text-sm text-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 leading-relaxed"
+                 data-en="Yes — a great match is <b>Kamogawa-kan</b>, a riverside ryokan a 5-minute walk from Gion. It has private onsen baths and a seasonal kaiseki dinner, and it's family-run since 1932. Rooms start around ¥28,000/night."
+                 data-jp="はい — おすすめは<b>鴨川館</b>です。祇園から徒歩5分の鴨川沿いの旅館で、貸切温泉と季節の懐石料理があり、1932年創業の家族経営です。お部屋は1泊28,000円前後から。">
+              Yes — a great match is <b>Kamogawa-kan</b>, a riverside ryokan a 5-minute walk from Gion. It has private onsen baths and a seasonal kaiseki dinner, and it's family-run since 1932. Rooms start around ¥28,000/night.</div>
+
+            <!-- the recommendation card the AI can now build, because the data is readable -->
+            <a href="storefront.html" id="r-card" class="hp-hide block mt-3 rounded-xl border border-gray-200 bg-white overflow-hidden hover:shadow-md transition-shadow">
+              <div class="h-24 bg-gradient-to-br from-amber-700 via-orange-600 to-amber-300 relative">
+                <span class="absolute top-2 right-2 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/90 text-emerald-700"
+                      data-en="✓ Verified via AIVIBLE" data-jp="✓ AIVIBLEで認証済み">✓ Verified via AIVIBLE</span>
+              </div>
+              <div class="p-3">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-sm font-bold text-gray-900">Kamogawa-kan 鴨川館</span>
+                  <span class="text-[11px] text-amber-700 font-bold">¥28,000~</span>
+                </div>
+                <div class="text-[12px] text-gray-500 mt-0.5"
+                     data-en="Riverside ryokan · private onsen · kaiseki · 5 min from Gion"
+                     data-jp="鴨川沿いの旅館 · 貸切温泉 · 懐石 · 祇園から5分">Riverside ryokan · private onsen · kaiseki · 5 min from Gion</div>
+                <div class="mt-2 text-[11px] font-bold text-indigo-600 flex items-center gap-1">
+                  <span data-en="View the business page" data-jp="店舗ページを見る">View the business page</span><span>→</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- contrast callout + onward CTA -->
+    <div id="r-kicker" class="hp-hide mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <div class="flex items-start gap-3">
+        <span class="text-xl">🔁</span>
+        <div class="flex-1">
+          <div class="text-sm font-bold text-gray-900"
+               data-en="Before AIVIBLE, the AI said “I can't recommend it — I can't read the site.”"
+               data-jp="AIVIBLE導入前は、AIは「サイトが読めず、推薦できません」と答えていました。">
+            Before AIVIBLE, the AI said “I can't recommend it — I can't read the site.”</div>
+          <div class="text-xs text-gray-500 mt-1"
+               data-en="Same question, same traveler. The only thing that changed is that the business became AI-readable — so now it gets recommended, and put on the map."
+               data-jp="質問も旅行者も同じ。変わったのは、ビジネスがAIに読めるようになったことだけ。だから今は推薦され、地図に載ります。">
+            Same question, same traveler. The only thing that changed is that the business became AI-readable — so now it gets recommended, and put on the map.</div>
+          <div class="mt-3 flex flex-wrap gap-3">
+            <a href="storefront.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg transition-colors"
+               data-en="See the page travelers land on →" data-jp="旅行者がたどり着くページを見る →">See the page travelers land on →</a>
+            <a href="discover.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 px-2 py-2"
+               data-en="Or plan a whole trip with AI →" data-jp="またはAIで旅程をまるごと作る →">Or plan a whole trip with AI →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script>
+    // Reveal the conversation in sequence (after lang.js sets the text).
+    (function () {
+      function show(id){ var e=document.getElementById(id); if(e){ e.classList.remove('hp-hide'); e.classList.add('hp-show'); } }
+      setTimeout(function(){ show('r-user'); }, 400);
+      setTimeout(function(){ show('r-reply'); }, 1200);
+      setTimeout(function(){ show('r-card'); }, 2000);
+      setTimeout(function(){ show('r-kicker'); }, 2700);
+    })();
+  </script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

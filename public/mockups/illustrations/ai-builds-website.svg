@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none">
+  <!-- AIVIBLE · "AI builds website" — Shirube + browser mock + restaurant -->
+  <rect width="320" height="240" fill="#F9ECD9"/>
+
+  <!-- restaurant (食堂) — detailed -->
+  <g>
+    <!-- body -->
+    <rect x="158" y="166" width="138" height="72" fill="#204E8E"/>
+    <!-- roof: wide eave + gable band + drooping side eaves -->
+    <path d="M148 172 L168 152 L286 152 L306 172 Z" fill="#16335e"/>
+    <rect x="168" y="148" width="118" height="7" fill="#1A3F73"/>
+    <path d="M148 172 L158 165 L158 179 Z" fill="#16335e"/>
+    <path d="M306 172 L296 165 L296 179 Z" fill="#16335e"/>
+    <!-- sign panel + ramen bowl -->
+    <rect x="206" y="134" width="42" height="24" rx="3" fill="#F4ECDD"/>
+    <circle cx="227" cy="146" r="9" fill="none" stroke="#16335e" stroke-width="2"/>
+    <path d="M221 145 a6 6 0 0 0 12 0 Z" fill="#16335e"/>
+    <g stroke="#16335e" stroke-width="1.4" fill="none" stroke-linecap="round"><path d="M224 140 q-1.5 -2.5 0 -4.5"/><path d="M227 140 q-1.5 -2.5 0 -4.5"/><path d="M230 140 q-1.5 -2.5 0 -4.5"/></g>
+    <!-- 食堂 red vertical sign (left) -->
+    <rect x="164" y="168" width="16" height="36" rx="2" fill="#C5432F"/>
+    <text x="172" y="182" font-family="serif" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">食</text>
+    <text x="172" y="194" font-family="serif" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">堂</text>
+    <!-- left lattice window -->
+    <rect x="186" y="176" width="20" height="26" fill="#16335e"/>
+    <g stroke="#3C6CB0" stroke-width="1"><line x1="193" y1="176" x2="193" y2="202"/><line x1="199" y1="176" x2="199" y2="202"/><line x1="186" y1="185" x2="206" y2="185"/></g>
+    <!-- noren (center entrance) -->
+    <path d="M210 178 h40 v16 l-5 6 -5 -6 -5 6 -5 -6 -5 6 -5 -6 -5 6 -5 -6 Z" fill="#16335e"/>
+    <g stroke="#2E5286" stroke-width="1"><line x1="220" y1="178" x2="220" y2="196"/><line x1="230" y1="178" x2="230" y2="196"/><line x1="240" y1="178" x2="240" y2="196"/></g>
+    <!-- right shoji windows -->
+    <rect x="258" y="176" width="32" height="30" fill="#F4ECDD"/>
+    <g stroke="#204E8E" stroke-width="1.2"><line x1="266" y1="176" x2="266" y2="206"/><line x1="274" y1="176" x2="274" y2="206"/><line x1="282" y1="176" x2="282" y2="206"/><line x1="258" y1="190" x2="290" y2="190"/></g>
+    <!-- A-board 営業中 (far left ground) -->
+    <path d="M139 238 L146 211 L153 238 Z" fill="#16335e"/>
+    <rect x="142" y="215" width="8" height="19" fill="#C5432F"/>
+    <text x="146" y="221" font-family="serif" font-size="4.6" fill="#fff" text-anchor="middle">営</text>
+    <text x="146" y="227" font-family="serif" font-size="4.6" fill="#fff" text-anchor="middle">業</text>
+    <text x="146" y="233" font-family="serif" font-size="4.6" fill="#fff" text-anchor="middle">中</text>
+    <!-- stool -->
+    <rect x="250" y="220" width="14" height="3" fill="#8a6d3f"/>
+    <rect x="251" y="223" width="2.5" height="13" fill="#6f5631"/><rect x="260.5" y="223" width="2.5" height="13" fill="#6f5631"/>
+    <!-- potted tree (far right) -->
+    <circle cx="298" cy="210" r="9" fill="#204E8E"/><circle cx="304" cy="214" r="6" fill="#204E8E"/><circle cx="293" cy="216" r="5" fill="#204E8E"/>
+    <path d="M291 224 h14 l-2 12 h-10 Z" fill="#16335e"/>
+  </g>
+
+  <!-- browser window -->
+  <g>
+    <rect x="92" y="20" width="210" height="132" rx="8" fill="#FFFFFF" stroke="#E4DAC6" stroke-width="1.5"/>
+    <path d="M92 28 a8 8 0 0 1 8 -8 h194 a8 8 0 0 1 8 8 v8 h-210 Z" fill="#16335e"/>
+    <circle cx="103" cy="28" r="2.4" fill="#fff" opacity=".8"/><circle cx="111" cy="28" r="2.4" fill="#fff" opacity=".8"/><circle cx="119" cy="28" r="2.4" fill="#fff" opacity=".8"/>
+    <text x="104" y="58" font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="#16335e">Welcome to</text>
+    <text x="104" y="72" font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="#16335e">Our Restaurant</text>
+    <text x="104" y="88" font-family="Inter,sans-serif" font-size="7.5" fill="#9aa6b8">Local flavors. Made with care.</text>
+    <rect x="104" y="96" width="52" height="16" rx="8" fill="#204E8E"/><text x="130" y="107" font-family="Inter,sans-serif" font-size="7.5" font-weight="700" fill="#fff" text-anchor="middle">Book a Table</text>
+    <!-- hero image -->
+    <rect x="210" y="46" width="82" height="50" rx="4" fill="#BFD3E6"/>
+    <path d="M210 96 v-16 l16 -16 l14 14 l18 -20 l34 30 v8 Z" fill="#5C86B4"/>
+    <circle cx="276" cy="60" r="6" fill="#fff" opacity=".8"/>
+    <!-- feature row -->
+    <g fill="#204E8E"><circle cx="112" cy="130" r="6"/><circle cx="170" cy="130" r="6"/><circle cx="232" cy="130" r="6"/></g>
+    <rect x="122" y="127" width="34" height="5" rx="2.5" fill="#E7EAF1"/>
+    <rect x="180" y="127" width="40" height="5" rx="2.5" fill="#E7EAF1"/>
+    <rect x="242" y="127" width="44" height="5" rx="2.5" fill="#E7EAF1"/>
+  </g>
+
+  <!-- Shirube pointing, far left -->
+  <g transform="translate(-14,30) scale(0.84)">
+    <path d="M44 152 q-11 6 -13 15" stroke="#204E8E" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <rect x="28" y="156" width="4.5" height="12" rx="2.2" fill="#204E8E"/>
+    <rect x="23" y="168" width="14" height="7" rx="2" fill="#C5432F"/>
+    <circle cx="31" cy="166" r="5" fill="#204E8E"/>
+    <path d="M90 150 q10 0 16 -6" stroke="#204E8E" stroke-width="8.5" fill="none" stroke-linecap="round"/>
+    <circle cx="108" cy="143" r="5.4" fill="#204E8E"/>
+    <path d="M110 139.5 L116 136.5" stroke="#204E8E" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <rect x="42" y="90" width="50" height="120" rx="14" fill="#204E8E"/>
+    <rect x="54" y="208" width="11" height="9" rx="3.5" fill="#204E8E"/>
+    <rect x="69" y="208" width="11" height="9" rx="3.5" fill="#204E8E"/>
+    <circle cx="58" cy="114" r="4" fill="#fff"/><circle cx="76" cy="114" r="4" fill="#fff"/>
+    <path d="M54 125 Q67 136 79 126.5 Q67 128 54 125 Z" fill="#FFC94F"/>
+    <path d="M80 124 L85.5 126.6 L81.5 130 Z" fill="#FFC94F"/>
+    <text x="67" y="161" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="10" font-weight="700" fill="#F9ECD9" text-anchor="middle" writing-mode="tb" letter-spacing="2">シルベ</text>
+  </g>
+</svg>

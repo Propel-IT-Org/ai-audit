@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVIBLE — Analyzing your AI visibility</title>
+  <!-- Auto-advances to the grade, like the real app would -->
+  <meta http-equiv="refresh" content="15;url=results.html" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{indigo:{50:'#EEF1F8',100:'#D9E0F1',200:'#B6C2E0',300:'#8597C4',400:'#4E69A8',500:'#223A70',600:'#18243F',700:'#152033',800:'#101A2B',900:'#0C1320'},purple:{500:'#223A70',600:'#18243F'},gold:{500:'#C8A859'}}}}}</script>
+  <link rel="stylesheet" href="brand.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .japan-red { color: #e5351a; }
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .cursor { display:inline-block; width:2px; background:#10A37F; margin-left:1px; animation: blink 1s step-end infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .hide { opacity: 0; transform: translateY(6px); }
+    .show { opacity: 1; transform: translateY(0); transition: all .45s ease; }
+    .typing-dot { animation: tdot 1.2s ease-in-out infinite; }
+    .typing-dot:nth-child(2){ animation-delay:.2s } .typing-dot:nth-child(3){ animation-delay:.4s }
+    @keyframes tdot { 0%,100%{ opacity:.25 } 50%{ opacity:1 } }
+    .bar { animation: grow 15s ease-out forwards; }
+    @keyframes grow { from { width: 4%; } to { width: 97%; } }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-indigo-50 to-white text-gray-900 min-h-screen flex flex-col">
+
+  <!-- MOCKUP FLOW BAR -->
+  <div class="bg-gray-900 text-gray-400 py-2 px-4 text-xs font-medium flex items-center justify-between">
+    <a href="index.html" class="hover:text-white">← Audit</a>
+    <span class="tracking-widest uppercase">[Mockup v2 — Flow 1→2: Analyzing · auto-advances to grade]</span>
+    <a href="results.html" class="text-white hover:text-indigo-300">Next: Score →</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bg-white/80 border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-1">
+        <span class="japan-red text-xl leading-none">●</span>
+        <span class="text-xl font-bold text-gray-900">AIVIBLE</span>
+      </a>
+      <button data-lang-toggle class="text-sm border border-gray-200 px-3 py-1 rounded-full hover:bg-gray-50 font-medium">日本語</button>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-2xl mx-auto px-4 py-8">
+
+    <!-- PROGRESS HERO (same loading pattern as generating.html) -->
+    <div class="text-center mb-8">
+      <div class="flex items-center justify-center gap-3 mb-2">
+        <div class="w-7 h-7 rounded-full border-[3px] border-indigo-100 border-t-indigo-500 spin"></div>
+        <h1 class="text-2xl font-extrabold text-gray-900"
+            data-en="Analyzing your AI visibility…"
+            data-jp="AI可視化を分析中…">Analyzing your AI visibility…</h1>
+      </div>
+      <p class="text-sm text-gray-500"
+         data-en="This is how travelers look for you now — we asked an AI the kind of question your guests ask, then watched it try to read <span class='font-mono text-gray-700'>kamogawakan.com</span>."
+         data-jp="いま、旅行者はこうやってお店を探しています。お客様が尋ねるような質問をAIに投げかけ、<span class='font-mono text-gray-700'>kamogawakan.com</span> をどう読むのかを確認しました。">
+        This is how travelers look for you now — we asked an AI the kind of question your guests ask, then watched it try to read <span class="font-mono text-gray-700">kamogawakan.com</span>.</p>
+      <div class="h-2 bg-gray-200 rounded-full mt-5 overflow-hidden max-w-md mx-auto">
+        <div class="h-2 bg-indigo-500 rounded-full bar"></div>
+      </div>
+    </div>
+
+    <!-- CHATGPT-STYLE WINDOW -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
+      <!-- window top bar -->
+      <div class="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100">
+        <span class="w-6 h-6 rounded-full flex items-center justify-center text-white text-[11px] font-bold" style="background:#10A37F;">✺</span>
+        <span class="text-sm font-semibold text-gray-700">ChatGPT</span>
+        <span class="ml-auto text-[11px] text-gray-400" data-en="traveler planning Japan" data-jp="日本を計画中の旅行者">traveler planning Japan</span>
+      </div>
+
+      <!-- messages -->
+      <div class="px-4 py-5 space-y-4 min-h-[260px]">
+
+        <!-- user message (typed) -->
+        <div id="userMsg" class="hide flex justify-end">
+          <div class="bg-gray-100 text-gray-800 text-sm rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[80%]"
+               data-en="Where should I stay in Kyoto? Looking for a traditional ryokan near Gion with a private onsen and kaiseki dinner."
+               data-jp="京都でどこに泊まるのがいい？祇園の近くで、貸切温泉と懐石料理のある旅館を探しています。">Where should I stay in Kyoto? Looking for a traditional ryokan near Gion with a private onsen and kaiseki dinner.</div>
+        </div>
+
+        <!-- assistant: searching + reading the site -->
+        <div id="searching" class="hide flex items-start gap-2.5">
+          <span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs flex-shrink-0 mt-0.5" style="background:#10A37F;">✺</span>
+          <div class="flex-1">
+            <div class="text-sm text-gray-500 flex items-center gap-2">
+              <span data-en="Searching the web…" data-jp="ウェブを検索中…">Searching the web…</span>
+              <span id="dots"><span class="typing-dot">●</span><span class="typing-dot">●</span><span class="typing-dot">●</span></span>
+            </div>
+
+            <!-- the website content "showing up" -->
+            <div id="reading" class="hide mt-3 rounded-xl border border-gray-200 overflow-hidden">
+              <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 border-b border-gray-100 text-xs text-gray-500">
+                <span>🌐</span><span class="font-mono">kamogawakan.com</span>
+                <span class="ml-auto text-[10px] text-gray-400" data-en="reading…" data-jp="読み取り中…">reading…</span>
+              </div>
+              <div class="p-3 font-mono text-[12px] leading-relaxed space-y-1">
+                <div class="r hide text-gray-800">鴨川館 — Kamogawa-kan</div>
+                <div class="r hide text-gray-500">京都・鴨川沿いの老舗旅館</div>
+                <div class="r hide text-amber-600">⚠ <span data-en="English content: not found" data-jp="英語コンテンツ：見つかりません">English content: not found</span></div>
+                <div class="r hide text-amber-600">⚠ <span data-en="Structured data (schema): none" data-jp="構造化データ（schema）：なし">Structured data (schema): none</span></div>
+                <div class="r hide text-red-500">⚠ <span data-en="GPTBot / PerplexityBot: blocked by robots.txt" data-jp="GPTBot / PerplexityBot：robots.txt によりブロック">GPTBot / PerplexityBot: blocked by robots.txt</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- assistant verdict -->
+        <div id="verdict" class="hide flex items-start gap-2.5">
+          <span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs flex-shrink-0 mt-0.5" style="background:#10A37F;">✺</span>
+          <div class="bg-gray-50 border border-gray-100 text-sm text-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[88%] leading-relaxed"
+               data-en="I found a ryokan called <b>Kamogawa-kan</b>, but its site is Japanese-only and blocks me from reading the details — so I can't confidently recommend it. Here are some <i>other</i> ryokan I can describe…"
+               data-jp="「<b>鴨川館</b>」という旅館は見つかりましたが、サイトが日本語のみで詳細を読み取れないため、自信を持って推薦できません。代わりに、内容を説明できる<i>他の</i>旅館をご案内します…">
+            I found a ryokan called <b>Kamogawa-kan</b>, but its site is Japanese-only and blocks me from reading the details — so I can't confidently recommend it. Here are some <i>other</i> ryokan I can describe…</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BRIDGE TO THE GRADE -->
+    <div id="bridge" class="hide mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+      <div class="w-9 h-9 rounded-full border-[3px] border-indigo-100 border-t-indigo-500 spin flex-shrink-0"></div>
+      <div class="flex-1">
+        <div class="text-sm font-bold text-gray-900"
+             data-en="That lost booking is what we measure."
+             data-jp="その逃した予約こそ、私たちが測るものです。">That lost booking is what we measure.</div>
+        <div class="text-xs text-gray-500"
+             data-en="Scoring your site against 18 AI-visibility signals…"
+             data-jp="18のAI可視化シグナルでサイトを採点中…">Scoring your site against 18 AI-visibility signals…</div>
+      </div>
+      <a href="results.html" class="text-xs text-indigo-500 hover:underline whitespace-nowrap" data-en="skip →" data-jp="スキップ →">skip →</a>
+    </div>
+
+  </main>
+
+  <script src="lang.js"></script>
+  <script src="brand.js"></script>
+  <script src="comments.js"></script>
+  <script>
+    // ---- choreography: type the traveler's query, then reveal the rest ----
+    function show(id){ var el = document.getElementById(id); if(el){ el.classList.remove('hide'); el.classList.add('show'); } }
+
+    // typewriter into the user bubble (respects current EN/JP text)
+    var userMsg = document.getElementById('userMsg');
+    var bubble = userMsg.querySelector('div');
+    var full = bubble.textContent;            // current-language text from lang.js
+    bubble.textContent = '';
+    var cur = document.createElement('span'); cur.className = 'cursor'; cur.style.height = '1em';
+    bubble.appendChild(document.createTextNode('')); bubble.appendChild(cur);
+    userMsg.classList.remove('hide'); userMsg.classList.add('show');
+
+    var i = 0;
+    function typeChar(){
+      if (i <= full.length){
+        bubble.firstChild.textContent = full.slice(0, i);
+        i++;
+        setTimeout(typeChar, 28);
+      } else {
+        cur.remove();
+        runSequence();
+      }
+    }
+    function runSequence(){
+      setTimeout(function(){ show('searching'); }, 500);
+      setTimeout(function(){ show('reading'); }, 1100);
+      // reveal scraped lines one by one
+      var lines = document.querySelectorAll('#reading .r');
+      lines.forEach(function(l, idx){ setTimeout(function(){ l.classList.remove('hide'); l.classList.add('show'); }, 1500 + idx*450); });
+      setTimeout(function(){ var d = document.getElementById('dots'); if(d) d.style.display='none'; show('verdict'); }, 1500 + lines.length*450 + 400);
+      setTimeout(function(){ show('bridge'); }, 1500 + lines.length*450 + 1100);
+    }
+    setTimeout(typeChar, 600);
+  </script>
+  <script src="_superseded.js"></script>
+</body>
+</html>

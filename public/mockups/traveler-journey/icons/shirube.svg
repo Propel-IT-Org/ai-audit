@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Shirube — navy guidepost (道標) mascot. The gold "this-way" arrow doubles as the smile (Amazon-style), with a dimple gap. -->
+  <rect x="10" y="6" width="28" height="36" rx="13" fill="#223A70"/>
+  <circle cx="19" cy="18" r="2.2" fill="#fff"/>
+  <circle cx="29" cy="18" r="2.2" fill="#fff"/>
+  <!-- smile (deep, thin pointed ends) -->
+  <path d="M15.8 24.2 Q22.8 32.4 29.8 25.8 Q22.8 27 15.8 24.2 Z" fill="#C8A859"/>
+  <!-- detached arrowhead = the dimple / "this-way" -->
+  <path d="M30.6 24 L34.2 25.6 L31.7 28.2 Z" fill="#C8A859"/>
+</svg>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" fill="none">
+  <!-- AIVIBLE · "Loading" — Shirube + spinner + seigaiha waves -->
+  <rect width="320" height="320" fill="#F9ECD9"/>
+
+  <!-- seigaiha wave cluster (bottom center) -->
+  <g fill="none" stroke="#204E8E" stroke-width="2.4">
+    <path d="M120 306 a16 16 0 0 1 32 0 M152 306 a16 16 0 0 1 32 0 M184 306 a16 16 0 0 1 32 0"/>
+    <path d="M120 306 a9 9 0 0 1 18 0 M152 306 a9 9 0 0 1 18 0 M184 306 a9 9 0 0 1 18 0" opacity=".55"/>
+    <path d="M136 292 a16 16 0 0 1 32 0 M168 292 a16 16 0 0 1 32 0"/>
+    <path d="M136 292 a9 9 0 0 1 18 0 M168 292 a9 9 0 0 1 18 0" opacity=".55"/>
+  </g>
+
+  <!-- spinner: yellow circular line + arrowhead, navy dots in a triangle (apex on top) -->
+  <g>
+    <path d="M160 70 A80 80 0 1 1 99 101" stroke="#FFC94F" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+    <path d="M90 92 L101 96 L96 107 Z" fill="#FFC94F"/>
+    <circle cx="160" cy="64" r="6.5" fill="#204E8E"/>
+    <circle cx="226" cy="192" r="6.5" fill="#204E8E"/>
+    <circle cx="94" cy="192" r="6.5" fill="#204E8E"/>
+  </g>
+
+  <!-- Shirube (neutral, centered, larger) -->
+  <g>
+    <rect x="134" y="92" width="52" height="116" rx="15" fill="#204E8E"/>
+    <path d="M134 152 q-9 7 -10 16" stroke="#204E8E" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M186 152 q9 7 10 16" stroke="#204E8E" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <rect x="147" y="206" width="11" height="9" rx="3.5" fill="#204E8E"/>
+    <rect x="162" y="206" width="11" height="9" rx="3.5" fill="#204E8E"/>
+    <circle cx="150" cy="120" r="4.2" fill="#fff"/><circle cx="170" cy="120" r="4.2" fill="#fff"/>
+    <path d="M146 132 Q160 143 173 133 Q160 135 146 132 Z" fill="#FFC94F"/>
+    <path d="M174 131 L180 133.6 L176 137 Z" fill="#FFC94F"/>
+    <text x="160" y="162" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="9.5" font-weight="700" fill="#F9ECD9" text-anchor="middle" writing-mode="tb" letter-spacing="1.5">シルベ</text>
+  </g>
+</svg>
