@@ -20,6 +20,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { CATEGORY_META, normalizeCategory } from "@/lib/places/categories";
 
 const RestaurantMiniMap = dynamic(() => import("./RestaurantMiniMap"), { ssr: false });
 
@@ -31,11 +32,12 @@ export interface MenuItem {
   badge?: string;
 }
 
-export interface RestaurantFrontmatter {
+export interface PlaceFrontmatter {
   name?: string;
   nameJa?: string;
   reading?: string;
   area?: string;
+  category?: string;
   rating?: number;
   reviewCount?: number;
   cuisineTags?: string[];
@@ -46,26 +48,19 @@ export interface RestaurantFrontmatter {
   website?: string;
   addressEn?: string;
   addressJa?: string;
-  overview?: Partial<
-    Record<
-      | "hours"
-      | "priceRange"
-      | "payment"
-      | "seating"
-      | "english"
-      | "reservations"
-      | "families"
-      | "gettingThere",
-      string
-    >
-  >;
+  /** Generic key→value overview rows. Keys used as display labels (camelCase converted). */
+  overview?: Record<string, string>;
   goodToKnow?: string[];
   picks?: { lead?: string; note?: string; items?: string[] };
+  /** Content sections (Menu / Highlights / Rooms / Baths / …). */
   menu?: { category: string; items: MenuItem[] }[];
   menuNote?: string;
   priceRecorded?: string;
   gallery?: { label: string; icon?: string }[];
 }
+
+/** @deprecated Use PlaceFrontmatter */
+export type RestaurantFrontmatter = PlaceFrontmatter;
 
 export interface DetailFallback {
   name: string;
@@ -84,16 +79,9 @@ const GALLERY_ICONS: Record<string, typeof Store> = {
   users: Users,
 };
 
-const OVERVIEW_ROWS: { key: keyof NonNullable<RestaurantFrontmatter["overview"]>; label: string }[] = [
-  { key: "hours", label: "Hours" },
-  { key: "priceRange", label: "Price range" },
-  { key: "payment", label: "Payment" },
-  { key: "seating", label: "Seating" },
-  { key: "english", label: "English" },
-  { key: "reservations", label: "Reservations" },
-  { key: "families", label: "Atmosphere" },
-  { key: "gettingThere", label: "Getting there" },
-];
+function camelToLabel(key: string): string {
+  return key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()).trim();
+}
 
 /** Bold the lead sentence (up to the first ". ") of a string. */
 function leadBold(text: string): ReactNode {
@@ -114,7 +102,7 @@ export function RestaurantDetail({
   overview,
   fallback,
 }: {
-  data: RestaurantFrontmatter;
+  data: PlaceFrontmatter;
   overview: ReactNode;
   fallback: DetailFallback;
 }) {
@@ -148,13 +136,14 @@ export function RestaurantDetail({
     }
   };
 
-  const rows = OVERVIEW_ROWS.filter((r) => data.overview?.[r.key]);
+  const overviewEntries = Object.entries(data.overview ?? {}).filter(([, v]) => v);
   const hasMenu = !!data.menu?.length;
   const hasGallery = !!data.gallery?.length;
+  const sectionLabel = CATEGORY_META[normalizeCategory(data.category)].section;
 
   const tabs: { key: TabKey; label: string; icon: typeof Info; show: boolean }[] = [
     { key: "overview", label: "Overview", icon: Info, show: true },
-    { key: "menu", label: "Menu", icon: UtensilsCrossed, show: hasMenu },
+    { key: "menu", label: sectionLabel, icon: UtensilsCrossed, show: hasMenu },
     { key: "gallery", label: "Gallery", icon: ImageIcon, show: hasGallery },
   ];
 
@@ -258,15 +247,15 @@ export function RestaurantDetail({
                 </div>
               )}
 
-              {(rows.length > 0 || addressEn || data.phone) && (
+              {(overviewEntries.length > 0 || addressEn || data.phone) && (
                 <Card className="gap-0 overflow-hidden rounded-[14px] border-[#E5E7E3] bg-white p-0 shadow-none">
-                  {rows.map((row, i) => (
+                  {overviewEntries.map(([key, val], i) => (
                     <div
-                      key={row.key}
+                      key={key}
                       className={`grid grid-cols-1 gap-1 px-5 py-4 sm:grid-cols-[150px_1fr] sm:gap-4 ${i > 0 ? "border-t border-[#E5E7E3]" : ""}`}
                     >
-                      <span className="text-sm text-[#5B6675]">{row.label}</span>
-                      <span className="whitespace-pre-line text-[15px]">{data.overview?.[row.key]}</span>
+                      <span className="text-sm text-[#5B6675]">{camelToLabel(key)}</span>
+                      <span className="whitespace-pre-line text-[15px]">{val}</span>
                     </div>
                   ))}
 

@@ -26,6 +26,7 @@ function parseFrontmatter(text: string): Record<string, string | number | boolea
 type MdxFields = Partial<{
   nameEn: string; nameJp: string; address: string; aiOverview: string;
   lat: string; lng: string; prefecture: string; websiteUrl: string; slug: string;
+  category: string; subcategory: string;
 }>;
 
 export async function parseRestaurantMdxAction(text: string): Promise<{ fields: MdxFields }> {
@@ -39,6 +40,8 @@ export async function parseRestaurantMdxAction(text: string): Promise<{ fields: 
   if (fm.slug) fields.slug = String(fm.slug);
   if (fm.lat != null) fields.lat = String(fm.lat);
   if (fm.lng != null) fields.lng = String(fm.lng);
+  if (fm.category) fields.category = String(fm.category);
+  if (fm.subtype ?? fm.subcategory) fields.subcategory = String(fm.subtype ?? fm.subcategory);
   const afterFrontmatter = text.replace(/^---[\s\S]*?---\r?\n?/, "").trim();
   const firstPara = afterFrontmatter.split(/\n\n+/).find((p) => p.trim() && !p.trim().startsWith("#"));
   if (firstPara) fields.aiOverview = firstPara.trim().slice(0, 600);

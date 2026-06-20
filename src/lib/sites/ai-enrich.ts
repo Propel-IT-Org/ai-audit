@@ -113,6 +113,7 @@ function buildPrompt(site: PublishedSite, findings: CheckResult[]): string {
     "  - **Discovered cuisine** — if the scrape didn't already capture it.",
     "  - **Discovered price range** — `$`, `$$`, `$$$`, `$$$$` if scrape missed it.",
     "  - **Discovered social handles** — Instagram, Facebook, X, YouTube, TikTok, LINE — only if missing from the scrape.",
+    "  - **Discovered contact** — street address, city, region, postal code, country, and decimal-degree lat/lng. Pull from Google Maps, TripAdvisor, or the official site. Only fill if the scrape left the address empty. Never invent coords.",
     "",
     "Hard rules for these fields:",
     "  - Reviews MUST be real quotes you found. Never fabricate. If you cannot find usable reviews, return an empty reviews array.",
@@ -191,6 +192,7 @@ const SYSTEM = [
   '  "discoveredCuisine": ["Japanese", "Omakase"] or null,',
   '  "discoveredPriceRange": "$$$$" or null,',
   '  "discoveredSocial": {"instagram": "https://...", "facebook": "https://..."} or null,',
+  '  "discoveredContact": {"street": "1-2-3 Chiyoda, Chiyoda-ku", "city": "Tokyo", "region": "Tokyo", "postalCode": "100-0001", "country": "Japan", "lat": 35.6762, "lng": 139.6503} or null,  // only from web_search, never invent; coords as decimal degrees',
   '  "hero": {"heading": "...", "sub": "..."},',
   '  "meta": {"title": "30-65 char SEO title", "description": "70-160 char meta description"}',
   "}",
@@ -240,6 +242,16 @@ interface RawSocial {
   line?: unknown;
 }
 
+interface RawContact {
+  street?: unknown;
+  city?: unknown;
+  region?: unknown;
+  postalCode?: unknown;
+  country?: unknown;
+  lat?: unknown;
+  lng?: unknown;
+}
+
 interface RawEnrichment {
   summary?: string;
   about?: string;
@@ -256,6 +268,7 @@ interface RawEnrichment {
   discoveredCuisine?: unknown[] | null;
   discoveredPriceRange?: unknown;
   discoveredSocial?: RawSocial | null;
+  discoveredContact?: RawContact | null;
   hero?: { heading?: unknown; sub?: unknown };
   meta?: { title?: unknown; description?: unknown };
 }
@@ -386,6 +399,23 @@ function parseDiscoveredSocial(
   return hasAny ? out : undefined;
 }
 
+function parseDiscoveredContact(
+  raw: RawContact | null | undefined,
+): import("./types").ContactInfo | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const out: import("./types").ContactInfo = {
+    street: safeString(raw.street, 200),
+    city: safeString(raw.city, 100),
+    region: safeString(raw.region, 100),
+    postalCode: safeString(raw.postalCode, 20),
+    country: safeString(raw.country, 80),
+    lat: safeNumber(raw.lat, -90, 90),
+    lng: safeNumber(raw.lng, -180, 180),
+  };
+  const hasAny = Object.values(out).some((v) => v !== undefined);
+  return hasAny ? out : undefined;
+}
+
 export async function enrichWithAudit(
   site: PublishedSite,
   report?: AuditReport,
@@ -446,6 +476,9 @@ export async function enrichWithAudit(
     const discoveredSocial = parseDiscoveredSocial(
       parsed.discoveredSocial ?? null,
     );
+    const discoveredContact = parseDiscoveredContact(
+      parsed.discoveredContact ?? null,
+    );
 
     const enrichment: GeoEnrichment = {
       summary: safeString(parsed.summary, 600),
@@ -459,6 +492,7 @@ export async function enrichWithAudit(
       discoveredCuisine,
       discoveredPriceRange,
       discoveredSocial,
+      discoveredContact,
       hero:
         parsed.hero && (parsed.hero.heading || parsed.hero.sub)
           ? {
@@ -548,6 +582,30 @@ export function applyEnrichment(
           }
         }
         r.social = social;
+      }
+      // Discovered contact — fill each missing key.
+      if (enrichment.discoveredContact) {
+        const contact = { ...r.contact };
+        for (const [key, val] of Object.entries(enrichment.discoveredContact)) {
+          const k = key as keyof import("./types").ContactInfo;
+          if (val != null && !contact[k]) {
+            (contact as Record<string, unknown>)[key] = val;
+          }
+        }
+        r.contact = contact;
+      }
+    } else if (data.industry === "general") {
+      // For general sites, also apply discovered contact.
+      if (enrichment.discoveredContact) {
+        const gData = data as import("./types").GeneralSiteData;
+        const contact = { ...gData.contact };
+        for (const [key, val] of Object.entries(enrichment.discoveredContact)) {
+          const k = key as keyof import("./types").ContactInfo;
+          if (val != null && !contact[k]) {
+            (contact as Record<string, unknown>)[key] = val;
+          }
+        }
+        gData.contact = contact;
       }
     }
 
@@ -694,7 +752,7 @@ export async function generateStructuredMenu(
   const name = r.name;
   const cuisine = r.cuisine?.join(", ") ?? "";
   const city = r.contact?.city ?? r.contact?.region ?? "";
-  const sourceUrl = site.subdomain ?? "";
+  const sourceUrl = site.sourceUrl ?? "";
 
   const prompt = `Search the web for the menu of "${name}"${cuisine ? `, a ${cuisine} restaurant` : ""}${city ? ` in ${city}` : ""}.${sourceUrl ? ` Their website: ${sourceUrl}` : ""}
 

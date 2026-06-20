@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { MapPin, List as ListIcon, Map as MapIcon } from "lucide-react";
 import { CategoryIcon } from "@/components/icons";
 import type { Restaurant } from "@/lib/db/schema/restaurant";
+import { CATEGORIES, CATEGORY_META, normalizeCategory } from "@/lib/places/categories";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
@@ -53,7 +54,7 @@ function RestaurantCard({ r }: { r: Restaurant }) {
 
         {(r.category || r.subcategory) && (
           <p className="text-xs text-muted-foreground">
-            {[r.category, r.subcategory].filter(Boolean).join(" · ")}
+            {[CATEGORY_META[normalizeCategory(r.category)].label, r.subcategory].filter(Boolean).join(" · ")}
           </p>
         )}
 
@@ -150,14 +151,17 @@ export function ExploreClient({ restaurants, mapRestaurants }: Props) {
   const [hiddenOnly, setHiddenOnly] = useState(false);
   const [view, setView] = useState<"list" | "map">("list");
 
-  const categories = useMemo(() => uniqueVals(restaurants, (r) => r.category), [restaurants]);
+  const presentCategories = useMemo(() => {
+    const set = new Set(restaurants.map((r) => normalizeCategory(r.category)));
+    return CATEGORIES.filter((c) => set.has(c));
+  }, [restaurants]);
   const prefectures = useMemo(() => uniqueVals(restaurants, (r) => r.prefecture), [restaurants]);
   const regions = useMemo(() => uniqueVals(restaurants, (r) => r.region), [restaurants]);
 
   const filtered = useMemo(() => {
     return restaurants.filter((r) => {
       if (hiddenOnly && !r.hiddenGem) return false;
-      if (category && r.category !== category) return false;
+      if (category && normalizeCategory(r.category) !== category) return false;
       if (prefecture && r.prefecture !== prefecture) return false;
       if (region && r.region !== region) return false;
       return true;
@@ -175,13 +179,14 @@ export function ExploreClient({ restaurants, mapRestaurants }: Props) {
         <ChipButton active={!!hiddenOnly} onClick={() => setHiddenOnly((v) => !v)} gold>
           ★ Hidden Gems
         </ChipButton>
-        {categories.map((c) => (
+        {presentCategories.map((c) => (
           <ChipButton
             key={`cat-${c}`}
             active={category === c}
             onClick={() => setCategory((cur) => (cur === c ? null : c))}
           >
-            {c}
+            <CategoryIcon category={c} size={14} className="mr-1 inline-block" />
+            {CATEGORY_META[c].label}
           </ChipButton>
         ))}
       </div>

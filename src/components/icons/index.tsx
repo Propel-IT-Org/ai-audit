@@ -204,11 +204,88 @@ export function PinIcon(props: IconProps) {
   );
 }
 
+export function AttractionIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 3 L13.8 8.6 H19.6 L14.9 11.9 L16.7 17.5 L12 14.2 L7.3 17.5 L9.1 11.9 L4.4 8.6 H10.2 Z" fill="currentColor" />
+    </Svg>
+  );
+}
+
+export function AccommodationIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <rect x="3.5" y="10" width="17" height="10" rx="1.2" fill="currentColor" />
+      <path d="M2 11 L12 4 L22 11" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="9" y="14" width="6" height="6" rx="0.8" fill="#fff" opacity="0.7" />
+    </Svg>
+  );
+}
+
+export function OnsenIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M5 18 Q8 14 12 18 Q16 22 19 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M5 13 Q8 9 12 13 Q16 17 19 13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M9 7 Q9.5 5 9 3 M12 7 Q12.5 5 12 3 M15 7 Q15.5 5 15 3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
+    </Svg>
+  );
+}
+
+export function ShoppingIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M6 7 H18 L16.5 17 H7.5 Z" fill="currentColor" />
+      <path d="M9 7 Q9 4 12 4 Q15 4 15 7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+export function TransportIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <rect x="4" y="6" width="16" height="11" rx="2" fill="currentColor" />
+      <rect x="6" y="8.5" width="5" height="3.5" rx="1" fill="#fff" opacity="0.8" />
+      <rect x="13" y="8.5" width="5" height="3.5" rx="1" fill="#fff" opacity="0.8" />
+      <circle cx="7.5" cy="19" r="1.6" fill="currentColor" />
+      <circle cx="16.5" cy="19" r="1.6" fill="currentColor" />
+      <path d="M7.5 17 V17.4 M16.5 17 V17.4" stroke="currentColor" strokeWidth="1.5" />
+    </Svg>
+  );
+}
+
+export function ServiceIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <circle cx="12" cy="8" r="4.2" fill="currentColor" />
+      <path d="M4 20 Q4 14 12 14 Q20 14 20 20" fill="currentColor" />
+    </Svg>
+  );
+}
+
+export function EventIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <rect x="3.5" y="5.5" width="17" height="15" rx="2" fill="none" stroke="currentColor" strokeWidth="1.9" />
+      <path d="M3.5 10.5 H20.5" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M8 3.5 V7.5 M16 3.5 V7.5" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      <rect x="7" y="13" width="4" height="4" rx="0.7" fill="currentColor" />
+    </Svg>
+  );
+}
+
 const CATEGORY_ICONS: Record<string, (p: IconProps) => React.JSX.Element> = {
-  restaurant: RestaurantIcon,
-  cafe: CafeIcon,
-  stay: StayIcon,
-  experience: ExperienceIcon,
+  restaurant:    RestaurantIcon,
+  cafe:          CafeIcon,
+  stay:          StayIcon,
+  experience:    ExperienceIcon,
+  attraction:    AttractionIcon,
+  accommodation: AccommodationIcon,
+  onsen:         OnsenIcon,
+  shopping:      ShoppingIcon,
+  transport:     TransportIcon,
+  service:       ServiceIcon,
+  event:         EventIcon,
 };
 
 export function CategoryIcon({ category, ...props }: IconProps & { category?: string | null }) {

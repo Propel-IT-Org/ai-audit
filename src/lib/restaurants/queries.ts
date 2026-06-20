@@ -1,6 +1,9 @@
 import { eq, isNotNull, and, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { restaurant, type Restaurant } from "@/lib/db/schema/restaurant";
+import type { PublishedSite } from "@/lib/sites/types";
+import { normalizeCategory } from "@/lib/places/categories";
+import type { Category } from "@/lib/places/categories";
 
 export interface ListRestaurantsOptions {
   prefecture?: string;
@@ -71,4 +74,49 @@ export async function updateRestaurant(
     .where(eq(restaurant.id, id))
     .returning();
   return rows[0] ?? null;
+}
+
+const INDUSTRY_TO_CATEGORY: Record<string, Category> = {
+  restaurant: "restaurant",
+  travel:     "attraction",
+  service:    "service",
+  general:    "service",
+};
+
+export async function upsertPlaceFromSite(site: PublishedSite): Promise<void> {
+  const d = site.data;
+  const contact = d.contact;
+  const geo = site.geo;
+
+  const rawCategory = INDUSTRY_TO_CATEGORY[site.industry] ?? "service";
+  const category = normalizeCategory(rawCategory);
+
+  const addressParts = [contact?.street, contact?.city, contact?.region, contact?.country]
+    .filter(Boolean);
+  const address = addressParts.length > 0 ? addressParts.join(", ") : undefined;
+
+  const imageUrl = d.hero?.image?.url ?? d.gallery?.[0]?.url ?? undefined;
+  const aiOverview = geo?.summary ?? d.description ?? undefined;
+
+  const values: Omit<typeof restaurant.$inferInsert, "id"> = {
+    slug: site.subdomain,
+    nameEn: d.name,
+    category,
+    address,
+    lat: contact?.lat ?? undefined,
+    lng: contact?.lng ?? undefined,
+    aiOverview,
+    websiteUrl: site.sourceUrl,
+    imageUrl,
+    publishedSubdomain: site.subdomain,
+    hiddenGem: false,
+  };
+
+  const existing = await getRestaurant(site.subdomain);
+  if (existing) {
+    await updateRestaurant(existing.id, values);
+  } else {
+    const id = `r_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    await createRestaurant({ id, ...values });
+  }
 }

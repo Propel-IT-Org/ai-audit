@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { saveRestaurantAction, parseRestaurantMdxAction } from "@/lib/restaurants/admin-actions";
+import { CATEGORIES, CATEGORY_META } from "@/lib/places/categories";
 import type { Restaurant } from "@/lib/db/schema/restaurant";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,8 +37,6 @@ function slugify(s: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-const CATEGORY_OPTIONS = ["restaurant", "cafe", "stay", "experience", "other"] as const;
-
 const formSchema = z.object({
   nameEn: z.string().min(1, "English name is required"),
   nameJp: z.string().optional(),
@@ -47,6 +46,7 @@ const formSchema = z.object({
   lat: z.string().optional(),
   lng: z.string().optional(),
   category: z.string().optional(),
+  subcategory: z.string().optional(),
   prefecture: z.string().optional(),
   imageUrl: z.union([z.string().url(), z.literal("")]).optional(),
   websiteUrl: z.union([z.string().url(), z.literal("")]).optional(),
@@ -65,6 +65,7 @@ const defaultValues: FormValues = {
   lat: "",
   lng: "",
   category: "",
+  subcategory: "",
   prefecture: "",
   imageUrl: "",
   websiteUrl: "",
@@ -85,6 +86,7 @@ export function AdminForm({ initial, mode = "create" }: { initial?: Restaurant; 
         lat: initial.lat != null ? String(initial.lat) : "",
         lng: initial.lng != null ? String(initial.lng) : "",
         category: initial.category ?? "",
+        subcategory: initial.subcategory ?? "",
         prefecture: initial.prefecture ?? "",
         imageUrl: initial.imageUrl ?? "",
         websiteUrl: initial.websiteUrl ?? "",
@@ -134,6 +136,7 @@ export function AdminForm({ initial, mode = "create" }: { initial?: Restaurant; 
       lat: values.lat ? parseFloat(values.lat) : undefined,
       lng: values.lng ? parseFloat(values.lng) : undefined,
       category: values.category || undefined,
+      subcategory: values.subcategory || undefined,
       prefecture: values.prefecture || undefined,
       imageUrl: values.imageUrl || undefined,
       websiteUrl: values.websiteUrl || undefined,
@@ -258,9 +261,9 @@ export function AdminForm({ initial, mode = "create" }: { initial?: Restaurant; 
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {CATEGORY_OPTIONS.map((c) => (
+                    {CATEGORIES.map((c) => (
                       <SelectItem key={c} value={c}>
-                        {c}
+                        {CATEGORY_META[c].label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -269,16 +272,28 @@ export function AdminForm({ initial, mode = "create" }: { initial?: Restaurant; 
             )}
           />
           <Controller
-            name="prefecture"
+            name="subcategory"
             control={control}
             render={({ field }) => (
               <Field>
-                <FieldLabel htmlFor={field.name}>Prefecture</FieldLabel>
-                <Input {...field} id={field.name} placeholder="e.g. Tokyo" />
+                <FieldLabel htmlFor={field.name}>Subtype</FieldLabel>
+                <Input {...field} id={field.name} placeholder="e.g. Ramen, Hot Spring, Museum" />
+                <FieldDescription>Optional free-text subtype.</FieldDescription>
               </Field>
             )}
           />
         </Field>
+
+        <Controller
+          name="prefecture"
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor={field.name}>Prefecture</FieldLabel>
+              <Input {...field} id={field.name} placeholder="e.g. Tokyo" />
+            </Field>
+          )}
+        />
 
         <Controller
           name="imageUrl"

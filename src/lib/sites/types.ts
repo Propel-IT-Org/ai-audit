@@ -217,6 +217,8 @@ export interface GeoEnrichment {
   discoveredPriceRange?: string;
   /** Social links discovered via web (only used to fill missing scraped fields). */
   discoveredSocial?: Partial<SocialLinks>;
+  /** Address + coords discovered via web (only used to fill missing scraped fields). */
+  discoveredContact?: Partial<ContactInfo>;
   /** Markdown body of /llms.txt (canonical short map). */
   llmsTxt?: string;
   /** Markdown body of /llms-full.txt (full fact dump). */

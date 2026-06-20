@@ -6,10 +6,11 @@ import {
   MapProvider,
   GoogleMap,
   GemPin,
-  PlacePin,
+  CategoryPin,
   AdvancedMarker,
   InfoWindow,
 } from "@/components/map/GoogleMap";
+import { CATEGORY_META, normalizeCategory } from "@/lib/places/categories";
 import type { Restaurant } from "@/lib/db/schema/restaurant";
 
 const JAPAN_CENTER = { lat: 36.2, lng: 138.2 };
@@ -27,7 +28,7 @@ export default function SmeMapView({ restaurants }: { restaurants: Restaurant[] 
             position={{ lat: r.lat as number, lng: r.lng as number }}
             onClick={() => setActiveId(r.id)}
           >
-            {r.hiddenGem ? <GemPin /> : <PlacePin />}
+            {r.hiddenGem ? <GemPin /> : <CategoryPin category={r.category} />}
           </AdvancedMarker>
         ))}
 
@@ -37,10 +38,12 @@ export default function SmeMapView({ restaurants }: { restaurants: Restaurant[] 
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#C8A859] text-white text-[10px] font-bold">★</span>
             <span className="text-foreground">Hidden gem</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="inline-block h-3.5 w-3.5 rounded-full bg-[#223A70]" />
-            <span className="text-foreground">Place</span>
-          </div>
+          {Array.from(new Set(restaurants.map((r) => normalizeCategory(r.category)))).map((cat) => (
+            <div key={cat} className="flex items-center gap-2">
+              <span className="inline-block h-3.5 w-3.5 rounded-full" style={{ backgroundColor: CATEGORY_META[cat].pin }} />
+              <span className="text-foreground">{CATEGORY_META[cat].label}</span>
+            </div>
+          ))}
         </div>
 
         {active && (

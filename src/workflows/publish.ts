@@ -10,6 +10,7 @@ import { applyEnrichment, enrichWithAudit, generateStructuredMenu } from "@/lib/
 import { translateSiteToEnglish } from "@/lib/sites/translator";
 import type { PublishedSite, RestaurantData } from "@/lib/sites/types";
 import type { AuditReport } from "@/lib/types";
+import { upsertPlaceFromSite } from "@/lib/restaurants/queries";
 
 export interface PublishWorkflowInput extends PublishInput {
   /** Full audit report. Drives the AI enrichment step. */
@@ -46,6 +47,7 @@ export async function publishSiteWorkflow(
     const enriched = await enrichStep(runId, translated, input.audit);
     const menuFilled = await structuredMenuStep(runId, enriched);
     const result = await persistStep(runId, menuFilled);
+    await upsertPlaceStep(runId, result);
     await closeStreamStep();
     return result;
   } catch (err) {
@@ -171,6 +173,17 @@ async function persistStep(runId: string, site: PublishedSite): Promise<Publishe
   });
   await emit({ state: "completed", message: `Published at ${plannedUrl}`, progress: 100, result: site, plannedUrl });
   return site;
+}
+
+async function upsertPlaceStep(runId: string, site: PublishedSite): Promise<void> {
+  "use step";
+  try {
+    await upsertPlaceFromSite(site);
+    await emit({ state: "running", message: "Added to explore map.", progress: 97 });
+  } catch (err) {
+    // Best-effort — don't fail the publish if the upsert fails.
+    console.warn("[publish] upsertPlaceFromSite failed:", err);
+  }
 }
 
 async function markPublishFailed(runId: string, message: string): Promise<void> {

@@ -10,6 +10,7 @@ import {
   useMapsLibrary,
   type MapProps,
 } from "@vis.gl/react-google-maps";
+import { CATEGORY_META, normalizeCategory } from "@/lib/places/categories";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 export const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? "DEMO_MAP_ID";
@@ -90,6 +91,11 @@ export function NumberedPin({ n }: { n: number }) {
 
 export function DotPin() {
   return <PinShell color="#9CA3AF" size={20} />;
+}
+
+export function CategoryPin({ category }: { category?: string | null }) {
+  const cat = normalizeCategory(category);
+  return <PinShell color={CATEGORY_META[cat].pin} />;
 }
 
 export { AdvancedMarker, InfoWindow, useMap, useMapsLibrary };

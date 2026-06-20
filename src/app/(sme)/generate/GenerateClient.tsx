@@ -289,11 +289,20 @@ export function GenerateClient() {
           Published at <span className="font-mono">{publishedSubdomain}.{APEX}</span>
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a
+            href={`https://${publishedSubdomain}.${APEX}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl bg-gold px-6 py-3 font-bold text-kon transition-colors hover:bg-gold/90"
+          >
+            Visit website
+            <ArrowRight className="h-4 w-4" />
+          </a>
           <Link
             href={`/storefront/${publishedSubdomain}`}
             className="inline-flex items-center gap-2 rounded-xl bg-kon2 px-6 py-3 font-bold text-white transition-colors hover:bg-kon"
           >
-            View Storefront
+            View storefront
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Button variant="outline" onClick={restart}>
