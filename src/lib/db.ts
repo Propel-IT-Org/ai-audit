@@ -18,11 +18,11 @@ if (!databaseUrl) {
 
 const pool =
   globalForDb.conn ??
-  new SQL(databaseUrl, {
+  new SQL(databaseUrl!, {
     max: 20,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
-    dialect: "postgres",
+    idleTimeout: 30,
+    connectionTimeout: 2,
+    adapter: "postgres",
   });
 
 if (process.env.NODE_ENV !== "production") {
