@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin } from "better-auth/plugins/admin";
+import { nextCookies } from "better-auth/next-js";
 import { db } from "./db";
 import * as schema from "./auth-schema";
 
@@ -21,7 +22,7 @@ export const auth = betterAuth({
     },
   },
   trustedOrigins: [authUrl.origin, `${authUrl.protocol}//www.${authUrl.host}`],
-  plugins: [admin()],
+  plugins: [admin(), nextCookies()],
 });
 
 export async function requireAdmin(request: Request): Promise<boolean> {
