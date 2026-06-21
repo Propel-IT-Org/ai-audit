@@ -1,10 +1,11 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { drizzle } from "drizzle-orm/bun-sql";
+// import { Pool } from "pg";
+import { SQL } from "bun";
 import * as authSchema from "./auth-schema";
 import * as restaurantSchema from "./db/schema/restaurant";
 
 const globalForDb = globalThis as unknown as {
-  conn: Pool | undefined;
+  conn: SQL | undefined;
 };
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -17,11 +18,11 @@ if (!databaseUrl) {
 
 const pool =
   globalForDb.conn ??
-  new Pool({
-    connectionString: databaseUrl,
+  new SQL(databaseUrl, {
     max: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
+    dialect: "postgres",
   });
 
 if (process.env.NODE_ENV !== "production") {
