@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   Globe,
   MessageSquare,
@@ -69,12 +69,15 @@ function readForwardedAudit(rawUrl: string): AuditReport | undefined {
 
 export function GenerateClient() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const initialUrl = searchParams?.get("url") ?? "";
 
   const [url, setUrl] = useState(initialUrl);
   const [snsUrl, setSnsUrl] = useState("");
   const [industry, setIndustry] = useState<Industry>("restaurant");
-  const [subdomain, setSubdomain] = useState(initialUrl ? slugFromUrl(initialUrl) : "");
+  const [subdomain, setSubdomain] = useState(
+    initialUrl ? slugFromUrl(initialUrl) : "",
+  );
   const [touchedSub, setTouchedSub] = useState(false);
 
   const [check, setCheck] = useState<SubdomainCheck | null>(null);
@@ -82,8 +85,13 @@ export function GenerateClient() {
 
   const [urlError, setUrlError] = useState<string | null>(null);
   const [viewState, setViewState] = useState<ViewState>("landing");
-  const [progress, setProgress] = useState<{ message: string; pct?: number } | null>(null);
-  const [publishedSubdomain, setPublishedSubdomain] = useState<string | null>(null);
+  const [progress, setProgress] = useState<{
+    message: string;
+    pct?: number;
+  } | null>(null);
+  const [publishedSubdomain, setPublishedSubdomain] = useState<string | null>(
+    null,
+  );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
@@ -106,7 +114,10 @@ export function GenerateClient() {
         const r = await fetch("/api/publish/check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ subdomain, sourceUrl: url ? normalizeUrl(url) : undefined }),
+          body: JSON.stringify({
+            subdomain,
+            sourceUrl: url ? normalizeUrl(url) : undefined,
+          }),
         });
         const j = await r.json();
         setCheck({
@@ -150,14 +161,25 @@ export function GenerateClient() {
             if (!line) continue;
             const payload = line.slice(5).trim();
             if (!payload || payload === "[DONE]") continue;
-            let ev: { state?: string; message?: string; progress?: number; error?: string };
+            let ev: {
+              state?: string;
+              message?: string;
+              progress?: number;
+              error?: string;
+            };
             try {
               ev = JSON.parse(payload);
             } catch {
               continue;
             }
-            if (typeof ev.message === "string" || typeof ev.progress === "number") {
-              setProgress({ message: ev.message ?? ev.state ?? "Working…", pct: ev.progress });
+            if (
+              typeof ev.message === "string" ||
+              typeof ev.progress === "number"
+            ) {
+              setProgress({
+                message: ev.message ?? ev.state ?? "Working…",
+                pct: ev.progress,
+              });
             }
             if (ev.state === "completed") {
               await reader.cancel().catch(() => {});
@@ -181,10 +203,13 @@ export function GenerateClient() {
     while (!signal.aborted) {
       await new Promise((res) => setTimeout(res, 1500));
       if (signal.aborted) return;
-      const r = await fetch(`/api/publish/status?runId=${encodeURIComponent(id)}`, {
-        cache: "no-store",
-        signal,
-      });
+      const r = await fetch(
+        `/api/publish/status?runId=${encodeURIComponent(id)}`,
+        {
+          cache: "no-store",
+          signal,
+        },
+      );
       if (!r.ok) continue;
       const s = (await r.json()) as {
         state?: string;
@@ -240,7 +265,17 @@ export function GenerateClient() {
       });
 
       if (!r.ok) {
-        const j = (await r.json().catch(() => ({}))) as { code?: string; error?: string };
+        const j = (await r.json().catch(() => ({}))) as {
+          code?: string;
+          error?: string;
+        };
+        // Session expired between page load and publish — bounce to sign-in,
+        // returning here (with the URL) so the customization is preserved.
+        if (r.status === 401) {
+          const next = `/generate?url=${encodeURIComponent(trimmed)}`;
+          router.push(`/signin?next=${encodeURIComponent(next)}`);
+          return;
+        }
         throw new Error(j.error ?? `Failed: ${r.status}`);
       }
 
@@ -284,9 +319,14 @@ export function GenerateClient() {
         <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/10">
           <Sparkles className="h-10 w-10 text-emerald-500" />
         </div>
-        <h1 className="text-3xl font-extrabold text-foreground">Your storefront is live!</h1>
+        <h1 className="text-3xl font-extrabold text-foreground">
+          Your storefront is live!
+        </h1>
         <p className="mt-3 max-w-sm text-muted-foreground">
-          Published at <span className="font-mono">{publishedSubdomain}.{APEX}</span>
+          Published at{" "}
+          <span className="font-mono">
+            {publishedSubdomain}.{APEX}
+          </span>
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <a
@@ -319,10 +359,12 @@ export function GenerateClient() {
         <div className="relative mx-auto max-w-3xl text-center">
           <p className="av-eyebrow mb-3">For businesses</p>
           <h1 className="mb-4 text-4xl font-extrabold leading-tight tracking-tight text-white md:text-5xl">
-            Build your <span className="text-gold">AI storefront</span> in 60 seconds
+            Build your <span className="text-gold">AI storefront</span> in 60
+            seconds
           </h1>
           <p className="mx-auto mb-8 max-w-xl text-base text-indigo-100/80 md:text-lg">
-            Paste your website URL — we&apos;ll translate, enrich, and publish an English storefront that AI travel tools can find and recommend.
+            Paste your website URL — we&apos;ll translate, enrich, and publish
+            an English storefront that AI travel tools can find and recommend.
           </p>
 
           {viewState === "error" && errorMsg && (
@@ -361,19 +403,25 @@ export function GenerateClient() {
               className="h-12 w-full rounded-md border border-border bg-white px-3 text-base text-foreground shadow-sm"
             >
               {INDUSTRY_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
               ))}
             </select>
 
             {/* Custom subdomain + availability */}
             <div className="rounded-md bg-white/95 p-3 shadow-sm">
-              <label className="av-eyebrow mb-1 block text-kon2">Choose your subdomain</label>
+              <label className="av-eyebrow mb-1 block text-kon2">
+                Choose your subdomain
+              </label>
               <div className="flex items-center gap-2">
                 <Input
                   value={subdomain}
                   onChange={(e) => {
                     setTouchedSub(true);
-                    setSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, "-"));
+                    setSubdomain(
+                      e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, "-"),
+                    );
                   }}
                   placeholder="your-business"
                   className="h-11 font-mono"
@@ -383,7 +431,11 @@ export function GenerateClient() {
                 </span>
               </div>
               <div className="mt-1 flex min-h-5 flex-wrap items-center gap-x-2 text-xs">
-                {checking && <span className="text-muted-foreground">Checking availability…</span>}
+                {checking && (
+                  <span className="text-muted-foreground">
+                    Checking availability…
+                  </span>
+                )}
                 {!checking && check?.ok && (
                   <span className="inline-flex items-center gap-1 text-emerald-600">
                     <CheckCircle className="h-3 w-3" /> Available
@@ -391,7 +443,8 @@ export function GenerateClient() {
                 )}
                 {!checking && check?.sameSource && (
                   <span className="inline-flex items-center gap-1 text-amber-600">
-                    <CheckCircle className="h-3 w-3" /> Owned by this site — re-publishing overwrites it.
+                    <CheckCircle className="h-3 w-3" /> Owned by this site —
+                    re-publishing overwrites it.
                   </span>
                 )}
                 {!checking && check && !check.ok && !check.sameSource && (
@@ -402,7 +455,10 @@ export function GenerateClient() {
                     {check.suggestion && (
                       <button
                         type="button"
-                        onClick={() => { setTouchedSub(true); setSubdomain(check.suggestion ?? subdomain); }}
+                        onClick={() => {
+                          setTouchedSub(true);
+                          setSubdomain(check.suggestion ?? subdomain);
+                        }}
                         className="font-mono underline underline-offset-2 hover:no-underline"
                       >
                         Try {check.suggestion}
@@ -419,7 +475,9 @@ export function GenerateClient() {
               disabled={!canStart}
               className="h-14 w-full bg-gold px-8 text-lg font-bold text-kon shadow-lg transition-all hover:scale-[1.02] hover:bg-gold/90 hover:shadow-xl disabled:opacity-60 disabled:hover:scale-100"
             >
-              {check?.sameSource ? "Re-publish my storefront" : "Build my storefront"}
+              {check?.sameSource
+                ? "Re-publish my storefront"
+                : "Build my storefront"}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -449,10 +507,16 @@ function PublishingView({
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="container mx-auto max-w-md px-4 text-center">
         <Loader2 className="mx-auto mb-6 h-12 w-12 animate-spin text-primary" />
-        <h2 className="mb-2 text-2xl font-bold text-foreground">Building your AI storefront…</h2>
-        <p className="mb-6 text-muted-foreground">This takes about 30–60 seconds.</p>
+        <h2 className="mb-2 text-2xl font-bold text-foreground">
+          Building your AI storefront…
+        </h2>
+        <p className="mb-6 text-muted-foreground">
+          This takes about 30–60 seconds.
+        </p>
 
-        <p className="mb-2 text-sm text-foreground">{progress?.message ?? "Working…"}</p>
+        <p className="mb-2 text-sm text-foreground">
+          {progress?.message ?? "Working…"}
+        </p>
         {typeof pct === "number" && (
           <div className="mx-auto h-1.5 w-full max-w-sm overflow-hidden rounded-full bg-muted">
             <div
@@ -462,7 +526,11 @@ function PublishingView({
           </div>
         )}
 
-        <Button variant="ghost" onClick={onCancel} className="mt-8 text-muted-foreground hover:text-foreground">
+        <Button
+          variant="ghost"
+          onClick={onCancel}
+          className="mt-8 text-muted-foreground hover:text-foreground"
+        >
           Cancel
         </Button>
       </div>

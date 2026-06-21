@@ -15,6 +15,7 @@ import {
   readPublishedSite,
 } from "@/lib/sites/storage";
 import { normalizeUrl } from "@/lib/utils/url";
+import { auth } from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -36,6 +37,14 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const session = await auth.api.getSession({ headers: req.headers });
+  if (!session) {
+    return Response.json(
+      { error: "Sign in required", code: "UNAUTHENTICATED" },
+      { status: 401 },
+    );
+  }
+
   let body: unknown;
   try {
     body = await req.json();
