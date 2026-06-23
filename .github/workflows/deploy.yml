@@ -47,8 +47,19 @@ jobs:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_KEY }}
+          envs: ANTHROPIC_API_KEY,BLOB_READ_WRITE_TOKEN,NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID,NEXT_PUBLIC_APP_URL,SITE_APEX_HOSTS,SITE_PUBLIC_APEX,NEXT_PUBLIC_SITE_APEX
           script: |
             cd /var/www/ai-audit
             npm ci --omit=dev
+            cat > .env.local << ENVEOF
+            ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
+            BLOB_READ_WRITE_TOKEN=$BLOB_READ_WRITE_TOKEN
+            NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+            NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=$NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID
+            NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+            SITE_APEX_HOSTS=$SITE_APEX_HOSTS
+            SITE_PUBLIC_APEX=$SITE_PUBLIC_APEX
+            NEXT_PUBLIC_SITE_APEX=$NEXT_PUBLIC_SITE_APEX
+            ENVEOF
             pm2 restart ai-audit || pm2 start npm --name ai-audit -- start
             pm2 save
