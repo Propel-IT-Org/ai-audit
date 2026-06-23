@@ -6,7 +6,8 @@ import { getRestaurant } from "@/lib/restaurants/queries";
 import { readRestaurantMdx } from "@/lib/restaurants/mdx-storage";
 import { mdxComponents } from "@/components/mdx-components";
 import { SafeMdx } from "@/components/SafeMdx";
-import { RestaurantDetail, type RestaurantFrontmatter } from "./RestaurantDetail";
+import { PlaceDetail } from "@/components/place/PlaceDetail";
+import type { Place } from "@/lib/places/place-types";
 
 const compileOptions = { parseFrontmatter: true } as const;
 
@@ -37,11 +38,11 @@ export default async function RestaurantPage({
 
   // Parse frontmatter — the rich restaurant data lives there; the body is the
   // AI-overview prose. Falls back to a simple layout on plain MDX / parse error.
-  let frontmatter: RestaurantFrontmatter = {};
+  let frontmatter: Record<string, unknown> = {};
   let body: React.ReactNode = null;
   if (mdxSource) {
     try {
-      const compiled = await compileMDX<RestaurantFrontmatter>({
+      const compiled = await compileMDX<Record<string, unknown>>({
         source: mdxSource,
         options: compileOptions,
         components: mdxComponents,
@@ -54,13 +55,14 @@ export default async function RestaurantPage({
     }
   }
 
-  const isRich = !!(frontmatter.name || frontmatter.menu || frontmatter.overview);
+  const isRich = !!(frontmatter.name || frontmatter.category || frontmatter.overview);
 
   if (isRich) {
     return (
-      <RestaurantDetail
-        data={frontmatter}
-        overview={body}
+      <PlaceDetail
+        data={frontmatter as unknown as Place}
+        body={body}
+        galleryImages={r.galleryUrls ?? []}
         fallback={{
           name: r.nameEn,
           nameJp: r.nameJp,

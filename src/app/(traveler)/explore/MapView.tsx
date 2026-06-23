@@ -70,7 +70,7 @@ export default function MapView({ restaurants, language }: Props) {
                     href={`/restaurants/${active.slug}`}
                     className="inline-block text-sm font-medium text-[#223A70] hover:underline"
                   >
-                    View full page →
+                    View {CATEGORY_META[normalizeCategory(active.category)].label.toLowerCase()} →
                   </Link>
                 )}
                 {active.websiteUrl && (

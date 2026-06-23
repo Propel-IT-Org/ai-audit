@@ -23,6 +23,25 @@ function parseFrontmatter(text: string): Record<string, string | number | boolea
   return data;
 }
 
+/**
+ * Insert/replace the frontmatter `gallery:` block with the given image URLs as
+ * `- { src: "<url>" }` entries, so the MDX file stays self-contained alongside
+ * the DB column. Best-effort: returns the original text if there's no frontmatter.
+ */
+function injectGalleryUrls(mdx: string, urls: string[]): string {
+  const block = ["gallery:", ...urls.map((u) => `  - { src: ${JSON.stringify(u)} }`)].join("\n");
+  const fm = mdx.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!fm) return `---\n${block}\n---\n\n${mdx}`;
+
+  // Drop an existing `gallery:` block (its key line + indented children).
+  const body = fm[1]
+    .replace(/^gallery:[ \t]*\r?\n(?:[ \t]+.*(?:\r?\n|$))*/m, "")
+    .replace(/^gallery:[ \t]*.*\r?\n?/m, "")
+    .replace(/\s*$/, "");
+  const newFrontmatter = `${body}\n${block}`;
+  return mdx.replace(/^---\r?\n[\s\S]*?\r?\n---/, () => `---\n${newFrontmatter}\n---`);
+}
+
 type MdxFields = Partial<{
   nameEn: string; nameJp: string; address: string; aiOverview: string;
   lat: string; lng: string; prefecture: string; websiteUrl: string; slug: string;
@@ -88,6 +107,7 @@ const schema = z.object({
   imageEmoji: z.string().optional(),
   websiteUrl: z.string().url().optional(),
   hiddenGem: z.boolean().optional(),
+  galleryUrls: z.array(z.string().url()).max(6).optional(),
   auditScore: z.number().int().optional(),
   auditGrade: z.string().optional(),
   mdxBody: z.string().optional(),
@@ -109,16 +129,23 @@ export async function saveRestaurantAction(data: SaveRestaurantInput): Promise<{
   }
 
   try {
-    const { mdxBody, ...rest } = parsed.data;
+    const { mdxBody, galleryUrls, ...rest } = parsed.data;
 
     // Store MDX content in Vercel Blob (not inline in Postgres). Persist the
-    // returned blob URL; clear the legacy inline column.
+    // returned blob URL; clear the legacy inline column. Gallery URLs are
+    // injected into the MDX frontmatter so the file stays self-contained.
     let mdxUrl: string | undefined;
     if (mdxBody && mdxBody.trim()) {
-      mdxUrl = await writeRestaurantMdx(rest.slug, mdxBody);
+      const body = galleryUrls?.length ? injectGalleryUrls(mdxBody, galleryUrls) : mdxBody;
+      mdxUrl = await writeRestaurantMdx(rest.slug, body);
     }
 
-    const values = { ...rest, mdxUrl, mdxBody: null as string | null };
+    const values = {
+      ...rest,
+      galleryUrls: galleryUrls?.length ? galleryUrls : null,
+      mdxUrl,
+      mdxBody: null as string | null,
+    };
 
     const existing = await getRestaurant(rest.slug);
     if (existing) {

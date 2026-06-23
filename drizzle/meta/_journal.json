@@ -22,6 +22,13 @@
       "when": 1781671441550,
       "tag": "0002_eager_mongu",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782242395218,
+      "tag": "0003_colossal_the_liberteens",
+      "breakpoints": true
     }
   ]
 }

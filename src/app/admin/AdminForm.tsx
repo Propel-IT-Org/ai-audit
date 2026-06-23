@@ -51,8 +51,11 @@ const formSchema = z.object({
   imageUrl: z.union([z.string().url(), z.literal("")]).optional(),
   websiteUrl: z.union([z.string().url(), z.literal("")]).optional(),
   hiddenGem: z.boolean(),
+  galleryUrls: z.array(z.union([z.string().url("Enter a valid URL"), z.literal("")])).max(6),
   mdxBody: z.string().optional(),
 });
+
+const EMPTY_GALLERY = ["", "", "", "", "", ""];
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -70,6 +73,7 @@ const defaultValues: FormValues = {
   imageUrl: "",
   websiteUrl: "",
   hiddenGem: false,
+  galleryUrls: EMPTY_GALLERY,
   mdxBody: "",
 };
 
@@ -91,6 +95,7 @@ export function AdminForm({ initial, mode = "create" }: { initial?: Restaurant; 
         imageUrl: initial.imageUrl ?? "",
         websiteUrl: initial.websiteUrl ?? "",
         hiddenGem: initial.hiddenGem ?? false,
+        galleryUrls: [...(initial.galleryUrls ?? []), ...EMPTY_GALLERY].slice(0, 6),
         mdxBody: "",
       }
     : defaultValues;
@@ -141,6 +146,7 @@ export function AdminForm({ initial, mode = "create" }: { initial?: Restaurant; 
       imageUrl: values.imageUrl || undefined,
       websiteUrl: values.websiteUrl || undefined,
       hiddenGem: values.hiddenGem,
+      galleryUrls: (values.galleryUrls ?? []).map((u) => u.trim()).filter(Boolean),
       mdxBody: values.mdxBody || undefined,
     });
 
@@ -153,7 +159,7 @@ export function AdminForm({ initial, mode = "create" }: { initial?: Restaurant; 
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
       <FieldGroup>
         <Controller
           name="nameEn"
@@ -306,6 +312,33 @@ export function AdminForm({ initial, mode = "create" }: { initial?: Restaurant; 
             </Field>
           )}
         />
+
+        <Field>
+          <FieldLabel>Gallery image URLs</FieldLabel>
+          <FieldDescription>Up to 6 photos shown in the place&apos;s Gallery tab.</FieldDescription>
+          <div className="flex flex-col gap-2">
+            {EMPTY_GALLERY.map((_, i) => (
+              <Controller
+                key={i}
+                name={`galleryUrls.${i}` as const}
+                control={control}
+                render={({ field, fieldState }) => (
+                  <div>
+                    <Input
+                      {...field}
+                      value={field.value ?? ""}
+                      id={field.name}
+                      type="url"
+                      placeholder={`https://… (photo ${i + 1})`}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </div>
+                )}
+              />
+            ))}
+          </div>
+        </Field>
 
         <Controller
           name="websiteUrl"

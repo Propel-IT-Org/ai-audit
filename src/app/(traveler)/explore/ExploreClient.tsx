@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { MapPin, List as ListIcon, Map as MapIcon } from "lucide-react";
@@ -79,7 +79,7 @@ function RestaurantCard({ r }: { r: Restaurant }) {
             href={`/restaurants/${r.slug}`}
             className="pointer-events-auto relative z-20 mt-3 inline-block self-start text-xs font-medium text-[#223A70] hover:underline"
           >
-            View restaurant page →
+            View {CATEGORY_META[normalizeCategory(r.category)].label.toLowerCase()} →
           </Link>
         )}
       </div>
@@ -158,15 +158,22 @@ export function ExploreClient({ restaurants, mapRestaurants }: Props) {
   const prefectures = useMemo(() => uniqueVals(restaurants, (r) => r.prefecture), [restaurants]);
   const regions = useMemo(() => uniqueVals(restaurants, (r) => r.region), [restaurants]);
 
-  const filtered = useMemo(() => {
-    return restaurants.filter((r) => {
+  const matchesFilters = useCallback(
+    (r: Restaurant) => {
       if (hiddenOnly && !r.hiddenGem) return false;
       if (category && normalizeCategory(r.category) !== category) return false;
       if (prefecture && r.prefecture !== prefecture) return false;
       if (region && r.region !== region) return false;
       return true;
-    });
-  }, [restaurants, category, prefecture, region, hiddenOnly]);
+    },
+    [category, prefecture, region, hiddenOnly],
+  );
+
+  const filtered = useMemo(() => restaurants.filter(matchesFilters), [restaurants, matchesFilters]);
+  const filteredMap = useMemo(
+    () => mapRestaurants.filter(matchesFilters),
+    [mapRestaurants, matchesFilters],
+  );
 
   return (
     <section className="container mx-auto px-4 py-8">
@@ -241,7 +248,7 @@ export function ExploreClient({ restaurants, mapRestaurants }: Props) {
 
       {view === "map" ? (
         <div className="overflow-hidden rounded-lg border border-border" style={{ height: "60vh" }}>
-          <MapView restaurants={mapRestaurants} language="en" />
+          <MapView restaurants={filteredMap} language="en" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="py-16 text-center">

@@ -6,6 +6,7 @@ import {
   integer,
   timestamp,
   index,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 export const restaurant = pgTable(
@@ -29,6 +30,7 @@ export const restaurant = pgTable(
     lng: doublePrecision("lng"),
     imageUrl: text("image_url"),
     imageEmoji: text("image_emoji"),
+    galleryUrls: jsonb("gallery_urls").$type<string[]>(),
     websiteUrl: text("website_url"),
     hiddenGem: boolean("hidden_gem").default(false),
     auditScore: integer("audit_score"),
