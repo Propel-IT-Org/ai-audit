@@ -169,6 +169,8 @@ const RESERVED_SUBDOMAINS = new Set([
   "aivy",
   "tokyo",
   "japan",
+  // Reserved for future Aivible products
+  "hiddengems",
 ]);
 
 export function isReservedSubdomain(sub: string): boolean {
