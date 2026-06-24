@@ -131,7 +131,6 @@ const RESERVED_SUBDOMAINS = new Set([
   "dev",
   "test",
   "sandbox",
-  "staging",
   "preview",
   "beta",
   "alpha",
