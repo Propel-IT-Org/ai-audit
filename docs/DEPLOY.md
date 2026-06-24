@@ -19,8 +19,14 @@ The `main` branch auto-deploys to **https://aivible.tokyo** via GitHub Actions o
 **Reverse proxy:** Caddy (TLS auto-provisioned via Let's Encrypt)
 **App directory:** `/var/www/ai-audit/`
 
+**Caddy binary:** custom build via xcaddy with `github.com/caddy-dns/digitalocean` plugin (required for wildcard TLS). Binary at `/usr/bin/caddy` (stock backup at `/usr/bin/caddy.stock`).
+
 **Caddy config** (`/etc/caddy/Caddyfile`):
 ```
+{
+    email jozzua@gmail.com
+}
+
 aivible.tokyo, www.aivible.tokyo {
     reverse_proxy localhost:3000
     encode gzip
@@ -33,10 +39,26 @@ staging.aivible.tokyo {
     encode gzip
 }
 
+*.aivible.tokyo {
+    tls {
+        dns digitalocean <DO_FULL_ACCESS_TOKEN>
+    }
+    reverse_proxy localhost:3000
+    encode gzip
+}
+
 :80 {
     redir https://{host}{uri} permanent
 }
 ```
+
+DNS records on DigitalOcean (aivible.tokyo):
+- `A @ → 159.223.83.208` (apex)
+- `CNAME www → @`
+- `A staging → 159.223.83.208`
+- `A * → 159.223.83.208` (wildcard for storefront subdomains)
+- `A docs → 209.97.164.52`
+- `A bot → 209.97.164.52`
 
 ---
 
