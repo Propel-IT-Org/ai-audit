@@ -7,7 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
 // Anything else with a single subdomain label gets rewritten to /sites/<label>.
 
 const APEX_HOSTS = (
-  process.env.SITE_APEX_HOSTS ?? "shorobik.com,localhost:3000,localhost"
+  process.env.NEXT_PUBLIC_SITE_APEX ??
+  process.env.SITE_APEX_HOSTS ??
+  "shorobik.com,localhost:3000,localhost"
 )
   .split(",")
   .map((h) => h.trim().toLowerCase())

@@ -11,12 +11,19 @@ export interface PublishInput {
 }
 
 function buildCanonical(subdomain: string): string {
-  const apex = process.env.SITE_PUBLIC_APEX ?? "shorobik.com";
+  const apex =
+    process.env.NEXT_PUBLIC_SITE_APEX ??
+    process.env.SITE_PUBLIC_APEX ??
+    "shorobik.com";
   return `https://${subdomain}.${apex}`;
 }
 
 /** Hit the 30–65 char sweet spot the meta-tags analyzer wants. */
-function buildTitle(name: string, city: string | undefined, cuisineFirst: string | undefined): string {
+function buildTitle(
+  name: string,
+  city: string | undefined,
+  cuisineFirst: string | undefined,
+): string {
   const suffixes = [
     cuisineFirst && city ? `— ${cuisineFirst} restaurant in ${city}` : null,
     city ? `— Restaurant in ${city} | Menu & Reservations` : null,
@@ -52,7 +59,10 @@ function buildDescription(
   let out = parts.join(" ");
   // Pad if too short.
   const padHints: string[] = [];
-  if (cuisine?.length && !out.toLowerCase().includes(cuisine[0].toLowerCase())) {
+  if (
+    cuisine?.length &&
+    !out.toLowerCase().includes(cuisine[0].toLowerCase())
+  ) {
     padHints.push(`${cuisine.join(", ")} cuisine.`);
   }
   if (city && !out.toLowerCase().includes(city.toLowerCase())) {
@@ -68,7 +78,10 @@ function buildDescription(
   return out;
 }
 
-function buildProxiedOgImage(canonical: string, srcUrl: string | undefined): string | undefined {
+function buildProxiedOgImage(
+  canonical: string,
+  srcUrl: string | undefined,
+): string | undefined {
   if (!srcUrl || !/^https?:\/\//i.test(srcUrl)) return undefined;
   return `${canonical.replace(/\/$/, "")}/api/img?u=${encodeURIComponent(srcUrl)}`;
 }
@@ -76,7 +89,9 @@ function buildProxiedOgImage(canonical: string, srcUrl: string | undefined): str
 /**
  * Scrape `sourceUrl`, build a typed site (pre-translation, pre-enrichment).
  */
-export async function buildPublishedSite(input: PublishInput): Promise<PublishedSite> {
+export async function buildPublishedSite(
+  input: PublishInput,
+): Promise<PublishedSite> {
   const { siteData, pages, errors } = await crawlSite(input.sourceUrl, {
     industry: input.industry === "restaurant" ? "restaurant" : "general",
     maxPages: Math.min(input.maxPages ?? 10, 25),
@@ -87,7 +102,9 @@ export async function buildPublishedSite(input: PublishInput): Promise<Published
     );
   }
   const homepage = pages.find((p) => p.url === siteData.rootUrl) ?? pages[0];
-  const source = detectSourceLanguage(homepage.renderedHtml || homepage.rawHtml);
+  const source = detectSourceLanguage(
+    homepage.renderedHtml || homepage.rawHtml,
+  );
   const ts = new Date().toISOString();
 
   if (input.industry === "restaurant") {
