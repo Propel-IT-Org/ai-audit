@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { MapPin, List as ListIcon, Map as MapIcon } from "lucide-react";
@@ -252,7 +253,13 @@ export function ExploreClient({ restaurants, mapRestaurants }: Props) {
         </div>
       ) : filtered.length === 0 ? (
         <div className="py-16 text-center">
-          <MapPin className="mx-auto h-12 w-12 text-muted-foreground/50" />
+          <Image
+            src="/mockups/traveler-journey/illustrations/no-results.webp"
+            alt="Shirube with an empty result card"
+            width={240}
+            height={240}
+            className="mx-auto h-40 w-auto"
+          />
           <p className="mt-4 text-muted-foreground">No places match your filters.</p>
         </div>
       ) : (

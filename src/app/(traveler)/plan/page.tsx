@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Sparkles, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,14 @@ export default function PlanPage() {
         <p className="mx-auto mt-3 max-w-xl text-base text-indigo-100/80">
           Pick a destination and dates — our AI builds a day-by-day itinerary from verified local gems.
         </p>
+        <Image
+          src="/mockups/traveler-journey/illustrations/onboarding-plan.webp"
+          alt="Shirube presenting an itinerary"
+          width={320}
+          height={200}
+          className="mx-auto mt-6 h-36 w-auto md:h-44"
+          priority
+        />
       </section>
 
       <div className="mx-auto -mt-10 max-w-xl px-4 pb-20">

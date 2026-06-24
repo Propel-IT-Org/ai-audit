@@ -1,7 +1,7 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { Aivy } from "@/components/brand/Aivy";
 
 interface ComingSoonProps {
   title?: string;
@@ -10,9 +10,14 @@ interface ComingSoonProps {
 export function ComingSoon({ title = "Coming soon" }: ComingSoonProps) {
   return (
     <section className="flex flex-col items-center justify-center px-4 py-20 text-center">
-      <span className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-aivy to-aivy-deep">
-        <Aivy size={48} />
-      </span>
+      <Image
+        src="/shirube-character-full.webp"
+        alt="Shirube"
+        width={120}
+        height={120}
+        className="mb-4 h-28 w-auto"
+        priority
+      />
       <h1 className="text-2xl font-extrabold text-gray-900">{title}</h1>
       <p className="mt-2 max-w-sm text-sm text-gray-500">
         This feature is being built by the AIVIBLE team.

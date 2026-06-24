@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { withWorkflow } from "workflow/next";
 
 const nextConfig: NextConfig = {
+  output: process.env.BUILD_STANDALONE === "true" ? "standalone" : undefined,
   reactCompiler: true,
   reactStrictMode: false,
   serverExternalPackages: [

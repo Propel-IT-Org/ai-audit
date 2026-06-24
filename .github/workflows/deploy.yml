@@ -2,7 +2,7 @@ name: Deploy to Digital Ocean
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
@@ -11,19 +11,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: npm
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
-      - name: Build
-        run: npm run build
+      - name: Build (standalone)
+        run: bun run build
         env:
+          BUILD_STANDALONE: "true"
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
           NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
           NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID }}
@@ -31,29 +36,55 @@ jobs:
           SITE_APEX_HOSTS: ${{ secrets.SITE_APEX_HOSTS }}
           SITE_PUBLIC_APEX: ${{ secrets.SITE_PUBLIC_APEX }}
 
+      - name: Assemble standalone bundle
+        run: |
+          cp -r .next/static .next/standalone/.next/static
+          cp -r public .next/standalone/public
+
       - name: Copy build to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_KEY }}
-          source: ".next/,public/,package.json,package-lock.json,next.config.ts"
+          source: ".next/standalone/"
           target: /var/www/ai-audit/
+          strip_components: 2
           overwrite: true
 
-      - name: Install deps & restart app
+      - name: Restart app
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+          NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID }}
+          NEXT_PUBLIC_SITE_APEX: ${{ secrets.NEXT_PUBLIC_SITE_APEX }}
+          SITE_APEX_HOSTS: ${{ secrets.SITE_APEX_HOSTS }}
+          SITE_PUBLIC_APEX: ${{ secrets.SITE_PUBLIC_APEX }}
         with:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_KEY }}
-          envs: ANTHROPIC_API_KEY,BLOB_READ_WRITE_TOKEN,NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID,NEXT_PUBLIC_APP_URL,SITE_APEX_HOSTS,SITE_PUBLIC_APEX,NEXT_PUBLIC_SITE_APEX
+          envs: ANTHROPIC_API_KEY,BLOB_READ_WRITE_TOKEN,DATABASE_URL,BETTER_AUTH_SECRET,BETTER_AUTH_URL,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID,NEXT_PUBLIC_APP_URL,SITE_APEX_HOSTS,SITE_PUBLIC_APEX,NEXT_PUBLIC_SITE_APEX
           script: |
+            export PATH="$HOME/.bun/bin:$PATH"
+            which bun || curl -fsSL https://bun.sh/install | bash
             cd /var/www/ai-audit
-            npm ci --omit=dev
-            cat > .env.local << ENVEOF
+            cat > .env << ENVEOF
             ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
             BLOB_READ_WRITE_TOKEN=$BLOB_READ_WRITE_TOKEN
+            DATABASE_URL=$DATABASE_URL
+            BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
+            BETTER_AUTH_URL=$BETTER_AUTH_URL
+            GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+            GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
             NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
             NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=$NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID
             NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
@@ -61,5 +92,7 @@ jobs:
             SITE_PUBLIC_APEX=$SITE_PUBLIC_APEX
             NEXT_PUBLIC_SITE_APEX=$NEXT_PUBLIC_SITE_APEX
             ENVEOF
-            pm2 restart ai-audit || pm2 start npm --name ai-audit -- start
+            pm2 restart ai-audit --update-env \
+              || PORT=3000 HOSTNAME=127.0.0.1 pm2 start server.js \
+                   --name ai-audit --interpreter "$HOME/.bun/bin/bun"
             pm2 save

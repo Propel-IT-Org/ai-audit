@@ -57,7 +57,7 @@ export default function FrontDoorPage() {
               Search what you want to experience, build an AI-assisted itinerary, and discover verified local gems English-only search hides.
             </p>
             <ul className="mt-4 space-y-1.5 text-[13px] text-gray-600">
-              <Point text="AI itinerary planner (chat with Aivy)" />
+              <Point text="AI itinerary planner (chat with Shirube)" />
               <Point text="Verified hidden gems on a live map" />
               <Point text="Bilingual JP + EN search" />
             </ul>
