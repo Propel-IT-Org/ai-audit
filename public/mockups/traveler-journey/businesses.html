@@ -52,7 +52,7 @@
   <header class="bg-white border-b border-gray-100 flex-shrink-0">
     <div class="px-4 py-2.5 flex items-center justify-between gap-3">
       <a href="index.html" class="flex items-center gap-1.5 flex-shrink-0">
-        <img src="icons/shirube.svg" alt="Shirube" class="w-7 h-7" />
+        <img src="icons/shirube-new.webp" alt="Shirube" class="w-7 h-7" />
         <span class="text-lg font-bold text-gray-900">AIVIBLE</span>
       </a>
       <div class="hidden md:flex items-center gap-6 text-sm text-gray-500">
@@ -78,7 +78,7 @@
     <!-- LEFT: Shirube discovery chat — the primary interface, search happens here -->
     <aside id="pane-chat" class="w-full md:w-[360px] md:flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
       <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2.5 flex-shrink-0">
-        <span class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>
+        <span class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background:#F5EEDC;"><img src="icons/shirube-new.webp" alt="Shirube" style="width:62%;height:62%" /></span>
         <div class="min-w-0">
           <div class="text-sm font-bold text-gray-900 truncate" data-en="Shirube · Local guide" data-jp="シルベ · 地元ガイド">Shirube · Local guide</div>
           <div class="text-[11px] text-green-500 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span><span data-en="Near Gion, Kyoto" data-jp="祇園・京都の近く">Near Gion, Kyoto</span></div>
@@ -88,7 +88,7 @@
       <!-- message stream -->
       <div id="chat-stream" class="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         <div class="flex gap-2.5">
-          <span class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>
+          <span class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:#F5EEDC;"><img src="icons/shirube-new.webp" alt="Shirube" style="width:62%;height:62%" /></span>
           <div class="bg-gray-50 border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 leading-relaxed" data-en="📍 You're near <b>Gion, Kyoto</b>. I found verified local places around you — the gold <span class='text-purple-600 font-semibold'>💎 gems</span> are JP-only finds most AI search misses. What are you after?" data-jp="📍 現在地は<b>祇園・京都</b>。周辺の認証済みスポットを見つけました。金色の<span class='text-purple-600 font-semibold'>💎名店</span>は日本語のみでAI検索が見落とす穴場です。何をお探しですか？">📍 You're near <b>Gion, Kyoto</b>. I found verified local places around you — the gold <span class="text-purple-600 font-semibold">💎 gems</span> are JP-only finds most AI search misses. What are you after?</div>
         </div>
         <!-- quick searches (chat-driven) -->
@@ -282,7 +282,7 @@
     }
     function bubbleShirube(html){
       var d=document.createElement('div'); d.className='flex gap-2.5';
-      d.innerHTML='<span class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:#F5EEDC;"><img src="icons/shirube.svg" alt="Shirube" style="width:62%;height:62%" /></span>'+
+      d.innerHTML='<span class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:#F5EEDC;"><img src="icons/shirube-new.webp" alt="Shirube" style="width:62%;height:62%" /></span>'+
         '<div class="bg-gray-50 border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 leading-relaxed">'+html+'</div>';
       stream.appendChild(d); stream.scrollTop=stream.scrollHeight;
     }
