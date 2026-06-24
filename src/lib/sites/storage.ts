@@ -171,6 +171,22 @@ const RESERVED_SUBDOMAINS = new Set([
   "japan",
   // Reserved for future Aivible products
   "hiddengems",
+  "gems",
+  // Founder names & nicknames
+  "ely",
+  "elymar",
+  "apao",
+  "elyapao",
+  "cher",
+  "cherprang",
+  "areekul",
+  "ian",
+  "tseng",
+  "yingheng",
+  "tsengyingheng",
+  "apar",
+  "numeri",
+  "sattar",
 ]);
 
 export function isReservedSubdomain(sub: string): boolean {
