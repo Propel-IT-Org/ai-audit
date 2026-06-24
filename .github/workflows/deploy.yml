@@ -75,7 +75,8 @@ jobs:
           envs: ANTHROPIC_API_KEY,BLOB_READ_WRITE_TOKEN,DATABASE_URL,BETTER_AUTH_SECRET,BETTER_AUTH_URL,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID,NEXT_PUBLIC_APP_URL,SITE_APEX_HOSTS,SITE_PUBLIC_APEX,NEXT_PUBLIC_SITE_APEX
           script: |
             export PATH="$HOME/.bun/bin:$PATH"
-            which bun || curl -fsSL https://bun.sh/install | bash
+            command -v bun >/dev/null 2>&1 || npm install -g bun
+            BUN_BIN="$(command -v bun)"
             cd /var/www/ai-audit
             cat > .env << ENVEOF
             ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
@@ -94,5 +95,5 @@ jobs:
             ENVEOF
             pm2 restart ai-audit --update-env \
               || PORT=3000 HOSTNAME=127.0.0.1 pm2 start server.js \
-                   --name ai-audit --interpreter "$HOME/.bun/bin/bun"
+                   --name ai-audit --interpreter "$BUN_BIN"
             pm2 save

@@ -92,8 +92,9 @@ apt-get install -y nodejs
 npm install -g pm2
 pm2 startup systemd -u root --hp /root
 
-# bun (app runtime) — the deploy workflow also self-installs this on first run
-curl -fsSL https://bun.sh/install | bash
+# bun (app runtime) — installed via npm so no `unzip` is required on the box.
+# The deploy workflow also self-installs this on first run if missing.
+npm install -g bun
 
 # App directory
 mkdir -p /var/www/ai-audit
