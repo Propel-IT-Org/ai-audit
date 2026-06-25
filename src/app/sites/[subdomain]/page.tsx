@@ -3,8 +3,9 @@ import type { Metadata } from "next";
 import { readPublishedSite, isValidSubdomain } from "@/lib/sites/storage";
 import { RestaurantHome } from "@/templates/restaurant/RestaurantHome";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+// ISR: published sites are immutable between publishes. Time-based fallback +
+// on-demand purge via revalidateSite() on publish/edit/delete.
+export const revalidate = 3600;
 
 interface Params {
   params: Promise<{ subdomain: string }>;

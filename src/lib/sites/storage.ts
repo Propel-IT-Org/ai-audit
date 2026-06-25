@@ -6,6 +6,26 @@ import {
 } from "../storage/blob";
 import type { PublishedSite } from "./types";
 import { cache } from "react";
+import { revalidatePath } from "next/cache";
+
+/** Time-based ISR fallback (seconds) for published-site routes. */
+export const SITE_REVALIDATE_SECONDS = 3600;
+
+/**
+ * Invalidate every cached route for a subdomain. Called on publish/edit/delete.
+ * `revalidatePath(..., "layout")` purges `/sites/<sub>` and all nested routes
+ * (menu, reservation, robots/sitemap/llms) in one call, so a republish shows up
+ * immediately instead of waiting out the time-based fallback. Swallows errors
+ * so a publish never fails on a revalidation hiccup — the `revalidate` fallback
+ * still refreshes content within the interval.
+ */
+export function revalidateSite(subdomain: string): void {
+  try {
+    revalidatePath(`/sites/${subdomain}`, "layout");
+  } catch {
+    // May be called outside a request scope in some workflow contexts.
+  }
+}
 
 export function isValidSubdomain(sub: string): boolean {
   return /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(sub) && sub.length <= 63;
@@ -36,6 +56,7 @@ export async function writePublishedSite(site: PublishedSite): Promise<string> {
     cacheControlMaxAge: 60,
     token: blobToken(),
   });
+  revalidateSite(site.subdomain);
   return r.url;
 }
 
@@ -66,7 +87,10 @@ export const readPublishedSite = cache(async (subdomain: string) => {
   const url = await discoverSiteBlobUrl(subdomain);
   if (!url) return null;
   try {
-    const r = await fetch(url, { cache: "no-store" });
+    // Cacheable read: the route segment's `revalidate` governs freshness, and
+    // `revalidateSite()` purges on publish. (No `cache: "no-store"`, which would
+    // force the whole route dynamic.)
+    const r = await fetch(url, { next: { revalidate: SITE_REVALIDATE_SECONDS } });
     if (!r.ok) return null;
     return (await r.json()) as PublishedSite;
   } catch {
@@ -157,4 +181,5 @@ export async function deletePublishedSite(subdomain: string): Promise<void> {
   } catch {
     // ignore
   }
+  revalidateSite(subdomain);
 }

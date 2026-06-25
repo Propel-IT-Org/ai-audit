@@ -3,8 +3,9 @@ import type { Metadata } from "next";
 import { readPublishedSite, isValidSubdomain } from "@/lib/sites/storage";
 import { RestaurantReservation } from "@/templates/restaurant/RestaurantReservation";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+// ISR: see sites/[subdomain]/page.tsx. The reservation form is client-side, so
+// the static shell caches fine. Purged on publish via revalidateSite().
+export const revalidate = 3600;
 
 interface Params {
   params: Promise<{ subdomain: string }>;

@@ -2,7 +2,8 @@ import { isValidSubdomain, readPublishedSite } from "@/lib/sites/storage";
 import { buildSiteRobotsTxt } from "@/lib/sites/geo-files";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+// ISR: purged on publish via revalidateSite().
+export const revalidate = 3600;
 
 export async function GET(_req: Request, ctx: { params: Promise<{ subdomain: string }> }) {
   const { subdomain } = await ctx.params;
