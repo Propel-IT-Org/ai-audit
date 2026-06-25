@@ -53,6 +53,7 @@ export function proxy(req: NextRequest) {
     return NextResponse.next();
   }
   url.pathname = `/sites/${sub}${path === "/" ? "" : path}`;
+  url.protocol = "http";
   return NextResponse.rewrite(url);
 }
 
