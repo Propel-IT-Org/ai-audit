@@ -39,10 +39,12 @@ export default function RootLayout({
         "font-sans",
       )}
     >
+      <head>
+        <link rel="shortcut icon" href="/shirube-logo.webp" type="image/webp" />
+        <link rel="icon" href="/shirube-logo.webp" type="image/webp" />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
