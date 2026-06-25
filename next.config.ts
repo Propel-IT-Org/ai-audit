@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   output: process.env.BUILD_STANDALONE === "true" ? "standalone" : undefined,
   reactCompiler: true,
   reactStrictMode: false,
+  typedRoutes: true,
   serverExternalPackages: [
     "playwright",
     "playwright-core",
@@ -16,7 +17,6 @@ const nextConfig: NextConfig = {
     "@vercel/blob",
     "workflow",
   ],
-  typescript: { ignoreBuildErrors: true },
 };
 
 export default withWorkflow(nextConfig);

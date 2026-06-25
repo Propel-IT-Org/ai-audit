@@ -77,6 +77,7 @@ jobs:
             export PATH="$HOME/.bun/bin:$PATH"
             command -v bun >/dev/null 2>&1 || npm install -g bun
             BUN_BIN="$(command -v bun)"
+            echo "Using bun: $BUN_BIN ($($BUN_BIN --version))"
             cd /var/www/ai-audit
             cat > .env << ENVEOF
             ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
@@ -93,7 +94,12 @@ jobs:
             SITE_PUBLIC_APEX=$SITE_PUBLIC_APEX
             NEXT_PUBLIC_SITE_APEX=$NEXT_PUBLIC_SITE_APEX
             ENVEOF
-            pm2 restart ai-audit --update-env \
-              || PORT=3000 HOSTNAME=127.0.0.1 pm2 start server.js \
-                   --name ai-audit --interpreter "$BUN_BIN"
+            # Recreate under bun so the interpreter is guaranteed (pm2 restart
+            # keeps whatever interpreter the process was first started with).
+            pm2 delete ai-audit 2>/dev/null || true
+            PORT=3000 HOSTNAME=127.0.0.1 pm2 start server.js \
+              --name ai-audit --interpreter "$BUN_BIN" --update-env
             pm2 save
+            # Fail the deploy if it didn't come up under bun.
+            pm2 describe ai-audit | grep -q "$BUN_BIN" \
+              || { echo "ai-audit is NOT running under bun"; pm2 describe ai-audit; exit 1; }

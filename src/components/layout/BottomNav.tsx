@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link, { type LinkProps } from "next/link";
 import { usePathname } from "next/navigation";
 import {
   HomeIcon,
@@ -19,20 +19,33 @@ export function BottomNav() {
   const pathname = usePathname();
 
   const isActive = (href: string, exact = false) =>
-    exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
+    exact
+      ? pathname === href
+      : pathname === href || pathname.startsWith(href + "/");
 
-  const sideTab = (href: string, Icon: IconComponent, label: string, active: boolean) => (
-    <Link
-      href={href}
-      aria-current={active ? "page" : undefined}
-      className={`flex flex-1 flex-col items-center justify-end gap-0.5 py-1 transition-colors ${
-        active ? "text-[#223A70]" : "text-gray-400 hover:text-gray-700"
-      }`}
-    >
-      <Icon size={22} />
-      <span className={`text-[10px] ${active ? "font-semibold" : "font-medium"}`}>{label}</span>
-    </Link>
-  );
+  function sideTab<Href>(
+    href: LinkProps<Href>["href"],
+    Icon: IconComponent,
+    label: string,
+    active: boolean,
+  ) {
+    return (
+      <Link
+        href={href}
+        aria-current={active ? "page" : undefined}
+        className={`flex flex-1 flex-col items-center justify-end gap-0.5 py-1 transition-colors ${
+          active ? "text-[#223A70]" : "text-gray-400 hover:text-gray-700"
+        }`}
+      >
+        <Icon size={22} />
+        <span
+          className={`text-[10px] ${active ? "font-semibold" : "font-medium"}`}
+        >
+          {label}
+        </span>
+      </Link>
+    );
+  }
 
   return (
     <nav
@@ -51,7 +64,9 @@ export function BottomNav() {
           <span className="flex h-12 w-12 -mt-5 items-center justify-center rounded-full bg-[#223A70] text-white shadow-lg ring-4 ring-white transition group-hover:brightness-110">
             <ItineraryMapIcon size={24} />
           </span>
-          <span className="text-[10px] font-bold text-[#223A70]">Itinerary</span>
+          <span className="text-[10px] font-bold text-[#223A70]">
+            Itinerary
+          </span>
         </Link>
 
         {sideTab("/discover", GemIcon, "Discover", isActive("/discover"))}
