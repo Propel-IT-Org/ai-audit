@@ -8,6 +8,12 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # Deploy target. Was secrets.DO_HOST, which still pointed at the
+    # decommissioned droplet 159.223.83.208; that IP was recycled by
+    # DigitalOcean to another tenant. Set here because updating the
+    # secret requires repo admin.
+    env:
+      DO_HOST: 68.183.178.88
     steps:
       - uses: actions/checkout@v4
 
@@ -44,7 +50,7 @@ jobs:
       - name: Copy build to server
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.DO_HOST }}
+          host: ${{ env.DO_HOST }}
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_KEY }}
           source: ".next/standalone/"
@@ -69,7 +75,7 @@ jobs:
           SITE_APEX_HOSTS: ${{ secrets.SITE_APEX_HOSTS }}
           SITE_PUBLIC_APEX: ${{ secrets.SITE_PUBLIC_APEX }}
         with:
-          host: ${{ secrets.DO_HOST }}
+          host: ${{ env.DO_HOST }}
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_KEY }}
           envs: ANTHROPIC_API_KEY,BLOB_READ_WRITE_TOKEN,DATABASE_URL,BETTER_AUTH_SECRET,BETTER_AUTH_URL,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID,NEXT_PUBLIC_APP_URL,SITE_APEX_HOSTS,SITE_PUBLIC_APEX,NEXT_PUBLIC_SITE_APEX
