@@ -1,102 +1,110 @@
 "use client";
 
-import Link from "next/link";
-import { Check } from "lucide-react";
-import { TravelerMapIcon, NorenIcon } from "@/components/icons";
-
-function Point({ text }: { text: string }) {
-  return (
-    <li className="flex items-center gap-2">
-      <Check className="h-4 w-4 flex-none text-kon2" aria-hidden="true" />
-      <span>{text}</span>
-    </li>
-  );
-}
+import { SmeScoreAuditor } from "@/components/probe/SmeScoreAuditor";
+import { CheckCircle2, Bot, Globe2, Sparkles, ShieldCheck, Zap } from "lucide-react";
 
 export default function FrontDoorPage() {
   return (
-    <section className="hero-map relative px-4 py-12 md:py-16">
-      <div className="relative mx-auto w-full max-w-6xl">
-        <div className="grid items-center gap-8 md:grid-cols-2">
-          <div className="text-center md:text-left">
-            <p className="av-eyebrow mb-2">Japan&apos;s AI visibility layer</p>
-            <h1 className="text-3xl font-extrabold leading-tight text-white md:text-5xl">
-              Travelers ask AI. We make sure Japan&apos;s best places get recommended.
-            </h1>
-            <p className="mx-auto mt-3 max-w-xl text-sm text-indigo-100/80 md:mx-0 md:text-base">
-              Plan a Japan trip with verified local gems — or make your business one of the places AI recommends.
+    <div className="bg-gradient-to-b from-gray-50/70 via-white to-gray-50/50">
+      {/* Primary Hero & Interactive Tool */}
+      <section className="pt-6 pb-12">
+        <SmeScoreAuditor />
+      </section>
+
+      {/* Why GEO Matters Section */}
+      <section className="py-16 border-t border-gray-100 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="text-xs font-bold uppercase tracking-wider text-accent-brand">
+              The 2026 Search Shift
+            </span>
+            <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 mt-2">
+              Foreign Travelers No Longer Google. They Ask AI.
+            </h2>
+            <p className="mt-3 text-sm md:text-base text-gray-600">
+              When tourists ask ChatGPT or Perplexity for authentic ryokans or dining in Japan, AI answers with direct recommendations. If your data is unreadable, you are invisible.
             </p>
           </div>
-          <div className="overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/hero-a.webp"
-              alt="Japan AI visibility"
-              width={1672}
-              height={941}
-              className="h-auto w-full"
-            />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="p-6 rounded-2xl bg-gray-50 border border-gray-100 shadow-sm">
+              <div className="w-12 h-12 rounded-xl bg-indigo-50 text-kon2 flex items-center justify-center mb-4">
+                <Bot className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Hallucinations & Stale Data</h3>
+              <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+                Without authoritative structured markup, AI hallucinates your operating hours, confuses your pricing, and claims you don&apos;t accept international travelers.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-gray-50 border border-gray-100 shadow-sm">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
+                <Globe2 className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">English Language Friction</h3>
+              <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+                Foreign travelers search in English. Aivible bridges the translation gap, making Japanese-only menus and policies instantly readable to global AI answer engines.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-gray-50 border border-gray-100 shadow-sm">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+                <Zap className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Zero Commission Bypass</h3>
+              <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+                Direct booking and official contact instructions allow AI to route travelers straight to your reservation channels rather than high-commission third-party OTAs.
+              </p>
+            </div>
           </div>
         </div>
+      </section>
 
-        <div className="mt-10 grid gap-5 text-left md:grid-cols-2">
-          <Link
-            href="/plan"
-            className="group flex flex-col rounded-2xl bg-white p-6 shadow-2xl transition-transform hover:-translate-y-1"
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-light">
-                <TravelerMapIcon size={28} />
-              </span>
-              <div>
-                <div className="av-eyebrow">For travelers</div>
-                <h2 className="text-xl font-extrabold text-gray-900">Plan a trip to Japan</h2>
-              </div>
-            </div>
-            <p className="mt-3 flex-1 text-sm text-gray-500">
-              Search what you want to experience, build an AI-assisted itinerary, and discover verified local gems English-only search hides.
-            </p>
-            <ul className="mt-4 space-y-1.5 text-[13px] text-gray-600">
-              <Point text="AI itinerary planner (chat with Shirube)" />
-              <Point text="Verified hidden gems on a live map" />
-              <Point text="Bilingual JP + EN search" />
-            </ul>
-            <span className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-kon2 px-6 py-3 font-bold text-white transition-colors group-hover:bg-kon">
-              Start planning →
+      {/* How Aivible Works */}
+      <section id="how-it-works" className="py-16 bg-gray-50/60 border-t border-gray-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="text-xs font-bold uppercase tracking-wider text-kon2">
+              Simple 3-Step Process
             </span>
-          </Link>
+            <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 mt-2">
+              From Invisible to AI-Recommended
+            </h2>
+          </div>
 
-          <Link
-            href="/business"
-            className="group flex flex-col rounded-2xl bg-white p-6 shadow-2xl transition-transform hover:-translate-y-1"
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-paper">
-                <NorenIcon size={28} />
-              </span>
-              <div>
-                <div className="av-eyebrow">For businesses</div>
-                <h2 className="text-xl font-extrabold text-gray-900">Make your business AI-visible</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-md">
+              <div className="w-8 h-8 rounded-full bg-kon2 text-white font-bold flex items-center justify-center mb-4 text-sm">
+                1
               </div>
+              <h4 className="font-bold text-gray-900 text-base">Run Free AI Audit</h4>
+              <p className="mt-2 text-xs text-gray-600 leading-relaxed">
+                Scan your entity name across LLMs to reveal current hallucinations and English readiness gaps in 10 seconds.
+              </p>
             </div>
-            <p className="mt-3 flex-1 text-sm text-gray-500">
-              See how ChatGPT, Gemini and Perplexity see your business today — then let AI build you a site their travelers can actually find.
-            </p>
-            <ul className="mt-4 space-y-1.5 text-[13px] text-gray-600">
-              <Point text="Free AI-visibility audit (30 seconds)" />
-              <Point text="AI builds & refines your site" />
-              <Point text="Get recommended in AI itineraries" />
-            </ul>
-            <span className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl border-2 border-kon2 px-6 py-3 font-bold text-kon2 transition-colors group-hover:bg-kon2 group-hover:text-white">
-              Check my business →
-            </span>
-          </Link>
+
+            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-md">
+              <div className="w-8 h-8 rounded-full bg-accent-brand text-white font-bold flex items-center justify-center mb-4 text-sm">
+                2
+              </div>
+              <h4 className="font-bold text-gray-900 text-base">Generate AI Storefront</h4>
+              <p className="mt-2 text-xs text-gray-600 leading-relaxed">
+                Deploy an AI-optimized, bilingual storefront with verified JSON-LD schema to lock in authoritative business facts.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-md">
+              <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center mb-4 text-sm">
+                3
+              </div>
+              <h4 className="font-bold text-gray-900 text-base">Get Recommended</h4>
+              <p className="mt-2 text-xs text-gray-600 leading-relaxed">
+                Watch your AI visibility score rise as ChatGPT, Gemini, and Perplexity start citing your official answers.
+              </p>
+            </div>
+          </div>
         </div>
-
-        <p className="mt-6 text-center text-xs text-indigo-100/70">
-          The two sides connect: travelers&apos; AI itineraries fill with the businesses we make visible.
-        </p>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

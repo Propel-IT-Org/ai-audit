@@ -1,5 +1,5 @@
 import { db } from "./src/lib/db";
-import { migrate } from "drizzle-orm/bun-sql/migrator";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 import drizzleConf from "./drizzle.config";
 
 await migrate(db, {

@@ -21,30 +21,26 @@ export function TopNav() {
           <WaveLogo size={26} />
           <span className="text-xl font-bold text-gray-900">AIVIBLE</span>
         </Link>
-        <nav className="hidden items-center gap-5 text-sm text-gray-500 md:flex">
-          <Link href="/plan" className="transition-colors hover:text-gray-900">
-            Plan
+        <nav className="hidden items-center gap-6 text-sm text-gray-600 md:flex">
+          <Link href="/" className="font-semibold text-gray-900 transition-colors hover:text-accent-brand">
+            AI Scoring Tool
           </Link>
-          <Link href="/explore" className="transition-colors hover:text-gray-900">
-            Explore
-          </Link>
-          <Link href="/discover" className="transition-colors hover:text-gray-900">
-            Discover
-          </Link>
-          <span className="text-gray-200">|</span>
           <Link href="/business" className="transition-colors hover:text-gray-900">
-            For Businesses
+            Why GEO Matters
+          </Link>
+          <Link href="/storefronts" className="transition-colors hover:text-gray-900">
+            Storefronts
           </Link>
           <span className="text-gray-200">|</span>
           {isPending ? null : session ? (
             <div className="flex items-center gap-3">
-              <span className="max-w-48 truncate text-gray-700">
+              <span className="max-w-48 truncate text-gray-700 font-medium">
                 {session.user.name || session.user.email}
               </span>
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="transition-colors hover:text-gray-900"
+                className="text-xs font-semibold text-gray-500 hover:text-gray-900"
               >
                 Sign out
               </button>
