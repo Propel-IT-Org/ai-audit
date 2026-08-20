@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { db } from "../db";
 import { audits, Audit, NewAudit } from "../db/schema/audit";
 import { parseProbeResult } from "./parser";
+import { parseJsonLenient } from "@/lib/sites/json-extract";
 
 function getAnthropicClient(): Anthropic | null {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -164,7 +165,7 @@ Simulate how foreign travelers and AI answer engines interpret this entity. Answ
 
   try {
     const response = await client.messages.create({
-      model: "claude-3-5-haiku-20241022",
+      model: "claude-sonnet-4-6",
       max_tokens: 2000,
       temperature: 0.2,
       messages: [{ role: "user", content: prompt }],
@@ -173,13 +174,7 @@ Simulate how foreign travelers and AI answer engines interpret this entity. Answ
     const contentBlock = response.content[0];
     const textContent = contentBlock.type === "text" ? contentBlock.text : "";
     
-    // Extract JSON block
-    const jsonMatch = textContent.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error("No JSON found in LLM response");
-    }
-
-    const rawJson = JSON.parse(jsonMatch[0]);
+    const rawJson = parseJsonLenient(textContent) as Record<string, unknown>;
     const parsedData = parseProbeResult(rawJson, businessName, location);
 
     const newAuditData: NewAudit = {
